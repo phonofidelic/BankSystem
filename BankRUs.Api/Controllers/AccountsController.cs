@@ -1,6 +1,7 @@
 ﻿using BankRUs.Api.Dtos.Accounts;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.OpenAccount;
+using BankRUs.Application.UseCases.OpenAccount.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,13 +11,16 @@ namespace BankRUs.Api.Controllers;
 [ApiController]
 public class AccountsController : ControllerBase
 {
+    private readonly ILogger<AccountsController> _logger;
     private readonly OpenAccountHandler _openAccountHandler;
     private readonly GetBankAccountsForCustomerHandler _getBankAccountsForCustomerHandler;
 
     public AccountsController(
+        ILogger<AccountsController> logger,
         OpenAccountHandler openAccountHandler,
         GetBankAccountsForCustomerHandler getBankAccountsForCustomerHandler)
     {
+        _logger = logger;
         _openAccountHandler = openAccountHandler;
         _getBankAccountsForCustomerHandler = getBankAccountsForCustomerHandler;
     }
@@ -57,20 +61,34 @@ public class AccountsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateAccountRequestDto request)
     {
-        // Tjocka vs Tunna controllers
+        try
+        {
+            var openAccountResult = await _openAccountHandler.HandleAsync(
+                new OpenAccountCommand(
+                    FirstName: request.FirstName,
+                    LastName: request.LastName,
+                    SocialSecurityNumber: request.SocialSecurityNumber,
+                    Email: request.Email));
 
-        var openAccountResult = await _openAccountHandler.HandleAsync(
-            new OpenAccountCommand(
-                FirstName: request.FirstName,
-                LastName: request.LastName,
-                SocialSecurityNumber: request.SocialSecurityNumber,
-                Email: request.Email));
+            var response = new CreateAccountResponseDto(openAccountResult.UserId);
 
-        var response = new CreateAccountResponseDto(openAccountResult.UserId);
+            // Return 201 Created
+            return Created(string.Empty, response);
+        } catch (Exception ex)
+        {
+            // Log error
+            EventId eventId = new();
+            _logger.LogError(eventId, ex, message: ex.Message);
 
-        // Returnera 201 Created
-        
-        return Created(string.Empty, response);
+            if (ex.GetType() == typeof(DuplicateCustomerException))
+            {
+                // Return 400 Bad Request
+                return BadRequest();
+            }
+
+            return NotFound();
+        }
+
     }
 
     private static bool IsValidLuhn(string digits)

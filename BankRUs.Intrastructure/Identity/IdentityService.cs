@@ -1,5 +1,6 @@
 ﻿
 using BankRUs.Application.Identity;
+using BankRUs.Application.UseCases.OpenAccount.Exceptions;
 using BankRUs.Domain.Entities;
 using BankRUs.Intrastructure.Persistance;
 using Microsoft.AspNetCore.Identity;
@@ -62,6 +63,9 @@ public class IdentityService : IIdentityService
 
         if (!result.Succeeded)
         {
+            var error = result.Errors.FirstOrDefault();
+            if (error != null)
+                throw new DuplicateCustomerException(error.Description, error.Code);
             throw new Exception("Unable to create user");
         }
 
