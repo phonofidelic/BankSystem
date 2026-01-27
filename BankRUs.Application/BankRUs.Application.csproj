@@ -10,4 +10,8 @@
     <ProjectReference Include="..\BankRUs.Domain\BankRUs.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="BankAccounts\" />
+  </ItemGroup>
+
 </Project>

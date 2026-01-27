@@ -19,11 +19,12 @@ public class OpenAccountHandler
             SocialSecurityNumber: command.SocialSecurityNumber,
             Email: command.Email
          ));
-        
+
         // TODO: SocialSecurityNumber + Email ska vara UNIQUE
 
         // TODO: Skapa bankkonto
         // Delegera till infrastructure
+        var createCustomerResult = await _identityService.CreateCustomerAsync(new CreateCustomerRequest(createUserResult.UserId));
         
         // TODO: Skicka välkomstmail till kund
         // Delegera till infrastructure

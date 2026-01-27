@@ -1,5 +1,7 @@
 ﻿
 using BankRUs.Application.Identity;
+using BankRUs.Domain.Entities;
+using BankRUs.Intrastructure.Persistance;
 using Microsoft.AspNetCore.Identity;
 
 namespace BankRUs.Intrastructure.Identity;
@@ -7,10 +9,39 @@ namespace BankRUs.Intrastructure.Identity;
 public class IdentityService : IIdentityService
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ApplicationDbContext _context;
 
-    public IdentityService(UserManager<ApplicationUser> userManager)
+    public IdentityService(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
     {
         _userManager = userManager;
+        _context = context;
+    }
+
+    public async Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request)
+    {
+        try
+        {
+            var newCustomer = new Customer
+            {
+                Id = Guid.NewGuid(),
+                ApplicationUserId = request.ApplicationUserId
+            };
+
+            BankAccount bankAccount = new()
+            {
+                Id = Guid.NewGuid(),
+                CustomerId = newCustomer.Id
+            };
+
+            newCustomer.BankAccounts.Add(bankAccount);
+            await _context.Customers.AddAsync(newCustomer);
+            await _context.SaveChangesAsync();
+
+            return new CreateCustomerResult(newCustomer.Id);
+        }
+        catch (Exception ex) {
+            throw new Exception("Could not create Customer");
+        }
     }
 
     public async Task<CreateUserResult> CreateUserAsync(CreateUserRequest request)

@@ -4,9 +4,9 @@ using System.Text;
 
 namespace BankRUs.Domain.Entities
 {
-    public class Customer
+    public class Customer : BaseEntity
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public required Guid ApplicationUserId { get; init; }
         public ICollection<BankAccount> BankAccounts { get; set; } = [];
     }
