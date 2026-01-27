@@ -1,7 +1,8 @@
 ﻿using BankRUs.Api.Dtos.Accounts;
+using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.OpenAccount;
 using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
+using Microsoft.EntityFrameworkCore;
 
 namespace BankRUs.Api.Controllers;
 
@@ -10,10 +11,46 @@ namespace BankRUs.Api.Controllers;
 public class AccountsController : ControllerBase
 {
     private readonly OpenAccountHandler _openAccountHandler;
+    private readonly GetBankAccountsForCustomerHandler _getBankAccountsForCustomerHandler;
 
-    public AccountsController(OpenAccountHandler openAccountHandler)
+    public AccountsController(
+        OpenAccountHandler openAccountHandler,
+        GetBankAccountsForCustomerHandler getBankAccountsForCustomerHandler)
     {
         _openAccountHandler = openAccountHandler;
+        _getBankAccountsForCustomerHandler = getBankAccountsForCustomerHandler;
+    }
+
+    // GET /api/accounts/{customerId}
+    // ToDo: add guard
+    [HttpGet("{CustomerId}")]
+    public async Task<IActionResult> Get([FromRoute] GetBankAccountsForCustomerRequestDto request)
+    {
+
+        if (!Guid.TryParse(request.CustomerId, out Guid customerId))
+        {
+            return NotFound();
+        }
+        var query = new GetBankAccountsForCustomerQuery(customerId);
+
+
+        var result = await _getBankAccountsForCustomerHandler.HandleAsync(query);
+
+        var response = new GetBankAccountsForCustomerResponseDto(
+                result.bankAccounts.Select(ba =>
+                    new CustomerBankAccountDto(
+                        Id: ba.Id,
+                        CustomerId: ba.CustomerId,
+                        Balance: ba.Balance,
+                        OpenedAt: ba.CreatedAt,
+                        UpdatedAt: ba.UpdatedAt)));
+
+        if (response == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(response);
     }
 
     // POST /api/accounts (Endpoint /  API endpoint)
@@ -32,6 +69,7 @@ public class AccountsController : ControllerBase
         var response = new CreateAccountResponseDto(openAccountResult.UserId);
 
         // Returnera 201 Created
+        
         return Created(string.Empty, response);
     }
 
