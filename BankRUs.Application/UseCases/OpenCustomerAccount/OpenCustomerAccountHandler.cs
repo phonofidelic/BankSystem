@@ -12,23 +12,24 @@ public class OpenCustomerAccountHandler
     public async Task<OpenCustomerAccountResult> HandleAsync(OpenCustomerAccountCommand command)
     {
         // ToDo: Validate business rules for Customer Account Creation
+
         // Create new ApplicationUser
-        var createUserResult = await _identityService.CreateApplicationUserAsync(new CreateApplicationUserRequest(
+        var createApplicationUserResult = await _identityService.CreateApplicationUserAsync(new CreateApplicationUserRequest(
             FirstName: command.FirstName,
             LastName: command.LastName,
             SocialSecurityNumber: command.SocialSecurityNumber,
             Email: command.Email
          ));
 
+        // Create Customer
+        var createCustomerResult = await _identityService.CreateCustomerAsync(new CreateCustomerRequest(createApplicationUserResult.UserId));
 
         // TODO: Skapa bankkonto
-        // Delegera till infrastructure
-        var createCustomerResult = await _identityService.CreateCustomerAsync(new CreateCustomerRequest(createUserResult.UserId));
         
         // TODO: Skicka välkomstmail till kund
         // Delegera till infrastructure
         // _emailSender.Send("Ditt bankkonto är nu redo!");
 
-        return new OpenCustomerAccountResult(UserId: createUserResult.UserId);
+        return new OpenCustomerAccountResult(UserId: createApplicationUserResult.UserId);
     }
 }

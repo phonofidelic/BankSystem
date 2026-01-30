@@ -12,6 +12,14 @@ namespace BankRUs.Infrastructure.Repositories;
 public class BankAccountsRepository(ApplicationDbContext context) : IBankAccountsRepository
 {
     private readonly ApplicationDbContext _context = context;
+
+    public async Task Add(BankAccount bankAccount)
+    {
+        await _context.BankAccounts.AddAsync(bankAccount);
+        await _context.SaveChangesAsync();
+
+    }
+
     public async Task<IQueryable<BankAccount>> GetBankAccountsForCustomerAsync(Guid userId)
     {
         var customer = await _context.Customers.FirstOrDefaultAsync(c => c.ApplicationUserId == userId);

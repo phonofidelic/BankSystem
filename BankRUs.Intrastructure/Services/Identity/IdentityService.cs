@@ -27,6 +27,7 @@ public class IdentityService : IIdentityService
                 ApplicationUserId = request.ApplicationUserId
             };
 
+            // ToDo: Move to OpenBankAccount use case
             BankAccount bankAccount = new()
             {
                 Id = Guid.NewGuid(),
