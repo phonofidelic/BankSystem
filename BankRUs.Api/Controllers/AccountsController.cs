@@ -1,4 +1,5 @@
 ﻿using BankRUs.Api.Dtos.Accounts;
+using BankRUs.Api.Dtos.BankAccounts;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.OpenAccount;
 using BankRUs.Application.UseCases.OpenAccount.Exceptions;
@@ -26,10 +27,11 @@ public class AccountsController : ControllerBase
         _getBankAccountsForCustomerHandler = getBankAccountsForCustomerHandler;
     }
 
+    // ToDo: Move to BankAccountsController
     // GET /api/accounts/{customerId}
     // ToDo: add guard
     [HttpGet("{CustomerId}")]
-    public async Task<IActionResult> Get([FromRoute] GetBankAccountsForCustomerRequestDto request)
+    public async Task<IActionResult> Get([FromRoute] GetBankAccountsRequestDto request)
     {
 
         if (!Guid.TryParse(request.CustomerId, out Guid customerId))
@@ -41,7 +43,7 @@ public class AccountsController : ControllerBase
 
         var result = await _getBankAccountsForCustomerHandler.HandleAsync(query);
 
-        var response = new GetBankAccountsForCustomerResponseDto(
+        var response = new GetBankAccountsResponseDto(
                 result.bankAccounts.Select(ba =>
                     new CustomerBankAccountDto(
                         Id: ba.Id,

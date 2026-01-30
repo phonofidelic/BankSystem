@@ -11,8 +11,7 @@ public class OpenCustomerAccountHandler
 
     public async Task<OpenCustomerAccountResult> HandleAsync(OpenCustomerAccountCommand command)
     {
-        // TODO: Skapa användarkonto (ASP.NET Core Identity)
-        // Delegera till infrastructure
+        // Create Customer Account
         var createUserResult = await _identityService.CreateUserAsync(new CreateUserRequest(
             FirstName: command.FirstName,
             LastName: command.LastName,
