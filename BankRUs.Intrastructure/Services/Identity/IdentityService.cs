@@ -44,7 +44,7 @@ public class IdentityService : IIdentityService
         }
     }
 
-    public async Task<CreateUserResult> CreateUserAsync(CreateUserRequest request)
+    public async Task<CreateApplicationUserResult> CreateApplicationUserAsync(CreateApplicationUserRequest request)
     {
         var user = new ApplicationUser
         {
@@ -70,6 +70,6 @@ public class IdentityService : IIdentityService
 
         await _userManager.AddToRoleAsync(user, Roles.Customer);
 
-        return new CreateUserResult(UserId: Guid.Parse(user.Id));
+        return new CreateApplicationUserResult(UserId: Guid.Parse(user.Id));
     }
 }

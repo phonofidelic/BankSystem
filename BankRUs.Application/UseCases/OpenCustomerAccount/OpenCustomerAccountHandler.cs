@@ -11,15 +11,15 @@ public class OpenCustomerAccountHandler
 
     public async Task<OpenCustomerAccountResult> HandleAsync(OpenCustomerAccountCommand command)
     {
-        // Create Customer Account
-        var createUserResult = await _identityService.CreateUserAsync(new CreateUserRequest(
+        // ToDo: Validate business rules for Customer Account Creation
+        // Create new ApplicationUser
+        var createUserResult = await _identityService.CreateApplicationUserAsync(new CreateApplicationUserRequest(
             FirstName: command.FirstName,
             LastName: command.LastName,
             SocialSecurityNumber: command.SocialSecurityNumber,
             Email: command.Email
          ));
 
-        // TODO: SocialSecurityNumber + Email ska vara UNIQUE
 
         // TODO: Skapa bankkonto
         // Delegera till infrastructure
