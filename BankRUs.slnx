@@ -2,5 +2,5 @@
   <Project Path="BankRUs.Api/BankRUs.Api.csproj" />
   <Project Path="BankRUs.Application/BankRUs.Application.csproj" Id="cef4d8ae-4b7d-4e92-a8e4-0cb365c7d3f2" />
   <Project Path="BankRUs.Domain/BankRUs.Domain.csproj" Id="a49360e8-7c0e-4927-9a53-69f158889059" />
-  <Project Path="BankRUs.Intrastructure/BankRUs.Intrastructure.csproj" Id="b130ab18-2217-4a41-90c9-70d7abf2b1ce" />
+  <Project Path="BankRUs.Intrastructure/BankRUs.Infrastructure.csproj" Id="b130ab18-2217-4a41-90c9-70d7abf2b1ce" />
 </Solution>

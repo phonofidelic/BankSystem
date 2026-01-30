@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Net.Mail;
 using System.Text;
 
-namespace BankRUs.Intrastructure.Services.Email
+namespace BankRUs.Infrastructure.Services.Email
 {
     public class FakeEmailSender : IEmailSender
     {

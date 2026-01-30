@@ -1,10 +1,10 @@
 ﻿using BankRUs.Application.Services.Identity;
 using BankRUs.Application.UseCases.OpenAccount.Exceptions;
 using BankRUs.Domain.Entities;
-using BankRUs.Intrastructure.Persistance;
+using BankRUs.Infrastructure.Persistance;
 using Microsoft.AspNetCore.Identity;
 
-namespace BankRUs.Intrastructure.Services.Identity;
+namespace BankRUs.Infrastructure.Services.Identity;
 
 public class IdentityService : IIdentityService
 {

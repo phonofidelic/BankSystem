@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BankRUs.Intrastructure.Services.Identity;
+namespace BankRUs.Infrastructure.Services.Identity;
 
 public static class IdentitySeeder
 {

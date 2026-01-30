@@ -1,4 +1,4 @@
-﻿namespace BankRUs.Intrastructure.Services.Identity;
+﻿namespace BankRUs.Infrastructure.Services.Identity;
 
 public static class Roles
 {

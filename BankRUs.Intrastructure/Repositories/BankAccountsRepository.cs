@@ -1,13 +1,13 @@
 ﻿using BankRUs.Application.BankAccounts;
 using BankRUs.Domain.Entities;
-using BankRUs.Intrastructure.Persistance;
+using BankRUs.Infrastructure.Persistance;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 
-namespace BankRUs.Intrastructure.Repositories;
+namespace BankRUs.Infrastructure.Repositories;
 
 public class BankAccountsRepository(ApplicationDbContext context) : IBankAccountsRepository
 {
