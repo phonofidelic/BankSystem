@@ -1,5 +1,5 @@
 ﻿using BankRUs.Domain.Entities;
-using BankRUs.Intrastructure.Identity;
+using BankRUs.Intrastructure.Services.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 

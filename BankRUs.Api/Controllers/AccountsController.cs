@@ -2,6 +2,7 @@
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.OpenAccount;
 using BankRUs.Application.UseCases.OpenAccount.Exceptions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -82,7 +83,9 @@ public class AccountsController : ControllerBase
 
             if (ex.GetType() == typeof(DuplicateCustomerException))
             {
+                ModelState.AddModelError("Email", "Invalid Email");
                 // Return 400 Bad Request
+                
                 return BadRequest();
             }
 
@@ -90,22 +93,4 @@ public class AccountsController : ControllerBase
         }
 
     }
-
-    private static bool IsValidLuhn(string digits)
-    {
-        var sum = 0;
-
-        for (int i = 0; i < 9; i++)
-        {
-            var num = digits[i] - '0';
-            num *= (i % 2 == 0) ? 2 : 1;
-            if (num > 9) num -= 9;
-            sum += num;
-        }
-
-        var controlDigit = (10 - (sum % 10)) % 10;
-
-        return controlDigit == digits[9] - '0';
-    }
-
 }

@@ -1,10 +1,10 @@
 using BankRUs.Application.BankAccounts;
-using BankRUs.Application.Identity;
+using BankRUs.Application.Services.Identity;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.OpenAccount;
-using BankRUs.Intrastructure.Identity;
 using BankRUs.Intrastructure.Persistance;
 using BankRUs.Intrastructure.Repositories;
+using BankRUs.Intrastructure.Services.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;

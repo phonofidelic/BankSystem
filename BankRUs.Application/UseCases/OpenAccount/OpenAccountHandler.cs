@@ -1,4 +1,4 @@
-﻿using BankRUs.Application.Identity;
+﻿using BankRUs.Application.Services.Identity;
 
 namespace BankRUs.Application.UseCases.OpenAccount;
 
