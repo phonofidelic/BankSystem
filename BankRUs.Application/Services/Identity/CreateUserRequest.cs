@@ -1,4 +1,4 @@
-﻿namespace BankRUs.Application.Identity;
+﻿namespace BankRUs.Application.Services.Identity;
 
 public sealed record CreateUserRequest(
     string FirstName,

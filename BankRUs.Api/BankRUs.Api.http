@@ -12,3 +12,9 @@ Content-Type: application/json
   "email": "jane@doe.com"
 }
 
+###
+
+GET https://localhost:8000/api/accounts/cf22f367-f849-4077-bb7e-ed5daea7c340
+Content-Type: application/json
+
+{}

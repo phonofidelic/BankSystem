@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace BankRUs.Intrastructure.Identity;
+namespace BankRUs.Intrastructure.Services.Identity;
 
 public class ApplicationUser : IdentityUser
 {

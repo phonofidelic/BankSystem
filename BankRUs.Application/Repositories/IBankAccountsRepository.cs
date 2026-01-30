@@ -1,0 +1,12 @@
+﻿using BankRUs.Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace BankRUs.Application.BankAccounts
+{
+    public interface IBankAccountsRepository
+    {
+        public Task<IQueryable<BankAccount>> GetBankAccountsForCustomerAsync(Guid customerId);
+    }
+}
