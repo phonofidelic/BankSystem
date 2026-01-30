@@ -2,14 +2,14 @@
 
 namespace BankRUs.Application.UseCases.OpenAccount;
 
-public class OpenAccountHandler
+public class OpenCustomerAccountHandler
 {
     private readonly IIdentityService _identityService;
 
-    public OpenAccountHandler(IIdentityService identityService)
+    public OpenCustomerAccountHandler(IIdentityService identityService)
         => _identityService = identityService;
 
-    public async Task<OpenAccountResult> HandleAsync(OpenAccountCommand command)
+    public async Task<OpenCustomerAccountResult> HandleAsync(OpenCustomerAccountCommand command)
     {
         // TODO: Skapa användarkonto (ASP.NET Core Identity)
         // Delegera till infrastructure
@@ -30,6 +30,6 @@ public class OpenAccountHandler
         // Delegera till infrastructure
         // _emailSender.Send("Ditt bankkonto är nu redo!");
 
-        return new OpenAccountResult(UserId: createUserResult.UserId);
+        return new OpenCustomerAccountResult(UserId: createUserResult.UserId);
     }
 }

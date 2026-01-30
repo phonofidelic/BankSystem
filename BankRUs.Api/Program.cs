@@ -33,7 +33,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
-builder.Services.AddScoped<OpenAccountHandler>();
+builder.Services.AddScoped<OpenCustomerAccountHandler>();
 builder.Services.AddScoped<GetBankAccountsForCustomerHandler>();
 builder.Services.AddScoped<IIdentityService, IdentityService>();
 builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();

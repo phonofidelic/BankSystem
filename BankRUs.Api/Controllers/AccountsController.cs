@@ -13,12 +13,12 @@ namespace BankRUs.Api.Controllers;
 public class AccountsController : ControllerBase
 {
     private readonly ILogger<AccountsController> _logger;
-    private readonly OpenAccountHandler _openAccountHandler;
+    private readonly OpenCustomerAccountHandler _openAccountHandler;
     private readonly GetBankAccountsForCustomerHandler _getBankAccountsForCustomerHandler;
 
     public AccountsController(
         ILogger<AccountsController> logger,
-        OpenAccountHandler openAccountHandler,
+        OpenCustomerAccountHandler openAccountHandler,
         GetBankAccountsForCustomerHandler getBankAccountsForCustomerHandler)
     {
         _logger = logger;
@@ -65,7 +65,7 @@ public class AccountsController : ControllerBase
         try
         {
             var openAccountResult = await _openAccountHandler.HandleAsync(
-                new OpenAccountCommand(
+                new OpenCustomerAccountCommand(
                     FirstName: request.FirstName,
                     LastName: request.LastName,
                     SocialSecurityNumber: request.SocialSecurityNumber,
