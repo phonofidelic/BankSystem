@@ -1,6 +1,20 @@
 @BankRUs.Api_HostAddress = https://localhost:8000
 
-GET {{BankRUs.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### Öppna konto
+
+POST https://localhost:8000/api/accounts
+Content-Type: application/json
+
+{
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "socialSecurityNumber": "19900101-2013",
+  "email": "jane@doe.com"
+}
 
 ###
+
+GET https://localhost:8000/api/accounts/cf22f367-f849-4077-bb7e-ed5daea7c340
+Content-Type: application/json
+
+{}
