@@ -6,6 +6,7 @@ namespace BankRUs.Application.UseCases.OpenAccount;
 
 public class OpenCustomerAccountHandler : IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResult>
 {
+    //private readonly ILogger<OpenCustomerAccountHandler> _logger;
     private readonly IIdentityService _identityService;
     private readonly ICustomerService _customerService;
     private readonly IEmailSender _emailSender;
@@ -42,14 +43,20 @@ public class OpenCustomerAccountHandler : IHandler<OpenCustomerAccountCommand, O
             CustomerId: createCustomerResult.CustomerId,
             BankAccountId: Guid.NewGuid()));
 
-        // Send confirmation email to customer
-        var sendEmailRequest = new SendEmailRequest(
-            To: command.Email,
-            From: "your.bank@example.com",
-            Subject: "Välkommen till BankAB!",
-            Body: "Ditt bankkonto är nu redo!");
+        try
+        {
+            // Send confirmation email to customer
+            var sendEmailRequest = new SendEmailRequest(
+                To: command.Email,
+                From: "your.bank@example.com",
+                Subject: "Välkommen till BankAB!",
+                Body: "Ditt bankkonto är nu redo!");
 
-         await _emailSender.SendEmailAsync(sendEmailRequest);
+             await _emailSender.SendEmailAsync(sendEmailRequest);
+        } catch
+        {
+
+        }
 
         return new OpenCustomerAccountResult(UserId: createApplicationUserResult.UserId);
     }

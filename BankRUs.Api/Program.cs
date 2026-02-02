@@ -1,10 +1,12 @@
 using BankRUs.Application.BankAccounts;
+using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.Email;
 using BankRUs.Application.Services.Identity;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.OpenAccount;
 using BankRUs.Infrastructure.Persistance;
 using BankRUs.Infrastructure.Repositories;
+using BankRUs.Infrastructure.Services.CustomerService;
 using BankRUs.Infrastructure.Services.Email;
 using BankRUs.Infrastructure.Services.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -38,6 +40,7 @@ builder.Services.AddControllers()
 builder.Services.AddScoped<OpenCustomerAccountHandler>();
 builder.Services.AddScoped<GetBankAccountsForCustomerHandler>();
 builder.Services.AddScoped<IIdentityService, IdentityService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IEmailSender, FakeEmailSender>();
 builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();
 

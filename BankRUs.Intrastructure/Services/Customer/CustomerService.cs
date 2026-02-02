@@ -15,7 +15,6 @@ namespace BankRUs.Infrastructure.Services.CustomerService
             ApplicationDbContext context)
         {
             _context = context;
-            //var customer = _context.Customers
         }
 
         public async Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request)
@@ -54,7 +53,7 @@ namespace BankRUs.Infrastructure.Services.CustomerService
                     CustomerId = customer.Id
                 };
 
-                customer.BankAccounts.Add(newBankAccount);
+                _context.BankAccounts.Add(newBankAccount);
                 await _context.SaveChangesAsync();
                 return new CreateBankAccountResult(newBankAccount);
             }
