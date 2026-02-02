@@ -1,4 +1,5 @@
-﻿using BankRUs.Application.Services.Identity;
+﻿using BankRUs.Application.Services.CustomerService;
+using BankRUs.Application.Services.Identity;
 using BankRUs.Application.UseCases.OpenAccount.Exceptions;
 using BankRUs.Domain.Entities;
 using BankRUs.Infrastructure.Persistance;
@@ -15,36 +16,6 @@ public class IdentityService : IIdentityService
     {
         _userManager = userManager;
         _context = context;
-    }
-
-    public async Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request)
-    {
-        try
-        {
-            var newCustomer = new Customer
-            {
-                Id = Guid.NewGuid(),
-                ApplicationUserId = request.ApplicationUserId,
-                Email = request.Email,
-                SocialSecurityNumber = request.SocialSecurityNumber
-            };
-
-            // ToDo: Move to OpenBankAccount use case
-            BankAccount bankAccount = new()
-            {
-                Id = Guid.NewGuid(),
-                CustomerId = newCustomer.Id
-            };
-
-            newCustomer.BankAccounts.Add(bankAccount);
-            await _context.Customers.AddAsync(newCustomer);
-            await _context.SaveChangesAsync();
-
-            return new CreateCustomerResult(newCustomer.Id);
-        }
-        catch (Exception ex) {
-            throw new Exception("Could not create Customer");
-        }
     }
 
     public async Task<CreateApplicationUserResult> CreateApplicationUserAsync(CreateApplicationUserRequest request)

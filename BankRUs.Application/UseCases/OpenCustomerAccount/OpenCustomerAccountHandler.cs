@@ -1,18 +1,22 @@
-﻿using BankRUs.Application.Services.Email;
+﻿using BankRUs.Application.Services.CustomerService;
+using BankRUs.Application.Services.Email;
 using BankRUs.Application.Services.Identity;
 
 namespace BankRUs.Application.UseCases.OpenAccount;
 
-public class OpenCustomerAccountHandler
+public class OpenCustomerAccountHandler : IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResult>
 {
     private readonly IIdentityService _identityService;
+    private readonly ICustomerService _customerService;
     private readonly IEmailSender _emailSender;
 
     public OpenCustomerAccountHandler(
         IIdentityService identityService,
+        ICustomerService customerService,
         IEmailSender emailSender)
     { 
-        _identityService = identityService; 
+        _identityService = identityService;
+        _customerService = customerService;
         _emailSender = emailSender;
     }
 
@@ -27,19 +31,22 @@ public class OpenCustomerAccountHandler
             Email: command.Email
          ));
 
-        // Create Customer
-        var createCustomerResult = await _identityService.CreateCustomerAsync(new CreateCustomerRequest(
+        // Create new Customer
+        var createCustomerResult = await _customerService.CreateCustomerAsync(new CreateCustomerRequest(
             ApplicationUserId: createApplicationUserResult.UserId,
             SocialSecurityNumber: command.SocialSecurityNumber,
             Email: command.Email));
 
-        // TODO: Move bank account creation here from IdentityService?
+        // Create default bank account for new Customer
+        var createdDefaultBankAccountResult = await _customerService.CreateBankAccountAsync(new CreateBankAccountRequest(
+            CustomerId: createCustomerResult.CustomerId,
+            BankAccountId: Guid.NewGuid()));
 
         // Send confirmation email to customer
         var sendEmailRequest = new SendEmailRequest(
             To: command.Email,
             From: "your.bank@example.com",
-            Subject: "Ditt bankkonto är nu redo!",
+            Subject: "Välkommen till BankAB!",
             Body: "Ditt bankkonto är nu redo!");
 
          await _emailSender.SendEmailAsync(sendEmailRequest);
