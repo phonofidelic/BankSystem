@@ -2,6 +2,6 @@
 
 public interface IIdentityService
 {
-    Task<CreateUserResult> CreateUserAsync(CreateUserRequest request);
+    Task<CreateApplicationUserResult> CreateApplicationUserAsync(CreateApplicationUserRequest request);
     Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request);
 }

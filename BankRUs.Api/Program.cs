@@ -2,9 +2,9 @@ using BankRUs.Application.BankAccounts;
 using BankRUs.Application.Services.Identity;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.OpenAccount;
-using BankRUs.Intrastructure.Persistance;
-using BankRUs.Intrastructure.Repositories;
-using BankRUs.Intrastructure.Services.Identity;
+using BankRUs.Infrastructure.Persistance;
+using BankRUs.Infrastructure.Repositories;
+using BankRUs.Infrastructure.Services.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -33,7 +33,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
-builder.Services.AddScoped<OpenAccountHandler>();
+builder.Services.AddScoped<OpenCustomerAccountHandler>();
 builder.Services.AddScoped<GetBankAccountsForCustomerHandler>();
 builder.Services.AddScoped<IIdentityService, IdentityService>();
 builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();

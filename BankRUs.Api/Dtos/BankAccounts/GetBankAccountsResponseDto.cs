@@ -1,8 +1,8 @@
 ﻿using BankRUs.Domain.Entities;
 
-namespace BankRUs.Api.Dtos.Accounts;
+namespace BankRUs.Api.Dtos.BankAccounts;
 
-public record GetBankAccountsForCustomerResponseDto(IEnumerable<CustomerBankAccountDto> Accounts);
+public record GetBankAccountsResponseDto(IEnumerable<CustomerBankAccountDto> Accounts);
 
 public record CustomerBankAccountDto(
     Guid Id,

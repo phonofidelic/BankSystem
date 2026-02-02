@@ -1,4 +1,5 @@
 ﻿using BankRUs.Api.Dtos.Accounts;
+using BankRUs.Api.Dtos.BankAccounts;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.OpenAccount;
 using BankRUs.Application.UseCases.OpenAccount.Exceptions;
@@ -13,12 +14,12 @@ namespace BankRUs.Api.Controllers;
 public class AccountsController : ControllerBase
 {
     private readonly ILogger<AccountsController> _logger;
-    private readonly OpenAccountHandler _openAccountHandler;
+    private readonly OpenCustomerAccountHandler _openAccountHandler;
     private readonly GetBankAccountsForCustomerHandler _getBankAccountsForCustomerHandler;
 
     public AccountsController(
         ILogger<AccountsController> logger,
-        OpenAccountHandler openAccountHandler,
+        OpenCustomerAccountHandler openAccountHandler,
         GetBankAccountsForCustomerHandler getBankAccountsForCustomerHandler)
     {
         _logger = logger;
@@ -26,10 +27,11 @@ public class AccountsController : ControllerBase
         _getBankAccountsForCustomerHandler = getBankAccountsForCustomerHandler;
     }
 
+    // ToDo: Move to BankAccountsController
     // GET /api/accounts/{customerId}
     // ToDo: add guard
     [HttpGet("{CustomerId}")]
-    public async Task<IActionResult> Get([FromRoute] GetBankAccountsForCustomerRequestDto request)
+    public async Task<IActionResult> Get([FromRoute] GetBankAccountsRequestDto request)
     {
 
         if (!Guid.TryParse(request.CustomerId, out Guid customerId))
@@ -38,24 +40,34 @@ public class AccountsController : ControllerBase
         }
         var query = new GetBankAccountsForCustomerQuery(customerId);
 
-
-        var result = await _getBankAccountsForCustomerHandler.HandleAsync(query);
-
-        var response = new GetBankAccountsForCustomerResponseDto(
-                result.bankAccounts.Select(ba =>
-                    new CustomerBankAccountDto(
-                        Id: ba.Id,
-                        CustomerId: ba.CustomerId,
-                        Balance: ba.Balance,
-                        OpenedAt: ba.CreatedAt,
-                        UpdatedAt: ba.UpdatedAt)));
-
-        if (response == null)
+        try
         {
+            var result = await _getBankAccountsForCustomerHandler.HandleAsync(query);
+        
+
+            var response = new GetBankAccountsResponseDto(
+                    result.bankAccounts.Select(ba =>
+                        new CustomerBankAccountDto(
+                            Id: ba.Id,
+                            CustomerId: ba.CustomerId,
+                            Balance: ba.Balance,
+                            OpenedAt: ba.CreatedAt,
+                            UpdatedAt: ba.UpdatedAt)));
+
+            if (response == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(response);
+        } catch (Exception ex)
+        {
+            // Log error
+            EventId eventId = new();
+            _logger.LogError(eventId, ex, message: ex.Message);
+
             return NotFound();
         }
-
-        return Ok(response);
     }
 
     // POST /api/accounts (Endpoint /  API endpoint)
@@ -65,7 +77,7 @@ public class AccountsController : ControllerBase
         try
         {
             var openAccountResult = await _openAccountHandler.HandleAsync(
-                new OpenAccountCommand(
+                new OpenCustomerAccountCommand(
                     FirstName: request.FirstName,
                     LastName: request.LastName,
                     SocialSecurityNumber: request.SocialSecurityNumber,

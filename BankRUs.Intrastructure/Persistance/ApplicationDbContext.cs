@@ -1,9 +1,9 @@
 ﻿using BankRUs.Domain.Entities;
-using BankRUs.Intrastructure.Services.Identity;
+using BankRUs.Infrastructure.Services.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace BankRUs.Intrastructure.Persistance;
+namespace BankRUs.Infrastructure.Persistance;
 
 public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
 {
@@ -19,8 +19,12 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
             .HasMany(c => c.BankAccounts)
             .WithOne(b => b.Customer);
 
+        builder.Entity<Customer>()
+            .HasIndex(c => c.SocialSecurityNumber)
+            .IsUnique();
+
         builder.Entity<BankAccount>()
-            .Property(b => b.Balance).HasPrecision(19, 4);
+            .Property(b => b.Balance).HasPrecision(19, 2);
     }
 
     public override int SaveChanges()

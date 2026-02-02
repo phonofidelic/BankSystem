@@ -1,10 +1,10 @@
 ﻿using BankRUs.Application.Services.Identity;
 using BankRUs.Application.UseCases.OpenAccount.Exceptions;
 using BankRUs.Domain.Entities;
-using BankRUs.Intrastructure.Persistance;
+using BankRUs.Infrastructure.Persistance;
 using Microsoft.AspNetCore.Identity;
 
-namespace BankRUs.Intrastructure.Services.Identity;
+namespace BankRUs.Infrastructure.Services.Identity;
 
 public class IdentityService : IIdentityService
 {
@@ -24,9 +24,12 @@ public class IdentityService : IIdentityService
             var newCustomer = new Customer
             {
                 Id = Guid.NewGuid(),
-                ApplicationUserId = request.ApplicationUserId
+                ApplicationUserId = request.ApplicationUserId,
+                Email = request.Email,
+                SocialSecurityNumber = request.SocialSecurityNumber
             };
 
+            // ToDo: Move to OpenBankAccount use case
             BankAccount bankAccount = new()
             {
                 Id = Guid.NewGuid(),
@@ -44,14 +47,13 @@ public class IdentityService : IIdentityService
         }
     }
 
-    public async Task<CreateUserResult> CreateUserAsync(CreateUserRequest request)
+    public async Task<CreateApplicationUserResult> CreateApplicationUserAsync(CreateApplicationUserRequest request)
     {
         var user = new ApplicationUser
         {
             UserName = request.Email.Trim(),
             FirstName = request.FirstName.Trim(),
             LastName = request.LastName.Trim(),
-            SocialSecurityNumber = request.SocialSecurityNumber.Trim(),
             Email = request.Email.Trim()
         };
 
@@ -70,6 +72,6 @@ public class IdentityService : IIdentityService
 
         await _userManager.AddToRoleAsync(user, Roles.Customer);
 
-        return new CreateUserResult(UserId: Guid.Parse(user.Id));
+        return new CreateApplicationUserResult(UserId: Guid.Parse(user.Id));
     }
 }

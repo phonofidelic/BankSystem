@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace BankRUs.Intrastructure.Migrations
+namespace BankRUs.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class Create_Database : Migration

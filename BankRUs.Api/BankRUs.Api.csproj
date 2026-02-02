@@ -24,7 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BankRUs.Application\BankRUs.Application.csproj" />
     <ProjectReference Include="..\BankRUs.Domain\BankRUs.Domain.csproj" />
-    <ProjectReference Include="..\BankRUs.Intrastructure\BankRUs.Intrastructure.csproj" />
+    <ProjectReference Include="..\BankRUs.Intrastructure\BankRUs.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
