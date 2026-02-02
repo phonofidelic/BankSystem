@@ -1,13 +1,20 @@
-﻿using BankRUs.Application.Services.Identity;
+﻿using BankRUs.Application.Services.Email;
+using BankRUs.Application.Services.Identity;
 
 namespace BankRUs.Application.UseCases.OpenAccount;
 
 public class OpenCustomerAccountHandler
 {
     private readonly IIdentityService _identityService;
+    private readonly IEmailSender _emailSender;
 
-    public OpenCustomerAccountHandler(IIdentityService identityService)
-        => _identityService = identityService;
+    public OpenCustomerAccountHandler(
+        IIdentityService identityService,
+        IEmailSender emailSender)
+    { 
+        _identityService = identityService; 
+        _emailSender = emailSender;
+    }
 
     public async Task<OpenCustomerAccountResult> HandleAsync(OpenCustomerAccountCommand command)
     {
@@ -27,10 +34,16 @@ public class OpenCustomerAccountHandler
             Email: command.Email));
 
         // TODO: Skapa bankkonto
-        
+
         // TODO: Skicka välkomstmail till kund
         // Delegera till infrastructure
-        // _emailSender.Send("Ditt bankkonto är nu redo!");
+        var sendEmailRequest = new SendEmailRequest(
+            To: command.Email,
+            From: "your.bank@example.com",
+            Subject: "Ditt bankkonto är nu redo!",
+            Body: "Ditt bankkonto är nu redo!");
+
+         await _emailSender.SendEmailAsync(sendEmailRequest);
 
         return new OpenCustomerAccountResult(UserId: createApplicationUserResult.UserId);
     }

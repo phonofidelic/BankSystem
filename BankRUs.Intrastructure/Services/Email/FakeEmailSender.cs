@@ -8,12 +8,16 @@ namespace BankRUs.Infrastructure.Services.Email
 {
     public class FakeEmailSender : IEmailSender
     {
-        public async Task SendEmailAsync(string to, string from, string subject, string body)
+        public async Task SendEmailAsync(SendEmailRequest request)
         {
             var smtpClient = new SmtpClient("localhost", 25);
 
             await smtpClient.SendMailAsync(
-                new MailMessage(from, to, subject, body));
+                new MailMessage(
+                    from: request.From, 
+                    to: request.To, 
+                    subject: request.Subject, 
+                    body: request.Body));
         }
     }
 }
