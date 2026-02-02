@@ -1,3 +1,4 @@
+using BankRUs.Application;
 using BankRUs.Application.BankAccounts;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.Email;
@@ -11,6 +12,7 @@ using BankRUs.Infrastructure.Services.Email;
 using BankRUs.Infrastructure.Services.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +32,24 @@ var builder = WebApplication.CreateBuilder(args);
 // Registrera ApplicationDbContext i DI-containern
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
   options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
+builder.Services.AddOptions<CultureInfoConfig>()
+    .BindConfiguration(nameof(CultureInfoConfig))
+    .ValidateDataAnnotations()
+    .ValidateOnStart()
+    .PostConfigure(options =>
+    {
+        // Set system culture from config
+        CultureInfo systemCulture = new(options.SystemCulture);
+        CultureInfo.DefaultThreadCurrentCulture = systemCulture;
+        CultureInfo.DefaultThreadCurrentUICulture = systemCulture;
+    });
+
+builder.Services.AddOptions<CurrencyConfig>()
+    .BindConfiguration(nameof(CurrencyConfig))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 using System.Text;
 
 namespace BankRUs.Domain.ValueObjects
 {
+    [NotMapped]
     public class Currency : ValueObject
     {
         public required string EnglishName { get; set; }
@@ -21,6 +24,12 @@ namespace BankRUs.Domain.ValueObjects
 
         public override string ToString() {
             return ISOSymbol;
+        }
+
+        public static Currency Parse(string value, Dictionary<string, Currency> supportedCurrencyDictionary)
+        {
+            var currency = supportedCurrencyDictionary[value] ?? throw new Exception("Unsupported currency");
+            return currency;
         }
     }
 }

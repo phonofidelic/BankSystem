@@ -1,4 +1,6 @@
-﻿using BankRUs.Domain.Entities;
+﻿using BankRUs.Application;
+using BankRUs.Domain.Entities;
+using BankRUs.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -9,6 +11,12 @@ namespace BankRUs.Infrastructure.Persistence.Configurations
 {
     internal class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
     {
+        private readonly CurrencyConfig _currencyConfiguration;
+        public TransactionConfiguration(CurrencyConfig currencyConfiguration) {
+            _currencyConfiguration = currencyConfiguration;
+        }
+        public TransactionConfiguration() { }
+
         public void Configure(EntityTypeBuilder<Transaction> builder)
         {
             builder.ToTable("Transactions", t => t.IsTemporal(t => {
@@ -30,6 +38,20 @@ namespace BankRUs.Infrastructure.Persistence.Configurations
                 .HasConversion(
                     v => v.ToString().ToLower(),
                     v => Enum.Parse<TransactionType>(v, ignoreCase: true));
+
+            builder
+                .Property(t => t.Currency)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => Currency.Parse(v, _currencyConfiguration.SupportedCurrencies));
+
+            //builder
+            //    .OwnsOne(t => t.Currency, t =>
+            //    {
+            //        t.Property(c => c.ISOSymbol).HasColumnName(nameof(Currency));
+            //    });
+
+            //builder.Ignore(t => t.Currency);
         }
     }
 }

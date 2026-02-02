@@ -1,6 +1,7 @@
 ﻿using BankRUs.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace BankRUs.Domain.Entities;
@@ -18,6 +19,7 @@ public class Transaction(TransactionType type) : BaseCreatableEntity<Guid>
     public int Amount { get; set; }
 
     // Stored as Currency ISOSymbol
+    [NotMapped]
     public required Currency Currency { get; set; }
 
     public string Reference { get; set; } = string.Empty;
