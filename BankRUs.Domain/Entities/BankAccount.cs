@@ -11,7 +11,6 @@ namespace BankRUs.Domain.Entities
         public Guid CustomerId { get; set; }
         public Customer Customer { get; set; } = default!;
         public decimal Balance { get; set; }
-        // ToDo:
-        // Transactions
+        public ICollection<Transaction> Transactions { get; set; } = [];
     }
 }

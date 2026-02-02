@@ -9,8 +9,10 @@ public class Transaction(TransactionType type) : BaseCreatableEntity<Guid>
     public override Guid Id { get; set; } = Guid.NewGuid();
 
     public required Guid  CustomerId { get; set; }
+    public Customer Customer { get; set; } = default!;
 
     public required Guid BankAccountId { get; set; }
+    public BankAccount BankAccount { get; set; } = default!;
 
     public int Amount { get; set; }
 

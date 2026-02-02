@@ -2,6 +2,7 @@
 using BankRUs.Infrastructure.Services.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace BankRUs.Infrastructure.Persistance;
 
@@ -10,21 +11,13 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
 
     public DbSet<Customer> Customers { get; set; } = default!;
     public DbSet<BankAccount> BankAccounts { get; set; } = default!;
+    public DbSet<Transaction> Transactions { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
 
-        builder.Entity<Customer>()
-            .HasMany(c => c.BankAccounts)
-            .WithOne(b => b.Customer);
-
-        builder.Entity<Customer>()
-            .HasIndex(c => c.SocialSecurityNumber)
-            .IsUnique();
-
-        builder.Entity<BankAccount>()
-            .Property(b => b.Balance).HasPrecision(19, 2);
+        builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 
     public override int SaveChanges()
