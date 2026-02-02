@@ -18,5 +18,6 @@ namespace BankRUs.Domain.Entities
         public required string SocialSecurityNumber { get; set; }
 
         public ICollection<BankAccount> BankAccounts { get; set; } = [];
+        public ICollection<Transaction> Transactions { get; set; } = [];
     }
 }

@@ -16,6 +16,11 @@ namespace BankRUs.Infrastructure.Persistence.Configurations
                 .WithOne(b => b.Customer);
 
             builder
+                .HasMany(c => c.Transactions)
+                .WithOne(t => t.Customer)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder
                 .HasIndex(c => c.SocialSecurityNumber)
                 .IsUnique();
         }

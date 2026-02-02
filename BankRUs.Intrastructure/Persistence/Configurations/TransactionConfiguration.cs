@@ -11,6 +11,16 @@ namespace BankRUs.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Transaction> builder)
         {
+            builder.ToTable("Transactions", t => t.IsTemporal(t => {
+                t.HasPeriodStart("PeriodStart");
+                t.HasPeriodEnd("PeriodEnd");
+                t.UseHistoryTable("TransactionHistory");
+            }));
+
+            builder
+                .HasOne(t => t.Customer)
+                .WithMany(c => c.Transactions);
+
             builder
                 .Property(t => t.Amount)
                 .HasPrecision(19, 2);
