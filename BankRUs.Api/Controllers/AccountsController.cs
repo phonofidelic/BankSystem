@@ -40,24 +40,34 @@ public class AccountsController : ControllerBase
         }
         var query = new GetBankAccountsForCustomerQuery(customerId);
 
-
-        var result = await _getBankAccountsForCustomerHandler.HandleAsync(query);
-
-        var response = new GetBankAccountsResponseDto(
-                result.bankAccounts.Select(ba =>
-                    new CustomerBankAccountDto(
-                        Id: ba.Id,
-                        CustomerId: ba.CustomerId,
-                        Balance: ba.Balance,
-                        OpenedAt: ba.CreatedAt,
-                        UpdatedAt: ba.UpdatedAt)));
-
-        if (response == null)
+        try
         {
+            var result = await _getBankAccountsForCustomerHandler.HandleAsync(query);
+        
+
+            var response = new GetBankAccountsResponseDto(
+                    result.bankAccounts.Select(ba =>
+                        new CustomerBankAccountDto(
+                            Id: ba.Id,
+                            CustomerId: ba.CustomerId,
+                            Balance: ba.Balance,
+                            OpenedAt: ba.CreatedAt,
+                            UpdatedAt: ba.UpdatedAt)));
+
+            if (response == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(response);
+        } catch (Exception ex)
+        {
+            // Log error
+            EventId eventId = new();
+            _logger.LogError(eventId, ex, message: ex.Message);
+
             return NotFound();
         }
-
-        return Ok(response);
     }
 
     // POST /api/accounts (Endpoint /  API endpoint)

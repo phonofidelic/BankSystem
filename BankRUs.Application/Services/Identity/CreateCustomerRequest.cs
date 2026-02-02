@@ -6,5 +6,7 @@ namespace BankRUs.Application.Services.Identity;
 
 public sealed record CreateCustomerRequest
 (
-    Guid ApplicationUserId
+    Guid ApplicationUserId,
+    string SocialSecurityNumber,
+    string Email
 );

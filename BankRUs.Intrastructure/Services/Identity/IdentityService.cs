@@ -24,7 +24,9 @@ public class IdentityService : IIdentityService
             var newCustomer = new Customer
             {
                 Id = Guid.NewGuid(),
-                ApplicationUserId = request.ApplicationUserId
+                ApplicationUserId = request.ApplicationUserId,
+                Email = request.Email,
+                SocialSecurityNumber = request.SocialSecurityNumber
             };
 
             // ToDo: Move to OpenBankAccount use case
@@ -52,7 +54,6 @@ public class IdentityService : IIdentityService
             UserName = request.Email.Trim(),
             FirstName = request.FirstName.Trim(),
             LastName = request.LastName.Trim(),
-            SocialSecurityNumber = request.SocialSecurityNumber.Trim(),
             Email = request.Email.Trim()
         };
 

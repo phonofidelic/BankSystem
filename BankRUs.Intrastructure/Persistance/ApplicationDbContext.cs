@@ -19,8 +19,12 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
             .HasMany(c => c.BankAccounts)
             .WithOne(b => b.Customer);
 
+        builder.Entity<Customer>()
+            .HasIndex(c => c.SocialSecurityNumber)
+            .IsUnique();
+
         builder.Entity<BankAccount>()
-            .Property(b => b.Balance).HasPrecision(19, 4);
+            .Property(b => b.Balance).HasPrecision(19, 2);
     }
 
     public override int SaveChanges()

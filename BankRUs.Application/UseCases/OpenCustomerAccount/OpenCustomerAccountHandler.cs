@@ -17,12 +17,14 @@ public class OpenCustomerAccountHandler
         var createApplicationUserResult = await _identityService.CreateApplicationUserAsync(new CreateApplicationUserRequest(
             FirstName: command.FirstName,
             LastName: command.LastName,
-            SocialSecurityNumber: command.SocialSecurityNumber,
             Email: command.Email
          ));
 
         // Create Customer
-        var createCustomerResult = await _identityService.CreateCustomerAsync(new CreateCustomerRequest(createApplicationUserResult.UserId));
+        var createCustomerResult = await _identityService.CreateCustomerAsync(new CreateCustomerRequest(
+            ApplicationUserId: createApplicationUserResult.UserId,
+            SocialSecurityNumber: command.SocialSecurityNumber,
+            Email: command.Email));
 
         // TODO: Skapa bankkonto
         
