@@ -22,7 +22,7 @@ public class OpenBankAccountHandler : IHandler<OpenBankAccountCommand, OpenBankA
         // Create new bank account for existing Customer
         var createdNewBankAccountResult = await _customerService.CreateBankAccountAsync(new CreateBankAccountRequest(
             CustomerId: command.CustomerId,
-            BankAccountId: Guid.NewGuid()));
+            BankAccountName: command.BankAccountName));
        
 
         // Send confirmation email to customer

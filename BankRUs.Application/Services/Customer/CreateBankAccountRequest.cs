@@ -6,5 +6,5 @@ namespace BankRUs.Application.Services.CustomerService
 {
     public record CreateBankAccountRequest(
         Guid CustomerId,
-        Guid BankAccountId);
+        string BankAccountName);
 }

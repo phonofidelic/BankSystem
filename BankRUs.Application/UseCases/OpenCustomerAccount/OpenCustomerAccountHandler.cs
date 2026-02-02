@@ -42,7 +42,7 @@ public class OpenCustomerAccountHandler : IHandler<OpenCustomerAccountCommand, O
         // Create default bank account for new Customer
         var createdDefaultBankAccountResult = await _customerService.CreateBankAccountAsync(new CreateBankAccountRequest(
             CustomerId: createCustomerResult.CustomerId,
-            BankAccountId: Guid.NewGuid()));
+            BankAccountName: "Default Checking Account"));
 
         try
         {

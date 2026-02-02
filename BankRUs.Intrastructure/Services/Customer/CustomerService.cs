@@ -49,7 +49,7 @@ namespace BankRUs.Infrastructure.Services.CustomerService
                 
                 BankAccount newBankAccount = new()
                 {
-                    Id = Guid.NewGuid(),
+                    Name = request.BankAccountName,
                     CustomerId = customer.Id
                 };
 

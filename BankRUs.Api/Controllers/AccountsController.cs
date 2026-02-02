@@ -50,6 +50,7 @@ public class AccountsController : ControllerBase
                         new CustomerBankAccountDto(
                             Id: ba.Id,
                             CustomerId: ba.CustomerId,
+                            AccountName: ba.Name,
                             Balance: ba.Balance,
                             OpenedAt: ba.CreatedAt,
                             UpdatedAt: ba.UpdatedAt)));

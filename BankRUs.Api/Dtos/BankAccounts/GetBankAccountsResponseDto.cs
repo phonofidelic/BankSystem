@@ -7,6 +7,7 @@ public record GetBankAccountsResponseDto(IEnumerable<CustomerBankAccountDto> Acc
 public record CustomerBankAccountDto(
     Guid Id,
     Guid CustomerId,
+    string AccountName,
     decimal Balance,
     DateTime OpenedAt,
     DateTime UpdatedAt);
