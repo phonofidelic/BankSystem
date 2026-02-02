@@ -4,8 +4,8 @@ using System.Text;
 
 namespace BankRUs.Domain.Entities
 {
-    public abstract class BaseEntity<TId>
+    internal class Deposit : Transaction
     {
-        public virtual TId Id { get; set; } = default!;
+        public Deposit() : base(TransactionType.Deposit) { }
     }
 }

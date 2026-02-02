@@ -5,9 +5,9 @@ using System.Text;
 
 namespace BankRUs.Domain.Entities
 {
-    public class Customer
+    public class Customer : BaseUpdatableEntity<Guid>
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public override Guid Id { get; set; } = Guid.NewGuid();
 
         public required Guid ApplicationUserId { get; init; }
 
@@ -18,5 +18,6 @@ namespace BankRUs.Domain.Entities
         public required string SocialSecurityNumber { get; set; }
 
         public ICollection<BankAccount> BankAccounts { get; set; } = [];
+        public ICollection<Transaction> Transactions { get; set; } = [];
     }
 }
