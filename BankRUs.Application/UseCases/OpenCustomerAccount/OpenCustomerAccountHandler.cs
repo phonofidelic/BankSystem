@@ -6,7 +6,8 @@ namespace BankRUs.Application.UseCases.OpenAccount;
 
 public class OpenCustomerAccountHandler : IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResult>
 {
-    //private readonly ILogger<OpenCustomerAccountHandler> _logger;
+    // ToDo: Add ILoggerService?
+    //private readonly ILoggerService<OpenCustomerAccountHandler> _logger;
     private readonly IIdentityService _identityService;
     private readonly ICustomerService _customerService;
     private readonly IEmailSender _emailSender;
@@ -55,7 +56,7 @@ public class OpenCustomerAccountHandler : IHandler<OpenCustomerAccountCommand, O
              await _emailSender.SendEmailAsync(sendEmailRequest);
         } catch
         {
-
+            // ToDo: Log email sender error
         }
 
         return new OpenCustomerAccountResult(UserId: createApplicationUserResult.UserId);
