@@ -8,9 +8,10 @@ using System.Text;
 namespace BankRUs.Application.UseCases.MakeDepositToBankAccount
 {
     public record MakeDepositToBankAccountResult(
-        Guid TransactionId,
-        Guid CustomerId,
-        TransactionType Type,
-        decimal Ammount,
-        Currency Currency);
+        Deposit transaction);
+        //Guid TransactionId,
+        //Guid CustomerId,
+        //TransactionType Type,
+        //decimal Ammount,
+        //Currency Currency);
 }
