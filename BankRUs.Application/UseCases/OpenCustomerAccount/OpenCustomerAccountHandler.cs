@@ -33,10 +33,9 @@ public class OpenCustomerAccountHandler
             SocialSecurityNumber: command.SocialSecurityNumber,
             Email: command.Email));
 
-        // TODO: Skapa bankkonto
+        // TODO: Move bank account creation here from IdentityService?
 
-        // TODO: Skicka välkomstmail till kund
-        // Delegera till infrastructure
+        // Send confirmation email to customer
         var sendEmailRequest = new SendEmailRequest(
             To: command.Email,
             From: "your.bank@example.com",
