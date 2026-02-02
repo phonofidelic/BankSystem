@@ -4,9 +4,8 @@ using System.Text;
 
 namespace BankRUs.Domain.Entities
 {
-    public abstract class BaseEntity
+    public abstract class BaseEntity<TId>
     {
-        public virtual DateTime CreatedAt { get; set; }
-        public virtual DateTime UpdatedAt { get; set; }
+        public virtual TId Id { get; set; } = default!;
     }
 }

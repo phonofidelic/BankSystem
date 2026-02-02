@@ -4,9 +4,9 @@ using System.Text;
 
 namespace BankRUs.Domain.Entities
 {
-    public class BankAccount : BaseEntity
+    public class BankAccount : BaseUpdatableEntity<Guid>
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public override Guid Id { get; set; } = Guid.NewGuid();
         public string Name { get; set; } = "Checking account";
         public Guid CustomerId { get; set; }
         public Customer Customer { get; set; } = default!;

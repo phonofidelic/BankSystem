@@ -41,18 +41,28 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
 
     private void AddTimestamps()
     {
+        var now = DateTime.UtcNow; // current datetime
+
         var entities = ChangeTracker.Entries()
-            .Where(x => x.Entity is BaseEntity && (x.State == EntityState.Added || x.State == EntityState.Modified));
+            .Where(x => x.Entity is BaseCreatableEntity<Guid> && (x.State == EntityState.Added || x.State == EntityState.Modified));
 
-        foreach (var entity in entities)
+        var creatableEntries = ChangeTracker.Entries()
+            .Where(e => (e.Entity is BaseCreatableEntity<Guid>
+                || e.Entity is BaseCreatableEntity<int>)
+                && e.State == EntityState.Added);
+
+        foreach (var entry in creatableEntries) {
+            ((BaseCreatableEntity<int>)entry.Entity).CreatedAt = now;
+        }
+
+        var updatableEntries = ChangeTracker.Entries()
+            .Where(e => (e.Entity is BaseUpdatableEntity<Guid>
+                || e.Entity is BaseUpdatableEntity<int>)
+                && e.State == EntityState.Modified);
+
+        foreach (var entry in updatableEntries)
         {
-            var now = DateTime.UtcNow; // current datetime
-
-            if (entity.State == EntityState.Added)
-            {
-                ((BaseEntity)entity.Entity).CreatedAt = now;
-            }
-            ((BaseEntity)entity.Entity).UpdatedAt = now;
+            ((BaseUpdatableEntity<int>)entry.Entity).UpdatedAt = now;
         }
     }
 }
