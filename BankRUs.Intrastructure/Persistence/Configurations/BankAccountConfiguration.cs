@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BankRUs.Infrastructure.Persistance.Configurations
+namespace BankRUs.Infrastructure.Persistence.Configurations
 {
     internal class BankAccountConfiguration : IEntityTypeConfiguration<BankAccount>
     {

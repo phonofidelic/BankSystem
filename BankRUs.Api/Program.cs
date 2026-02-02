@@ -4,7 +4,7 @@ using BankRUs.Application.Services.Email;
 using BankRUs.Application.Services.Identity;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.OpenAccount;
-using BankRUs.Infrastructure.Persistance;
+using BankRUs.Infrastructure.Persistence;
 using BankRUs.Infrastructure.Repositories;
 using BankRUs.Infrastructure.Services.CustomerService;
 using BankRUs.Infrastructure.Services.Email;

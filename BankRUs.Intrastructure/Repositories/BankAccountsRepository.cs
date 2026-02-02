@@ -1,6 +1,6 @@
 ﻿using BankRUs.Application.BankAccounts;
 using BankRUs.Domain.Entities;
-using BankRUs.Infrastructure.Persistance;
+using BankRUs.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

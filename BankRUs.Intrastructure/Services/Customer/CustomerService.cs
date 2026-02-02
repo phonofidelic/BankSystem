@@ -1,6 +1,6 @@
 ﻿using BankRUs.Application.Services.CustomerService;
 using BankRUs.Domain.Entities;
-using BankRUs.Infrastructure.Persistance;
+using BankRUs.Infrastructure.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Text;
