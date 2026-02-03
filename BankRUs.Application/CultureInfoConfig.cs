@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace BankRUs.Application
+namespace BankRUs.Application;
+
+public class CultureInfoConfig
 {
-    public class CultureInfoConfig
-    {
-        [Required]
-        public readonly string SystemCulture = string.Empty;
-    }
+
+}
+public partial class ApiConfig
+{
+    [Required]
+    public string SystemCulture { get; set; } = string.Empty;
 }

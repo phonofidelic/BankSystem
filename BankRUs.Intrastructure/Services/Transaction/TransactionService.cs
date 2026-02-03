@@ -3,13 +3,14 @@ using BankRUs.Application.Services.TransactionService;
 using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Persistence;
+using Microsoft.Extensions.Options;
 
 namespace BankRUs.Infrastructure.Services.TransactionService
 {
-    public class TransactionService(ApplicationDbContext context, CurrencyConfig currencyConfig) : ITransactionService
+    public class TransactionService(ApplicationDbContext context, IOptions<CurrencyConfig> currencyConfig) : ITransactionService
     {
         private readonly ApplicationDbContext _context = context;
-        private readonly CurrencyConfig _currencyConfig = currencyConfig;
+        private readonly CurrencyConfig _currencyConfig = currencyConfig.Value;
         public async Task<CreateTransactionResult> CreateTransactionAsync(CreateTransactionRequest request)
         {
             Transaction transaction = new(TransactionType.Deposit) { 

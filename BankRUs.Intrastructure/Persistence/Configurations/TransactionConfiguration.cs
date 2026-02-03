@@ -3,6 +3,7 @@ using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,9 +12,9 @@ namespace BankRUs.Infrastructure.Persistence.Configurations
 {
     internal class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
     {
-        private readonly CurrencyConfig _currencyConfiguration;
-        public TransactionConfiguration(CurrencyConfig currencyConfiguration) {
-            _currencyConfiguration = currencyConfiguration;
+        private readonly AppSettings _appSettings;
+        public TransactionConfiguration(IOptions<AppSettings> appSettings) {
+            _appSettings = appSettings.Value;
         }
         public TransactionConfiguration() { }
 
@@ -43,7 +44,7 @@ namespace BankRUs.Infrastructure.Persistence.Configurations
                 .Property(t => t.Currency)
                 .HasConversion(
                     v => v.ToString(),
-                    v => Currency.Parse(v, _currencyConfiguration.SupportedCurrencies));
+                    v => _appSettings.SupportedCurrencies[v]);
 
             //builder
             //    .OwnsOne(t => t.Currency, t =>

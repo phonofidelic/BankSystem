@@ -1,3 +1,4 @@
+using BankRUs.Api;
 using BankRUs.Application;
 using BankRUs.Application.BankAccounts;
 using BankRUs.Application.Services.CustomerService;
@@ -36,8 +37,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
   options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
-builder.Services.AddOptions<CultureInfoConfig>()
-    .BindConfiguration(nameof(CultureInfoConfig))
+builder.Services.AddOptions<AppSettings>()
+    .BindConfiguration(nameof(AppSettings))
     .ValidateDataAnnotations()
     .ValidateOnStart()
     .PostConfigure(options =>
@@ -47,12 +48,6 @@ builder.Services.AddOptions<CultureInfoConfig>()
         CultureInfo.DefaultThreadCurrentCulture = systemCulture;
         CultureInfo.DefaultThreadCurrentUICulture = systemCulture;
     });
-
-builder.Services.AddOptions<CurrencyConfig>()
-    .BindConfiguration(nameof(CurrencyConfig))
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

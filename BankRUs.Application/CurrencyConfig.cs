@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace BankRUs.Application
+namespace BankRUs.Application;
+
+public class CurrencyConfig
 {
-    public sealed record CurrencyConfig
-    {
-        [Required]
-        public Dictionary<string, Currency> SupportedCurrencies = default!;
-    }
+    [Required]
+    public Dictionary<string, Currency> SupportedCurrencies { get; set; } = default!;
+}
+public partial class ApiConfig : CurrencyConfig
+{
 }
