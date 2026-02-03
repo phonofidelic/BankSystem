@@ -1,4 +1,5 @@
-﻿using BankRUs.Domain.Entities;
+﻿using BankRUs.Application.Services.AuditLog;
+using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 
 namespace BankRUs.Api.Dtos.BankAccounts;
@@ -11,4 +12,5 @@ public record PostDepositResponseDto(
     string Currency,
     string Reference,
     DateTime CreatedAt,
-    decimal BalanceAfter);
+    decimal BalanceAfter,
+    IEnumerable<AuditLog> AuditLog);

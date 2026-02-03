@@ -1,5 +1,6 @@
 ﻿using BankRUs.Api.Dtos.BankAccounts;
 using BankRUs.Application;
+using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount;
 using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
@@ -10,9 +11,11 @@ namespace BankRUs.Api.Controllers;
 [Route("api/bank-accounts")]
 [ApiController]
 public class BankAccountsController(
-    IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult> makeDepositToBankAccountHandler) : ControllerBase
+    IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult> makeDepositToBankAccountHandler,
+    IAuditLogger auditLogger) : ControllerBase
 {
     private readonly IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult> _makeDepositToBankAccountHandler = makeDepositToBankAccountHandler;
+    private readonly IAuditLogger _auditLogger = auditLogger;
 
     // GET /api/bank-accounts
 
@@ -46,7 +49,8 @@ public class BankAccountsController(
                 Currency: result.Currency,
                 Reference: result.Reference ?? "",
                 CreatedAt: result.CreatedAt,
-                BalanceAfter: 100));
+                BalanceAfter: 100,
+                AuditLog: _auditLogger.GetAuditLogs()));
         }
         catch (Exception ex) { 
             return BadRequest(ex.Message);

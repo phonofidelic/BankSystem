@@ -1,8 +1,13 @@
-﻿using BankRUs.Application.Services.TransactionService;
+﻿using BankRUs.Application.GuardClause;
+using BankRUs.Application.Services.AuditLog;
+using BankRUs.Application.Services.TransactionService;
+using BankRUs.Application.UseCases.MakeDepositToBankAccount.Guards;
 
 namespace BankRUs.Application.UseCases.MakeDepositToBankAccount;
 
-public class MakeDepositToBankAccountHandler(ITransactionService transactionService) : IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>
+public class MakeDepositToBankAccountHandler(
+    ITransactionService transactionService,
+    IAuditLogger auditLogger) : IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>
 {
     private readonly ITransactionService _transactionService = transactionService;
 
@@ -17,13 +22,18 @@ public class MakeDepositToBankAccountHandler(ITransactionService transactionServ
         // 2) The Customer has a Bank Account
 
         // 3) The Deposit Amount is a positive decimal
+        decimal sanitizedAmount = command.Amount;
+        sanitizedAmount = Guard.Ensure.RoundToNearestHundredth(sanitizedAmount, auditLogger);
+        sanitizedAmount = Guard.Against.NegativeAmount(sanitizedAmount);
+        sanitizedAmount = Guard.Against.ZeroAmount(sanitizedAmount);
+
 
         // 4) The Deposit Reference message has no more than 140 characters
 
         var createTransactionResult = await _transactionService.CreateTransactionAsync(new CreateTransactionRequest(
             CustomerId: command.CustomerId,
             BankAccountId: command.BankAccountId,
-            Amount: command.Amount,
+            Amount: sanitizedAmount,
             Currency: command.Currency,
             Reference: command.Reference));
 

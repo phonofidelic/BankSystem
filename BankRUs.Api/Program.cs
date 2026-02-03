@@ -1,6 +1,7 @@
 using BankRUs.Api;
 using BankRUs.Application;
 using BankRUs.Application.BankAccounts;
+using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.Email;
 using BankRUs.Application.Services.Identity;
@@ -10,6 +11,7 @@ using BankRUs.Application.UseCases.MakeDepositToBankAccount;
 using BankRUs.Application.UseCases.OpenAccount;
 using BankRUs.Infrastructure.Persistence;
 using BankRUs.Infrastructure.Repositories;
+using BankRUs.Infrastructure.Services.AuditLogService;
 using BankRUs.Infrastructure.Services.CustomerService;
 using BankRUs.Infrastructure.Services.Email;
 using BankRUs.Infrastructure.Services.Identity;
@@ -57,6 +59,7 @@ builder.Services.AddControllers()
 
 builder.Services.AddScoped<OpenCustomerAccountHandler>();
 builder.Services.AddScoped<GetBankAccountsForCustomerHandler>();
+builder.Services.AddScoped<IAuditLogger, AuditLogger>();
 builder.Services.AddScoped<IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, MakeDepositToBankAccountHandler>();
 builder.Services.AddScoped<IIdentityService, IdentityService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
