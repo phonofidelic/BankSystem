@@ -41,7 +41,7 @@ public class BankAccountsController(
             return Created(string.Empty, new PostDepositResponseDto(
                 TransactionId: result.TransactionId,
                 CustomerId: result.CustomerId,
-                Type: result.Type,
+                Type: result.Type.ToString().ToLower(),
                 Amount: result.Amount,
                 Currency: result.Currency,
                 Reference: result.Reference ?? "",
