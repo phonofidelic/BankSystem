@@ -4,7 +4,7 @@ using System.Text;
 
 namespace BankRUs.Application.UseCases.MakeDepositToBankAccount
 {
-    public record MakeDepositeToBankAccountCommand(
+    public record MakeDepositToBankAccountCommand(
         Guid CustomerId,
         Guid BankAccountId,
         decimal Amount,

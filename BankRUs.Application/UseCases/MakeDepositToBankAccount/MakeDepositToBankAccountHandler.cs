@@ -2,11 +2,11 @@
 
 namespace BankRUs.Application.UseCases.MakeDepositToBankAccount;
 
-public class MakeDepositToBankAccountHandler(ITransactionService transactionService) : IHandler<MakeDepositeToBankAccountCommand, MakeDepositToBankAccountResult>
+public class MakeDepositToBankAccountHandler(ITransactionService transactionService) : IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>
 {
     private readonly ITransactionService _transactionService = transactionService;
 
-    public async Task<MakeDepositToBankAccountResult> HandleAsync(MakeDepositeToBankAccountCommand command)
+    public async Task<MakeDepositToBankAccountResult> HandleAsync(MakeDepositToBankAccountCommand command)
     {
         // ToDo: Validate business rules for making a Bank Deposit Transaction
 
@@ -34,6 +34,8 @@ public class MakeDepositToBankAccountHandler(ITransactionService transactionServ
                 CustomerId: createTransactionResult.Transaction.CustomerId,
                 Type: createTransactionResult.Transaction.Type,
                 Amount: createTransactionResult.Transaction.Amount,
-                Currency: createTransactionResult.Transaction.Currency.ToString());
+                Currency: createTransactionResult.Transaction.Currency.ToString(),
+                Reference: createTransactionResult.Transaction.Reference,
+                CreatedAt: createTransactionResult.Transaction.CreatedAt);
     }
 }

@@ -39,26 +39,34 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     {
         var now = DateTime.UtcNow; // current datetime
 
-        var entities = ChangeTracker.Entries()
-            .Where(x => x.Entity is BaseCreatableEntity<Guid> && (x.State == EntityState.Added || x.State == EntityState.Modified));
+        //var entities = ChangeTracker.Entries()
+        //    .Where(x => x.Entity is BaseCreatableEntity<Guid> && (x.State == EntityState.Added || x.State == EntityState.Modified));
 
         var creatableEntries = ChangeTracker.Entries()
-            .Where(e => (e.Entity is BaseCreatableEntity<Guid>
-                || e.Entity is BaseCreatableEntity<int>)
+            .Where(e => (e.Entity is BaseCreatableEntity<int> || e.Entity is BaseCreatableEntity<Guid>)
                 && e.State == EntityState.Added);
 
         foreach (var entry in creatableEntries) {
-            ((BaseCreatableEntity<int>)entry.Entity).CreatedAt = now;
+           
+
+            if (entry.Entity is BaseCreatableEntity<int>)
+                ((BaseCreatableEntity<int>)entry.Entity).CreatedAt = now;
+
+            if (entry.Entity is BaseCreatableEntity<Guid>)
+                ((BaseCreatableEntity<Guid>)entry.Entity).CreatedAt = now;
         }
 
         var updatableEntries = ChangeTracker.Entries()
-            .Where(e => (e.Entity is BaseUpdatableEntity<Guid>
-                || e.Entity is BaseUpdatableEntity<int>)
+            .Where(e => (e.Entity is BaseUpdatableEntity<int> || e.Entity is BaseUpdatableEntity<Guid>)
                 && e.State == EntityState.Modified);
 
         foreach (var entry in updatableEntries)
         {
-            ((BaseUpdatableEntity<int>)entry.Entity).UpdatedAt = now;
+            if (entry.Entity is BaseCreatableEntity<int>)
+                ((BaseUpdatableEntity<int>)entry.Entity).UpdatedAt = now;
+
+            if (entry.Entity is BaseCreatableEntity<Guid>)
+                ((BaseUpdatableEntity<Guid>)entry.Entity).UpdatedAt = now;
         }
     }
 }
