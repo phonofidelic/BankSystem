@@ -16,15 +16,15 @@ public class Transaction(TransactionType type) : BaseCreatableEntity<Guid>
     public required Guid BankAccountId { get; set; }
     public BankAccount BankAccount { get; set; } = default!;
 
-    public int Amount { get; set; }
+    public decimal Amount { get; set; }
 
     // Stored as Currency ISOSymbol
     [NotMapped]
     public required Currency Currency { get; set; }
 
-    public string Reference { get; set; } = string.Empty;
+    public string? Reference { get; set; } = string.Empty;
 
-    public required TransactionType Type { get; init; } = type;
+    public TransactionType Type { get; init; } = type;
 }
 
 public enum TransactionType

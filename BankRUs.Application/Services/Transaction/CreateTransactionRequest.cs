@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BankRUs.Application.UseCases.MakeDepositToBankAccount
+namespace BankRUs.Application.Services.TransactionService
 {
-    public record MakeDepositeToBankAccountCommand(
+    public record CreateTransactionRequest(
         Guid CustomerId,
         Guid BankAccountId,
         decimal Amount,
