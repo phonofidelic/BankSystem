@@ -17,7 +17,7 @@ namespace BankRUs.Infrastructure.Services.TransactionService
             Transaction transaction = new(TransactionType.Deposit) { 
                 CustomerId = request.CustomerId,
                 BankAccountId = request.BankAccountId,
-                Amount = request.Amount,
+                Amount = decimal.Round(request.Amount, 2),
                 Currency = Currency.Parse(request.Currency, _appSettings.SupportedCurrencies),
                 Reference = request.Reference
             };
