@@ -2,6 +2,7 @@
 using BankRUs.Application;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount;
+using BankRUs.Application.UseCases.MakeDepositToBankAccount.Exceptions;
 using BankRUs.Infrastructure.Services.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,9 +14,11 @@ namespace BankRUs.Api.Controllers;
 [ApiController]
 public class BankAccountsController(
     IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult> makeDepositToBankAccountHandler,
+    ILogger<BankAccountsController> logger,
     IAuditLogger auditLogger) : ControllerBase
 {
     private readonly IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult> _makeDepositToBankAccountHandler = makeDepositToBankAccountHandler;
+    private readonly ILogger<BankAccountsController> _logger = logger;
     private readonly IAuditLogger _auditLogger = auditLogger;
 
     // GET /api/bank-accounts
@@ -53,8 +56,17 @@ public class BankAccountsController(
                 BalanceAfter: 100,
                 AuditLog: _auditLogger.GetAuditLogs()));
         }
-        catch (Exception ex) { 
-            return BadRequest(ex.Message);
+        catch (Exception ex) {
+            EventId eventId = new();
+            _logger.LogError(eventId, ex, message: ex.Message);
+
+            if (ex.GetType() == typeof(TransactionReferenceException))
+            {
+                ModelState.AddModelError("Reference", ex.Message);
+                return BadRequest(ModelState);
+            }
+
+            return BadRequest();
         }
     }
 }
