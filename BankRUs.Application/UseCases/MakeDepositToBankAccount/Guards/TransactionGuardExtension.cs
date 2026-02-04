@@ -1,13 +1,15 @@
 ﻿using BankRUs.Application.GuardClause;
 using BankRUs.Application.Services.AuditLog;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using BankRUs.Application.UseCases.MakeDepositToBankAccount.Exceptions;
 
 namespace BankRUs.Application.UseCases.MakeDepositToBankAccount.Guards
 {
     public static class TransactionGuardExtension
     {
+        public static string MaxReferenceLength(this IGuardClause guardClause, string? input)
+        {
+            return MaxLength(guardClause, input, 140);
+        }
         public static decimal NegativeAmount(this IGuardClause guardClause, decimal input)
         {
             return Negative(guardClause, input, 0);
@@ -52,6 +54,18 @@ namespace BankRUs.Application.UseCases.MakeDepositToBankAccount.Guards
             if (comparer.Compare(input, compareTo) == 0)
             {
                 throw new ArgumentException("Transaction amount must be greater than zero");
+            }
+
+            return input;
+        }
+
+        private static string MaxLength(this IGuardClause _, string? input, int maxLength)
+        {
+            if (input == null) return string.Empty;
+
+            if (input.Length > maxLength)
+            {
+                throw new TransactionReferenceException(string.Format("Reference message exceeds maximum length of {0} characters", maxLength));
             }
 
             return input;

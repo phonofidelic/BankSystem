@@ -29,13 +29,15 @@ public class MakeDepositToBankAccountHandler(
 
 
         // 4) The Deposit Reference message has no more than 140 characters
+        string? sanitizedReference = command.Reference;
+        sanitizedReference = Guard.Against.MaxReferenceLength(sanitizedReference);
 
         var createTransactionResult = await _transactionService.CreateTransactionAsync(new CreateTransactionRequest(
             CustomerId: command.CustomerId,
             BankAccountId: command.BankAccountId,
             Amount: sanitizedAmount,
             Currency: command.Currency,
-            Reference: command.Reference));
+            Reference: sanitizedReference));
 
         return createTransactionResult == null
             ? throw new Exception("Deposit transaction could not be made")
