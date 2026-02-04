@@ -1,6 +1,7 @@
 using BankRUs.Application;
 using BankRUs.Application.BankAccounts;
 using BankRUs.Application.Services.AuditLog;
+using BankRUs.Application.Services.Authentication;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.Email;
 using BankRUs.Application.Services.Identity;
@@ -11,13 +12,19 @@ using BankRUs.Application.UseCases.OpenAccount;
 using BankRUs.Infrastructure.Persistence;
 using BankRUs.Infrastructure.Repositories;
 using BankRUs.Infrastructure.Services.AuditLogService;
+using BankRUs.Infrastructure.Services.Authentication;
 using BankRUs.Infrastructure.Services.CustomerService;
 using BankRUs.Infrastructure.Services.Email;
 using BankRUs.Infrastructure.Services.Identity;
 using BankRUs.Infrastructure.Services.TransactionService;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +32,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Registrera ApplicationDbContext i DI-containern
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
   options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
+builder.Services
+  .AddIdentity<ApplicationUser, IdentityRole>()
+  .AddEntityFrameworkStores<ApplicationDbContext>()
+  .AddDefaultTokenProviders();
 
 builder.Services.AddOptions<AppSettings>()
     .BindConfiguration(nameof(AppSettings))
@@ -38,29 +50,11 @@ builder.Services.AddOptions<AppSettings>()
         CultureInfo.DefaultThreadCurrentUICulture = systemCulture;
     });
 
-builder.Services
-  .AddIdentity<ApplicationUser, IdentityRole>()
-  .AddEntityFrameworkStores<ApplicationDbContext>()
-  .AddDefaultTokenProviders();
-
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-    });
-
-// 3 typer av livslängder på objekt
-// - singleton = ett och samma objekt delas mellan alla andra under hela applikations livslängd
-// - scoped = varje HTTP-reqeust får sin egen isntans som sen delas av alla objekt inom denna request
-// - transitent = varje objekt får alltid sin egna instans av typen
-
 // Scoped services
-// Samma instans av CustomerService ska vara tillgänglig
-// för samtliga klasser inom ett anrop.
-// Varje request får sin egna instans av CustomerService.
-builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IAuditLogger, AuditLogger>();
 builder.Services.AddScoped<IIdentityService, IdentityService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IEmailSender, FakeEmailSender>();
 builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();
@@ -69,6 +63,49 @@ builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();
 builder.Services.AddScoped<OpenCustomerAccountHandler>();
 builder.Services.AddScoped<GetBankAccountsForCustomerHandler>();
 builder.Services.AddScoped<IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, MakeDepositToBankAccountHandler>();
+
+// Jwt config
+builder.Services.AddOptions<JwtOptions>()
+    .BindConfiguration(nameof(JwtOptions))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    var jwt = builder.Configuration
+        .GetSection(nameof(JwtOptions))
+        .Get<JwtOptions>()!;
+
+    options.RequireHttpsMetadata = builder.Environment.IsProduction();
+    options.SaveToken = true;
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = jwt.Issuer,
+        ValidateAudience = true,
+        ValidAudience = jwt.Audience,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(jwt.Secret)),
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.FromSeconds(30),
+        NameClaimType = JwtRegisteredClaimNames.Name,
+        RoleClaimType = ClaimTypes.Role
+    };
+});
+
+builder.Services.AddAuthorization();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
 
 var app = builder.Build();
 
