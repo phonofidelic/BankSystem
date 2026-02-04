@@ -2,6 +2,7 @@ using BankRUs.Application;
 using BankRUs.Application.BankAccounts;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.Authentication;
+using BankRUs.Application.Services.Authentication.AuthenticateUser;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.Email;
 using BankRUs.Application.Services.Identity;
@@ -13,6 +14,7 @@ using BankRUs.Infrastructure.Persistence;
 using BankRUs.Infrastructure.Repositories;
 using BankRUs.Infrastructure.Services.AuditLogService;
 using BankRUs.Infrastructure.Services.Authentication;
+using BankRUs.Infrastructure.Services.Authenticationl;
 using BankRUs.Infrastructure.Services.CustomerService;
 using BankRUs.Infrastructure.Services.Email;
 using BankRUs.Infrastructure.Services.Identity;
@@ -53,6 +55,7 @@ builder.Services.AddOptions<AppSettings>()
 // Scoped services
 builder.Services.AddScoped<IAuditLogger, AuditLogger>();
 builder.Services.AddScoped<IIdentityService, IdentityService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
@@ -61,6 +64,7 @@ builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();
 
 // Scoped Command/Query handlers
 builder.Services.AddScoped<OpenCustomerAccountHandler>();
+builder.Services.AddScoped<AuthenticateUserHandler>();
 builder.Services.AddScoped<GetBankAccountsForCustomerHandler>();
 builder.Services.AddScoped<IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, MakeDepositToBankAccountHandler>();
 

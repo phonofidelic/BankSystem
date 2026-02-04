@@ -2,13 +2,14 @@
 using BankRUs.Application;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount;
-using BankRUs.Domain.Entities;
-using BankRUs.Domain.ValueObjects;
+using BankRUs.Infrastructure.Services.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankRUs.Api.Controllers;
 
 [Route("api/bank-accounts")]
+[Authorize(Roles = Roles.Customer)]
 [ApiController]
 public class BankAccountsController(
     IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult> makeDepositToBankAccountHandler,
