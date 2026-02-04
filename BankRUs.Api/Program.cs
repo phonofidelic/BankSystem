@@ -1,4 +1,3 @@
-using BankRUs.Api;
 using BankRUs.Application;
 using BankRUs.Application.BankAccounts;
 using BankRUs.Application.Services.AuditLog;
@@ -23,18 +22,6 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//// Samma instans av CustomerService ska vara tillgänglig
-//// för samtliga klasser inom ett anrop.
-//// Varje request får sin egna instans av CustomerService
-//builder.Services.AddScoped<CustomerService>();
-
-// Det finns enbart en instans av CustomerService som delas
-// av alla komponenter i applikationen, över applikations livstid.
-
-//// Varje enskild komponent som begär en CustomerService får sin egna
-//// instans av denna.
-//builder.Services.AddTransient<CustomerService>();
-
 // Registrera ApplicationDbContext i DI-containern
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
   options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
@@ -51,31 +38,37 @@ builder.Services.AddOptions<AppSettings>()
         CultureInfo.DefaultThreadCurrentUICulture = systemCulture;
     });
 
+builder.Services
+  .AddIdentity<ApplicationUser, IdentityRole>()
+  .AddEntityFrameworkStores<ApplicationDbContext>()
+  .AddDefaultTokenProviders();
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
-builder.Services.AddScoped<OpenCustomerAccountHandler>();
-builder.Services.AddScoped<GetBankAccountsForCustomerHandler>();
-builder.Services.AddScoped<IAuditLogger, AuditLogger>();
-builder.Services.AddScoped<IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, MakeDepositToBankAccountHandler>();
-builder.Services.AddScoped<IIdentityService, IdentityService>();
-builder.Services.AddScoped<ICustomerService, CustomerService>();
-builder.Services.AddScoped<ITransactionService, TransactionService>();
-builder.Services.AddScoped<IEmailSender, FakeEmailSender>();
-builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();
-
 // 3 typer av livslängder på objekt
 // - singleton = ett och samma objekt delas mellan alla andra under hela applikations livslängd
 // - scoped = varje HTTP-reqeust får sin egen isntans som sen delas av alla objekt inom denna request
 // - transitent = varje objekt får alltid sin egna instans av typen
 
-builder.Services
-  .AddIdentity<ApplicationUser, IdentityRole>()
-  .AddEntityFrameworkStores<ApplicationDbContext>()
-  .AddDefaultTokenProviders();
+// Scoped services
+// Samma instans av CustomerService ska vara tillgänglig
+// för samtliga klasser inom ett anrop.
+// Varje request får sin egna instans av CustomerService.
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IAuditLogger, AuditLogger>();
+builder.Services.AddScoped<IIdentityService, IdentityService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<IEmailSender, FakeEmailSender>();
+builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();
+
+// Scoped Command/Query handlers
+builder.Services.AddScoped<OpenCustomerAccountHandler>();
+builder.Services.AddScoped<GetBankAccountsForCustomerHandler>();
+builder.Services.AddScoped<IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, MakeDepositToBankAccountHandler>();
 
 var app = builder.Build();
 
