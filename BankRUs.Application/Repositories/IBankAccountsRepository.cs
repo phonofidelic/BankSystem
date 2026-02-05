@@ -12,7 +12,7 @@ namespace BankRUs.Application.BankAccounts
 
         public Task<Guid> GetCustomerIdForBankAccountAsync(Guid bankAccountId);
 
-        public Task PostTransactionAsync(Transaction transaction);
+        public Task UpdateBankAccountBalanceWithTransactionAsync(Transaction transaction);
 
         public Task<decimal> GetBankAccountBalance(Guid bankAccountId);
 

@@ -44,7 +44,7 @@ public class MakeDepositToBankAccountHandler(
             Reference: sanitizedReference));
 
         // Post the transaction to update the bank account balance
-        await _bankAccountRepository.PostTransactionAsync(createTransactionResult.Transaction);
+        await _bankAccountRepository.UpdateBankAccountBalanceWithTransactionAsync(createTransactionResult.Transaction);
 
         // Retrieve the new balance
         var balanceAfter = await _bankAccountRepository.GetBankAccountBalance(command.BankAccountId);

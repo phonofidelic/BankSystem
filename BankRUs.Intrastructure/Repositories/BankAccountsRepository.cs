@@ -45,7 +45,7 @@ public class BankAccountsRepository(ApplicationDbContext context) : IBankAccount
         return bankAccount.Balance;
     }
 
-    public async Task PostTransactionAsync(Transaction transaction)
+    public async Task UpdateBankAccountBalanceWithTransactionAsync(Transaction transaction)
     {
         var bankAccount = await _context.BankAccounts.FindAsync(transaction.BankAccountId) 
             ?? throw new BankAccountNotFoundException();
