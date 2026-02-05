@@ -1,8 +1,8 @@
 ﻿using BankRUs.Api.Dtos.Accounts;
 using BankRUs.Api.Dtos.BankAccounts;
+using BankRUs.Application.Exceptions;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.OpenAccount;
-using BankRUs.Application.UseCases.OpenAccount.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

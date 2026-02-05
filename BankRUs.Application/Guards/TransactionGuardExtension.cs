@@ -1,8 +1,8 @@
-﻿using BankRUs.Application.GuardClause;
+﻿using BankRUs.Application.Exceptions;
+using BankRUs.Application.GuardClause;
 using BankRUs.Application.Services.AuditLog;
-using BankRUs.Application.UseCases.MakeDepositToBankAccount.Exceptions;
 
-namespace BankRUs.Application.UseCases.MakeDepositToBankAccount.Guards
+namespace BankRUs.Application.Guards
 {
     public static class TransactionGuardExtension
     {

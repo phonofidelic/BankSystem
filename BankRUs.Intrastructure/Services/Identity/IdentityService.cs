@@ -1,7 +1,5 @@
-﻿using BankRUs.Application.Services.CustomerService;
-using BankRUs.Application.Services.Identity;
-using BankRUs.Application.UseCases.OpenAccount.Exceptions;
-using BankRUs.Domain.Entities;
+﻿using BankRUs.Application.Services.Identity;
+using BankRUs.Application.Exceptions;
 using BankRUs.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 

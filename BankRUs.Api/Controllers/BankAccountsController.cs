@@ -1,12 +1,11 @@
 ﻿using BankRUs.Api.Dtos.BankAccounts;
 using BankRUs.Application;
+using BankRUs.Application.Exceptions;
 using BankRUs.Application.Repositories.Exceptions;
 using BankRUs.Application.Services.AuditLog;
-using BankRUs.Application.Services.Customer.Exceptions;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.CustomerService.GetCustomer;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount;
-using BankRUs.Application.UseCases.MakeDepositToBankAccount.Exceptions;
 using BankRUs.Infrastructure.Services.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
