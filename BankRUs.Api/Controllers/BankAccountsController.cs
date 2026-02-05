@@ -1,5 +1,6 @@
 ﻿using BankRUs.Api.Dtos.BankAccounts;
 using BankRUs.Application;
+using BankRUs.Application.Repositories.Exceptions;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.Customer.Exceptions;
 using BankRUs.Application.Services.CustomerService;
@@ -58,7 +59,6 @@ public class BankAccountsController(
             var getCustomerIdResult = await _customerService.GetCustomerIdAsync(new GetCustomerIdRequest(userGuid));
             
             MakeDepositToBankAccountResult result = await _makeDepositToBankAccountHandler.HandleAsync(new MakeDepositToBankAccountCommand(
-                //CustomerId: Guid.Parse("65840c74-674f-43e7-b3a8-8d0634cb6b4a"),
                 CustomerId: getCustomerIdResult.CustomerId,
                 BankAccountId: bankAccountId,
                 Amount: request.Amount,
@@ -80,10 +80,16 @@ public class BankAccountsController(
             EventId eventId = new();
             _logger.LogError(eventId, ex, message: ex.Message);
 
+            if (ex is BankAccountNotFoundException)
+            {
+                ModelState.AddModelError("Customer", ex.Message);
+                return NotFound(ex.Message); 
+            }
+
             if (ex is CustomerNotFoundException)
             {
                 ModelState.AddModelError("Customer", ex.Message);
-                return NotFound(ModelState);
+                return NotFound(ex.Message);
             }
 
             if (ex is BankAccountTransactionException)

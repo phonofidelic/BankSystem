@@ -1,5 +1,6 @@
 ﻿using BankRUs.Application.BankAccounts;
 using BankRUs.Application.GuardClause;
+using BankRUs.Application.Repositories.Exceptions;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.TransactionService;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount.Guards;
@@ -17,8 +18,11 @@ public class MakeDepositToBankAccountHandler(
     public async Task<MakeDepositToBankAccountResult> HandleAsync(MakeDepositToBankAccountCommand command)
     {
         // A Bank Deposit can be made if...
+        // 1) The Bank Account exists
+        bool bankAccountexists = _bankAccountRepository.BankAccountExists(command.BankAccountId);
+        if (!bankAccountexists) throw new BankAccountNotFoundException();
 
-        // 1) The Customer owns the Bank Account
+        // 2) The Customer owns the Bank Account
         var bankAccountOwnerId = await _bankAccountRepository.GetCustomerIdForBankAccountAsync(command.BankAccountId);
         Guard.Against.BankAccountNotOwned(bankAccountOwnerId, command.CustomerId);
 
