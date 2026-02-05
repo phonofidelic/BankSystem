@@ -9,6 +9,7 @@ using BankRUs.Application.Services.Identity;
 using BankRUs.Application.Services.TransactionService;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount;
+using BankRUs.Application.UseCases.MakeWithdrawalFromBankAccount;
 using BankRUs.Application.UseCases.OpenAccount;
 using BankRUs.Infrastructure.Persistence;
 using BankRUs.Infrastructure.Repositories;
@@ -66,7 +67,12 @@ builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();
 builder.Services.AddScoped<OpenCustomerAccountHandler>();
 builder.Services.AddScoped<AuthenticateUserHandler>();
 builder.Services.AddScoped<GetBankAccountsForCustomerHandler>();
-builder.Services.AddScoped<IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, MakeDepositToBankAccountHandler>();
+builder.Services.AddScoped<IHandler
+    <MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, 
+    MakeDepositToBankAccountHandler>();
+builder.Services.AddScoped<IHandler
+    <MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult>, 
+    MakeWithdrawalFromBankAccountHandler>();
 
 // Jwt config
 builder.Services.AddOptions<JwtOptions>()
