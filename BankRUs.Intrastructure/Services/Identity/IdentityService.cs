@@ -2,7 +2,7 @@
 using BankRUs.Application.Services.Identity;
 using BankRUs.Application.UseCases.OpenAccount.Exceptions;
 using BankRUs.Domain.Entities;
-using BankRUs.Infrastructure.Persistance;
+using BankRUs.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 
 namespace BankRUs.Infrastructure.Services.Identity;

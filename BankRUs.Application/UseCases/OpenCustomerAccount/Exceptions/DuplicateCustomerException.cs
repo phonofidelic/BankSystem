@@ -8,3 +8,4 @@ namespace BankRUs.Application.UseCases.OpenAccount.Exceptions
     {
     }
 }
+

@@ -1,11 +1,8 @@
 ﻿using BankRUs.Application.BankAccounts;
+using BankRUs.Application.Repositories.Exceptions;
 using BankRUs.Domain.Entities;
-using BankRUs.Infrastructure.Persistance;
+using BankRUs.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
 
 namespace BankRUs.Infrastructure.Repositories;
 
@@ -20,6 +17,11 @@ public class BankAccountsRepository(ApplicationDbContext context) : IBankAccount
 
     }
 
+    public bool BankAccountExists(Guid bankAccountId)
+    {
+        return _context.BankAccounts.Find(bankAccountId) != null;
+    }
+    
     public async Task<IQueryable<BankAccount>> GetBankAccountsForCustomerAsync(Guid userId)
     {
         var customer = await _context.Customers.FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
@@ -27,5 +29,31 @@ public class BankAccountsRepository(ApplicationDbContext context) : IBankAccount
             throw new Exception("Customer not found");
 
         return _context.BankAccounts.Where(b => b.CustomerId == customer.Id);
+    }
+
+    public async Task<Guid> GetCustomerIdForBankAccountAsync(Guid bankAccountId)
+    {
+        var bankAccount = await _context.BankAccounts.FindAsync(bankAccountId);
+        return bankAccount?.CustomerId ?? throw new Exception("Bank account not found");
+    }
+
+    public async Task<decimal> GetBankAccountBalance(Guid bankAccountId)
+    {
+        var bankAccount = await _context.BankAccounts.FindAsync(bankAccountId)
+            ?? throw new BankAccountNotFoundException();
+
+        return bankAccount.Balance;
+    }
+
+    public async Task UpdateBankAccountBalanceWithTransactionAsync(Transaction transaction)
+    {
+        var bankAccount = await _context.BankAccounts.FindAsync(transaction.BankAccountId) 
+            ?? throw new BankAccountNotFoundException();
+
+        var changeMultiplier = transaction.Type == TransactionType.Deposit ? 1 : -1;
+
+        bankAccount.Balance += (transaction.Amount * changeMultiplier);
+
+        await _context.SaveChangesAsync();
     }
 }
