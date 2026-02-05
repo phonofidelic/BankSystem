@@ -20,6 +20,11 @@ public class BankAccountsRepository(ApplicationDbContext context) : IBankAccount
 
     }
 
+    public bool BankAccountExists(Guid bankAccountId)
+    {
+        return _context.BankAccounts.Find(bankAccountId) != null;
+    }
+
     public async Task<IQueryable<BankAccount>> GetBankAccountsForCustomerAsync(Guid userId)
     {
         var customer = await _context.Customers.FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
@@ -27,5 +32,11 @@ public class BankAccountsRepository(ApplicationDbContext context) : IBankAccount
             throw new Exception("Customer not found");
 
         return _context.BankAccounts.Where(b => b.CustomerId == customer.Id);
+    }
+
+    public async Task<Guid> GetCustomerIdForBankAccountAsync(Guid bankAccountId)
+    {
+        var bankAccount = await _context.BankAccounts.FindAsync(bankAccountId);
+        return bankAccount?.CustomerId ?? throw new Exception("Bank account not found");
     }
 }

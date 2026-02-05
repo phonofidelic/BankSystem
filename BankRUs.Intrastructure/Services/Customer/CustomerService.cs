@@ -1,6 +1,9 @@
-﻿using BankRUs.Application.Services.CustomerService;
+﻿using BankRUs.Application.Services.Customer.Exceptions;
+using BankRUs.Application.Services.CustomerService;
+using BankRUs.Application.Services.CustomerService.GetCustomer;
 using BankRUs.Domain.Entities;
 using BankRUs.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -39,7 +42,16 @@ namespace BankRUs.Infrastructure.Services.CustomerService
                 throw new Exception("Could not create Customer");
             }
         }
-        
+
+        public async Task<GetCustomerIdResult> GetCustomerIdAsync(GetCustomerIdRequest request)
+        {
+            var customer = await _context
+                .Customers.Where(customer => customer.ApplicationUserId == request.ApplicationUserId)
+                .FirstAsync() ?? throw new CustomerNotFoundException(string.Format("Customer not found with user Id {0}", request.ApplicationUserId));
+
+            return new GetCustomerIdResult(CustomerId: customer.Id);
+        }
+
         public async Task<CreateBankAccountResult> CreateBankAccountAsync(CreateBankAccountRequest request)
         {
             try

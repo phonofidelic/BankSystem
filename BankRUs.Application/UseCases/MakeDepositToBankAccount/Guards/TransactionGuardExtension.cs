@@ -6,6 +6,11 @@ namespace BankRUs.Application.UseCases.MakeDepositToBankAccount.Guards
 {
     public static class TransactionGuardExtension
     {
+        public static void BankAccountNotOwned(this IGuardClause guardClause, Guid bankAccountOwnerId, Guid customerId)
+        {
+            if (bankAccountOwnerId != customerId)
+                throw new BankAccountTransactionException(string.Format("The provided Bank account is not owned by Customer with Id {0}", customerId));
+        }
         public static string MaxReferenceLength(this IGuardClause guardClause, string? input)
         {
             return MaxLength(guardClause, input, 140);
@@ -41,7 +46,7 @@ namespace BankRUs.Application.UseCases.MakeDepositToBankAccount.Guards
 
             if (comparer.Compare(input, compareTo) < 0)
             {
-                throw new ArgumentException("Transaction amount cannot be negative");
+                throw new BankAccountTransactionException("Transaction amount cannot be negative");
             }
 
             return input;
@@ -53,7 +58,7 @@ namespace BankRUs.Application.UseCases.MakeDepositToBankAccount.Guards
 
             if (comparer.Compare(input, compareTo) == 0)
             {
-                throw new ArgumentException("Transaction amount must be greater than zero");
+                throw new BankAccountTransactionException("Transaction amount must be greater than zero");
             }
 
             return input;
@@ -65,7 +70,7 @@ namespace BankRUs.Application.UseCases.MakeDepositToBankAccount.Guards
 
             if (input.Length > maxLength)
             {
-                throw new TransactionReferenceException(string.Format("Reference message exceeds maximum length of {0} characters", maxLength));
+                throw new BankAccountTransactionException(string.Format("Reference message exceeds maximum length of {0} characters", maxLength));
             }
 
             return input;

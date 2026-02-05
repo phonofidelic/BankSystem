@@ -1,4 +1,5 @@
-﻿using BankRUs.Application.GuardClause;
+﻿using BankRUs.Application.BankAccounts;
+using BankRUs.Application.GuardClause;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.TransactionService;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount.Guards;
@@ -6,27 +7,26 @@ using BankRUs.Application.UseCases.MakeDepositToBankAccount.Guards;
 namespace BankRUs.Application.UseCases.MakeDepositToBankAccount;
 
 public class MakeDepositToBankAccountHandler(
+    IBankAccountsRepository bankAccountsRepository,
     ITransactionService transactionService,
     IAuditLogger auditLogger) : IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>
 {
+    private readonly IBankAccountsRepository _bankAccountRepository = bankAccountsRepository;
     private readonly ITransactionService _transactionService = transactionService;
 
     public async Task<MakeDepositToBankAccountResult> HandleAsync(MakeDepositToBankAccountCommand command)
     {
-        // ToDo: Validate business rules for making a Bank Deposit Transaction
-
         // A Bank Deposit can be made if...
 
-        // 1) The Customer has a Customer Account
-
-        // 2) The Customer has a Bank Account
+        // 1) The Customer owns the Bank Account
+        var bankAccountOwnerId = await _bankAccountRepository.GetCustomerIdForBankAccountAsync(command.BankAccountId);
+        Guard.Against.BankAccountNotOwned(bankAccountOwnerId, command.CustomerId);
 
         // 3) The Deposit Amount is a positive decimal
         decimal sanitizedAmount = command.Amount;
         sanitizedAmount = Guard.Ensure.RoundToNearestHundredth(sanitizedAmount, auditLogger);
         sanitizedAmount = Guard.Against.NegativeAmount(sanitizedAmount);
         sanitizedAmount = Guard.Against.ZeroAmount(sanitizedAmount);
-
 
         // 4) The Deposit Reference message has no more than 140 characters
         string? sanitizedReference = command.Reference;

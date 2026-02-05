@@ -9,5 +9,9 @@ namespace BankRUs.Application.BankAccounts
     {
         public Task Add(BankAccount bankAccount);
         public Task<IQueryable<BankAccount>> GetBankAccountsForCustomerAsync(Guid customerId);
+
+        public Task<Guid> GetCustomerIdForBankAccountAsync(Guid bankAccountId);
+
+        public bool BankAccountExists(Guid bankAccountId);
     }
 }
