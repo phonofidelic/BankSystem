@@ -71,7 +71,7 @@ public class BankAccountsController(
                 Type: result.Type.ToString().ToLower(),
                 Amount: result.Amount,
                 Currency: result.Currency,
-                Reference: result.Reference ?? "",
+                Reference: result.Reference,
                 CreatedAt: result.CreatedAt,
                 BalanceAfter: 100,
                 AuditLog: _auditLogger.GetAuditLogs()));

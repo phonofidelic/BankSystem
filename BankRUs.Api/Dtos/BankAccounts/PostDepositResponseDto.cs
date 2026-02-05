@@ -10,7 +10,7 @@ public record PostDepositResponseDto(
     string Type,
     decimal Amount,
     string Currency,
-    string Reference,
+    string? Reference,
     DateTime CreatedAt,
     decimal BalanceAfter,
     IEnumerable<AuditLog> AuditLog);

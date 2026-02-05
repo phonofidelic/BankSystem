@@ -3,5 +3,5 @@
     public record PostDepositRequestDto (
         decimal Amount,
         string ISO_Currency_Symbol,
-        string Reference);
+        string? Reference);
 }

@@ -11,7 +11,7 @@ namespace BankRUs.Application.UseCases.MakeDepositToBankAccount.Guards
             if (bankAccountOwnerId != customerId)
                 throw new BankAccountTransactionException(string.Format("The provided Bank account is not owned by Customer with Id {0}", customerId));
         }
-        public static string MaxReferenceLength(this IGuardClause guardClause, string? input)
+        public static string? MaxReferenceLength(this IGuardClause guardClause, string? input)
         {
             return MaxLength(guardClause, input, 140);
         }
@@ -64,11 +64,11 @@ namespace BankRUs.Application.UseCases.MakeDepositToBankAccount.Guards
             return input;
         }
 
-        private static string MaxLength(this IGuardClause _, string? input, int maxLength)
+        private static string? MaxLength(this IGuardClause _, string? input, int maxLength)
         {
-            if (input == null) return string.Empty;
+            //if (input == null) return string.Empty;
 
-            if (input.Length > maxLength)
+            if (input?.Length > maxLength)
             {
                 throw new BankAccountTransactionException(string.Format("Reference message exceeds maximum length of {0} characters", maxLength));
             }
