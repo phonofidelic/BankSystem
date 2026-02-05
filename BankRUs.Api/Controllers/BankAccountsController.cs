@@ -73,7 +73,7 @@ public class BankAccountsController(
                 Currency: result.Currency,
                 Reference: result.Reference,
                 CreatedAt: result.CreatedAt,
-                BalanceAfter: 100,
+                BalanceAfter: result.BalanceAfter,
                 AuditLog: _auditLogger.GetAuditLogs()));
         }
         catch (Exception ex) {

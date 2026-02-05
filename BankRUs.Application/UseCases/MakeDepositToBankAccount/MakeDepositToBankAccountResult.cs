@@ -12,6 +12,7 @@ namespace BankRUs.Application.UseCases.MakeDepositToBankAccount
         Guid CustomerId,
         TransactionType Type,
         decimal Amount,
+        decimal BalanceAfter,
         string Currency,
         string? Reference,
         DateTime CreatedAt);

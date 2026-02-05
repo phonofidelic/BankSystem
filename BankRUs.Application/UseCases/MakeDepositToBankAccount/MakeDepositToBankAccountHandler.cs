@@ -43,6 +43,12 @@ public class MakeDepositToBankAccountHandler(
             Currency: command.Currency,
             Reference: sanitizedReference));
 
+        // Post the transaction to update the bank account balance
+        await _bankAccountRepository.PostTransactionAsync(createTransactionResult.Transaction);
+
+        // Retrieve the new balance
+        var balanceAfter = await _bankAccountRepository.GetBankAccountBalance(command.BankAccountId);
+
         return createTransactionResult == null
             ? throw new Exception("Deposit transaction could not be made")
             : new MakeDepositToBankAccountResult(
@@ -50,6 +56,7 @@ public class MakeDepositToBankAccountHandler(
                 CustomerId: createTransactionResult.Transaction.CustomerId,
                 Type: createTransactionResult.Transaction.Type,
                 Amount: createTransactionResult.Transaction.Amount,
+                BalanceAfter: balanceAfter,
                 Currency: createTransactionResult.Transaction.Currency.ToString(),
                 Reference: createTransactionResult.Transaction.Reference,
                 CreatedAt: createTransactionResult.Transaction.CreatedAt);
