@@ -4,6 +4,7 @@ using BankRUs.Application.Guards;
 using BankRUs.Application.Repositories.Exceptions;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.TransactionService;
+using BankRUs.Domain.Entities;
 
 namespace BankRUs.Application.UseCases.MakeDepositToBankAccount;
 
@@ -40,6 +41,7 @@ public class MakeDepositToBankAccountHandler(
         var createTransactionResult = await _transactionService.CreateTransactionAsync(new CreateTransactionRequest(
             CustomerId: command.CustomerId,
             BankAccountId: command.BankAccountId,
+            Type: TransactionType.Deposit,
             Amount: sanitizedAmount,
             Currency: command.Currency,
             Reference: sanitizedReference));
@@ -48,7 +50,7 @@ public class MakeDepositToBankAccountHandler(
         await _bankAccountRepository.UpdateBankAccountBalanceWithTransactionAsync(createTransactionResult.Transaction);
 
         // Retrieve the new balance
-        var balanceAfter = await _bankAccountRepository.GetBankAccountBalance(command.BankAccountId);
+        var balanceAfter = await _bankAccountRepository.GetBankAccountBalance(createTransactionResult.Transaction.BankAccountId);
 
         return createTransactionResult == null
             ? throw new Exception("Deposit transaction could not be made")

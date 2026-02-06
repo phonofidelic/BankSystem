@@ -8,6 +8,8 @@ namespace BankRUs.Application.BankAccounts
     public interface IBankAccountsRepository
     {
         public Task Add(BankAccount bankAccount);
+
+        // ToDo: Task<IReadonlyList<BankAccount>> ?
         public Task<IQueryable<BankAccount>> GetBankAccountsForCustomerAsync(Guid customerId);
 
         public Task<Guid> GetCustomerIdForBankAccountAsync(Guid bankAccountId);

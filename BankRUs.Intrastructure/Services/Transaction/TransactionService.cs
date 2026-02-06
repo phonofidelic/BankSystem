@@ -14,7 +14,7 @@ namespace BankRUs.Infrastructure.Services.TransactionService
         private readonly AppSettings _appSettings = appSettings.Value;
         public async Task<CreateTransactionResult> CreateTransactionAsync(CreateTransactionRequest request)
         {
-            Transaction transaction = new(TransactionType.Deposit) { 
+            Transaction transaction = new(request.Type) { 
                 CustomerId = request.CustomerId,
                 BankAccountId = request.BankAccountId,
                 Amount = request.Amount,

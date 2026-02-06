@@ -153,6 +153,30 @@ public class BankAccountsController(
             EventId eventId = new();
             _logger.LogError(eventId, ex, message: ex.Message);
 
+            if (ex is BankAccountNotFoundException)
+            {
+                ModelState.AddModelError("Customer", ex.Message);
+                return NotFound(ex.Message);
+            }
+
+            if (ex is CustomerNotFoundException)
+            {
+                ModelState.AddModelError("Customer", ex.Message);
+                return NotFound(ex.Message);
+            }
+
+            if (ex is BankAccountTransactionException)
+            {
+                ModelState.AddModelError("Transaction", ex.Message);
+                return BadRequest(ModelState);
+            }
+
+            if (ex is BankAccountOverdraftException)
+            {
+                ModelState.AddModelError("Transaction", ex.Message);
+                return BadRequest(ModelState);
+            }
+
             return BadRequest();
         }
     }

@@ -2,7 +2,7 @@
 
 namespace BankRUs.Api.Dtos.BankAccounts;
 
-public class PostWithdrawalResponseDto(
+public record PostWithdrawalResponseDto(
     Guid TransactionId,
     Guid CustomerId,
     string Type,
