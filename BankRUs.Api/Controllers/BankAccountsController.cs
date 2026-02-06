@@ -1,7 +1,6 @@
 ﻿using BankRUs.Api.Dtos.BankAccounts;
 using BankRUs.Application;
 using BankRUs.Application.Exceptions;
-using BankRUs.Application.Repositories.Exceptions;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.CustomerService.GetCustomer;
@@ -82,22 +81,14 @@ public class BankAccountsController(
             EventId eventId = new();
             _logger.LogError(eventId, ex, message: ex.Message);
 
-            if (ex is BankAccountNotFoundException)
+            if (ex is NotFoundException)
             {
-                ModelState.AddModelError("Customer", ex.Message);
-                return NotFound(ex.Message); 
-            }
-
-            if (ex is CustomerNotFoundException)
-            {
-                ModelState.AddModelError("Customer", ex.Message);
                 return NotFound(ex.Message);
             }
 
-            if (ex is BankAccountTransactionException)
+            if (ex is BadRequestException)
             {
-                ModelState.AddModelError("Transaction", ex.Message);
-                return BadRequest(ModelState);
+                return BadRequest(ex.Message);
             }
 
             return BadRequest();
@@ -153,28 +144,14 @@ public class BankAccountsController(
             EventId eventId = new();
             _logger.LogError(eventId, ex, message: ex.Message);
 
-            if (ex is BankAccountNotFoundException)
+            if (ex is NotFoundException)
             {
-                ModelState.AddModelError("Customer", ex.Message);
                 return NotFound(ex.Message);
             }
 
-            if (ex is CustomerNotFoundException)
+            if (ex is BadRequestException)
             {
-                ModelState.AddModelError("Customer", ex.Message);
-                return NotFound(ex.Message);
-            }
-
-            if (ex is BankAccountTransactionException)
-            {
-                ModelState.AddModelError("Transaction", ex.Message);
-                return BadRequest(ModelState);
-            }
-
-            if (ex is BankAccountOverdraftException)
-            {
-                ModelState.AddModelError("Transaction", ex.Message);
-                return BadRequest(ModelState);
+                return BadRequest(ex.Message);
             }
 
             return BadRequest();

@@ -1,7 +1,7 @@
 ﻿using BankRUs.Application.BankAccounts;
+using BankRUs.Application.Exceptions;
 using BankRUs.Application.GuardClause;
 using BankRUs.Application.Guards;
-using BankRUs.Application.Repositories.Exceptions;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.TransactionService;
 using BankRUs.Domain.Entities;

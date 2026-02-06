@@ -4,6 +4,6 @@ using System.Text;
 
 namespace BankRUs.Application.Exceptions;
 
-public class BankAccountOverdraftException() : Exception("Insufficient funds")
+public class NotFoundException(string message) : Exception(message)
 {
 }

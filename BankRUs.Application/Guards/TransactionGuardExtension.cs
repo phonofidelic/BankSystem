@@ -11,7 +11,7 @@ public static class TransactionGuardExtension
     public static void BankAccountOverdraft(this IGuardClause _, decimal currentBalance, decimal withdrawalAmount)
     {
         if (currentBalance < withdrawalAmount)
-            throw new BankAccountOverdraftException();
+            throw new BankAccountTransactionException("Insufficient funds");
     }
     public static void BankAccountNotOwned(this IGuardClause _, Guid bankAccountOwnerId, Guid customerId)
     {

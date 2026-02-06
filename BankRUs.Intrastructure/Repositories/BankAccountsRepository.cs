@@ -1,5 +1,5 @@
 ﻿using BankRUs.Application.BankAccounts;
-using BankRUs.Application.Repositories.Exceptions;
+using BankRUs.Application.Exceptions;
 using BankRUs.Domain.Entities;
 using BankRUs.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
