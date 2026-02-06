@@ -1,12 +1,9 @@
-﻿using BankRUs.Application.Services.Customer.Exceptions;
+﻿using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.CustomerService.GetCustomer;
 using BankRUs.Domain.Entities;
 using BankRUs.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BankRUs.Infrastructure.Services.CustomerService
 {

@@ -1,5 +1,5 @@
 ﻿using BankRUs.Application.BankAccounts;
-using BankRUs.Application.Repositories.Exceptions;
+using BankRUs.Application.Exceptions;
 using BankRUs.Domain.Entities;
 using BankRUs.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -24,11 +24,15 @@ public class BankAccountsRepository(ApplicationDbContext context) : IBankAccount
     
     public async Task<IQueryable<BankAccount>> GetBankAccountsForCustomerAsync(Guid userId)
     {
-        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
-        if (customer == null)
-            throw new Exception("Customer not found");
-
-        return _context.BankAccounts.Where(b => b.CustomerId == customer.Id);
+        var customer = await _context.Customers
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
+        
+        return customer == null
+            ? throw new Exception("Customer not found")
+            : _context.BankAccounts
+            .AsNoTracking()
+            .Where(b => b.CustomerId == customer.Id);
     }
 
     public async Task<Guid> GetCustomerIdForBankAccountAsync(Guid bankAccountId)

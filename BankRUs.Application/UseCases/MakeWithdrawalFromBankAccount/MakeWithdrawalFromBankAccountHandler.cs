@@ -6,19 +6,19 @@ using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.TransactionService;
 using BankRUs.Domain.Entities;
 
-namespace BankRUs.Application.UseCases.MakeDepositToBankAccount;
+namespace BankRUs.Application.UseCases.MakeWithdrawalFromBankAccount;
 
-public class MakeDepositToBankAccountHandler(
+public class MakeWithdrawalFromBankAccountHandler(
     IBankAccountsRepository bankAccountsRepository,
     ITransactionService transactionService,
-    IAuditLogger auditLogger) : IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>
+    IAuditLogger auditLogger) : IHandler<MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult>
 {
     private readonly IBankAccountsRepository _bankAccountRepository = bankAccountsRepository;
     private readonly ITransactionService _transactionService = transactionService;
 
-    public async Task<MakeDepositToBankAccountResult> HandleAsync(MakeDepositToBankAccountCommand command)
+    public async Task<MakeWithdrawalFromBankAccountResult> HandleAsync(MakeWithdrawalFromBankAccountCommand command)
     {
-        // A Bank Deposit can be made if...
+        // A withdrawal can be made from a Bank Account if...
 
         // 1) The Bank Account exists
         bool bankAccountexists = _bankAccountRepository.BankAccountExists(command.BankAccountId);
@@ -38,10 +38,14 @@ public class MakeDepositToBankAccountHandler(
         string? sanitizedReference = command.Reference;
         sanitizedReference = Guard.Against.MaxReferenceLength(sanitizedReference);
 
+        // 5) The current balance covers the withdrawal amount
+        var currentBankAccountBalance = await _bankAccountRepository.GetBankAccountBalance(command.BankAccountId);
+        Guard.Against.BankAccountOverdraft(currentBankAccountBalance, command.Amount);
+
         var createTransactionResult = await _transactionService.CreateTransactionAsync(new CreateTransactionRequest(
             CustomerId: command.CustomerId,
             BankAccountId: command.BankAccountId,
-            Type: TransactionType.Deposit,
+            Type: TransactionType.Withdrawal,
             Amount: sanitizedAmount,
             Currency: command.Currency,
             Reference: sanitizedReference));
@@ -54,7 +58,7 @@ public class MakeDepositToBankAccountHandler(
 
         return createTransactionResult == null
             ? throw new Exception("Deposit transaction could not be made")
-            : new MakeDepositToBankAccountResult(
+            : new MakeWithdrawalFromBankAccountResult(
                 TransactionId: createTransactionResult.Transaction.Id,
                 CustomerId: createTransactionResult.Transaction.CustomerId,
                 Type: createTransactionResult.Transaction.Type,

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BankRUs.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,6 +9,7 @@ namespace BankRUs.Application.Services.TransactionService
         Guid CustomerId,
         Guid BankAccountId,
         decimal Amount,
+        TransactionType Type,
         string Currency,
         string? Reference);
 }

@@ -1,9 +1,8 @@
 ﻿using BankRUs.Application.Services.AuditLog;
 
-
 namespace BankRUs.Api.Dtos.BankAccounts;
 
-public record PostDepositResponseDto(
+public record PostWithdrawalResponseDto(
     Guid TransactionId,
     Guid CustomerId,
     string Type,
