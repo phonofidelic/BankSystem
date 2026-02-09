@@ -19,8 +19,6 @@ public class Transaction(TransactionType type) : BaseCreatableEntity<Guid>
 
     public decimal Amount { get; set; }
 
-    // Stored as Currency ISOSymbol
-    [NotMapped]
     public required Currency Currency { get; set; }
 
     public string? Reference { get; set; } = string.Empty;

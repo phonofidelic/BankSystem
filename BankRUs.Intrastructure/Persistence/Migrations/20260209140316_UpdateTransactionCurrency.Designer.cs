@@ -4,6 +4,7 @@ using BankRUs.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BankRUs.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260209140316_UpdateTransactionCurrency")]
+    partial class UpdateTransactionCurrency
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,7 +83,7 @@ namespace BankRUs.Infrastructure.Migrations
                     b.HasIndex("SocialSecurityNumber")
                         .IsUnique();
 
-                    b.ToTable("Customers", (string)null);
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("BankRUs.Domain.Entities.Transaction", b =>
@@ -388,7 +391,7 @@ namespace BankRUs.Infrastructure.Migrations
 
                             b1.HasKey("BankAccountId");
 
-                            b1.ToTable("BankAccounts", (string)null);
+                            b1.ToTable("BankAccounts");
 
                             b1.WithOwner()
                                 .HasForeignKey("BankAccountId");

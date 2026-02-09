@@ -1,5 +1,4 @@
 ﻿using BankRUs.Domain.Entities;
-using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Services.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +6,9 @@ using System.Reflection;
 
 namespace BankRUs.Infrastructure.Persistence;
 
-public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
+public sealed class ApplicationDbContext(
+    DbContextOptions<ApplicationDbContext> options
+    ) : IdentityDbContext<ApplicationUser>(options)
 {
 
     public DbSet<Customer> Customers { get; set; } = default!;
@@ -17,8 +18,6 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-
-        //builder.Entity<Currency>().HasNoKey();
 
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
@@ -46,9 +45,8 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
             .Where(e => (e.Entity is BaseCreatableEntity<int> || e.Entity is BaseCreatableEntity<Guid>)
                 && e.State == EntityState.Added);
 
-        foreach (var entry in creatableEntries) {
-           
-
+        foreach (var entry in creatableEntries) 
+        {
             if (entry.Entity is BaseCreatableEntity<int>)
                 ((BaseCreatableEntity<int>)entry.Entity).CreatedAt = now;
 
@@ -62,10 +60,10 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
 
         foreach (var entry in updatableEntries)
         {
-            if (entry.Entity is BaseCreatableEntity<int>)
+            if (entry.Entity is BaseUpdatableEntity<int>)
                 ((BaseUpdatableEntity<int>)entry.Entity).UpdatedAt = now;
 
-            if (entry.Entity is BaseCreatableEntity<Guid>)
+            if (entry.Entity is BaseUpdatableEntity<Guid>)
                 ((BaseUpdatableEntity<Guid>)entry.Entity).UpdatedAt = now;
         }
     }

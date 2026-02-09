@@ -60,4 +60,9 @@ public class BankAccountsRepository(ApplicationDbContext context) : IBankAccount
 
         await _context.SaveChangesAsync();
     }
+
+    public async Task<BankAccount> GetBankAccountAsync(Guid bankAccountId)
+    {
+        return await _context.BankAccounts.FindAsync(bankAccountId) ?? throw new BankAccountNotFoundException();
+    }
 }

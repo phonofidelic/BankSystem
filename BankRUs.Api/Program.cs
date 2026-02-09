@@ -8,10 +8,13 @@ using BankRUs.Application.Services.Email;
 using BankRUs.Application.Services.Identity;
 using BankRUs.Application.Services.TransactionService;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
+using BankRUs.Application.UseCases.ListTransactionsForBankAccount;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount;
 using BankRUs.Application.UseCases.MakeWithdrawalFromBankAccount;
 using BankRUs.Application.UseCases.OpenAccount;
+using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Persistence;
+using BankRUs.Infrastructure.Persistence.Configurations;
 using BankRUs.Infrastructure.Repositories;
 using BankRUs.Infrastructure.Services.AuditLogService;
 using BankRUs.Infrastructure.Services.Authentication;
@@ -32,15 +35,6 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Registrera ApplicationDbContext i DI-containern
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-  options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
-
-builder.Services
-  .AddIdentity<ApplicationUser, IdentityRole>()
-  .AddEntityFrameworkStores<ApplicationDbContext>()
-  .AddDefaultTokenProviders();
-
 builder.Services.AddOptions<AppSettings>()
     .BindConfiguration(nameof(AppSettings))
     .ValidateDataAnnotations()
@@ -52,6 +46,19 @@ builder.Services.AddOptions<AppSettings>()
         CultureInfo.DefaultThreadCurrentCulture = systemCulture;
         CultureInfo.DefaultThreadCurrentUICulture = systemCulture;
     });
+
+// Registrera ApplicationDbContext i DI-containern
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+  options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
+builder.Services
+  .AddIdentity<ApplicationUser, IdentityRole>()
+  .AddEntityFrameworkStores<ApplicationDbContext>()
+  .AddDefaultTokenProviders();
+
+//builder.Services.AddSingleton<CurrencyValueGenerator>();
+//await CurrencySeeder
+
 
 // Scoped services
 builder.Services.AddScoped<IAuditLogger, AuditLogger>();
@@ -67,6 +74,7 @@ builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();
 builder.Services.AddScoped<OpenCustomerAccountHandler>();
 builder.Services.AddScoped<AuthenticateUserHandler>();
 builder.Services.AddScoped<GetBankAccountsForCustomerHandler>();
+builder.Services.AddScoped<IHandler<ListTransactionsForBankAccountQuery, ListTransactionsForBankAccountResult>, ListTransactionsForBankAccountHandler>();
 builder.Services.AddScoped<IHandler
     <MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, 
     MakeDepositToBankAccountHandler>();
@@ -128,6 +136,7 @@ if (app.Environment.IsDevelopment())
     dbContext.Database.Migrate();
 
     await IdentitySeeder.SeedAsync(scope.ServiceProvider);
+    await CurrencySeeder.SeedAsync(scope.ServiceProvider);
 }
 
 app.UseHttpsRedirection();

@@ -5,6 +5,7 @@ using BankRUs.Application.Guards;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.TransactionService;
 using BankRUs.Domain.Entities;
+using BankRUs.Domain.ValueObjects;
 
 namespace BankRUs.Application.UseCases.MakeDepositToBankAccount;
 

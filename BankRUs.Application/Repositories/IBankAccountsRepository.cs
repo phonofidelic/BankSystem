@@ -12,6 +12,8 @@ namespace BankRUs.Application.BankAccounts
         // ToDo: Task<IReadonlyList<BankAccount>> ?
         public Task<IQueryable<BankAccount>> GetBankAccountsForCustomerAsync(Guid customerId);
 
+        public Task<BankAccount> GetBankAccountAsync(Guid bankAccountId);
+
         public Task<Guid> GetCustomerIdForBankAccountAsync(Guid bankAccountId);
 
         public Task UpdateBankAccountBalanceWithTransactionAsync(Transaction transaction);

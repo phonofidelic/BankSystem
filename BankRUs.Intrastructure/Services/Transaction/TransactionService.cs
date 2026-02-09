@@ -1,4 +1,5 @@
 ﻿using BankRUs.Application;
+using BankRUs.Application.Pagination;
 using BankRUs.Application.Services.TransactionService;
 using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
@@ -18,7 +19,7 @@ namespace BankRUs.Infrastructure.Services.TransactionService
                 CustomerId = request.CustomerId,
                 BankAccountId = request.BankAccountId,
                 Amount = request.Amount,
-                Currency = Currency.Parse(request.Currency, _appSettings.SupportedCurrencies),
+                Currency = ParseCurrency(request.Currency),
                 Reference = request.Reference
             };
 
@@ -28,19 +29,22 @@ namespace BankRUs.Infrastructure.Services.TransactionService
             return new CreateTransactionResult(transaction);
         }
 
-        public async Task<PagedResult<Transaction>> GetTransactionsAsPagedResult(TransactionsPageQuery query)
+        public async Task<PagedResult<Transaction>> GetTransactionsAsPagedResultAsync(TransactionsPageQuery query)
         {
-            var transactions = _context.Transactions.Where(t => t.BankAccountId == query.BankAccountId);
+            var transactions = _context.Transactions.AsQueryable();
+
+            if (query.BankAccountId != null)
+                transactions = transactions.Where(t => t.BankAccountId == query.BankAccountId);
 
             transactions = query.SortOrder == SortOrder.Ascending 
                 ? transactions.OrderBy(t => t.CreatedAt)
                 : transactions.OrderByDescending(t => t.CreatedAt);
 
-            if (query.StartPeriod != null)
-                transactions = transactions.Where(t => t.CreatedAt >= query.StartPeriod);
+            if (query.StartPeriodUtc != null)
+                transactions = transactions.Where(t => t.CreatedAt >= query.StartPeriodUtc);
 
-            if (query.EndPeriod != null)
-                transactions = transactions.Where(t => t.CreatedAt <= query.EndPeriod);
+            if (query.EndPeriodUtc != null)
+                transactions = transactions.Where(t => t.CreatedAt <= query.EndPeriodUtc);
 
             if (query.Type != null)
                 transactions = transactions.Where(t => t.Type == query.Type);
@@ -54,13 +58,21 @@ namespace BankRUs.Infrastructure.Services.TransactionService
             return new PagedResult<Transaction>
             (
                 Items: items,
-                Meta: new PageMetadata(
-                    Page: query.Offset,
+                Meta: new PagedResultMetadata(
+                    Page: query.Page,
                     PageSize: query.PageSize,
                     TotalCount: totalItems,
                     TotalPages: totalPages
                     )
             );
+        }
+
+        // ToDo: Move to CurrencyService?
+        private Currency ParseCurrency(string isoSymbol)
+        {
+            var currency = _appSettings.SupportedCurrencies.FirstOrDefault(currency => currency.ISOSymbol == isoSymbol);
+
+            return currency ?? throw new Exception("Unsupported currency");
         }
     }
 }
