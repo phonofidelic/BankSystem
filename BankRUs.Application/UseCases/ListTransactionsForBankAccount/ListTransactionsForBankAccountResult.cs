@@ -1,4 +1,4 @@
-﻿using BankRUs.Application.Pagination;
+﻿using BankRUs.Application.Paginatioin;
 using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 
@@ -8,4 +8,4 @@ public record ListTransactionsForBankAccountResult(
     Guid BankAccountId,
     Currency Currency,
     decimal CurrentBalance,
-    PagedResult<Transaction> QueryResult);
+    BasePagedResult<Transaction> QueryResult);

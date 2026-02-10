@@ -1,4 +1,5 @@
-﻿using BankRUs.Application.Services.CustomerService.GetCustomer;
+﻿using BankRUs.Application.Paginatioin;
+using BankRUs.Application.Services.CustomerService.GetCustomer;
 using BankRUs.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,8 @@ namespace BankRUs.Application.Services.CustomerService;
 
 public interface ICustomerService
 {
-    Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request);
+    public Task<BasePagedResult<Customer>> GetCustomersAsPagedResult(CustomersPageQuery query);
+    public Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request);
     public Task<CreateBankAccountResult> CreateBankAccountAsync(CreateBankAccountRequest request);
     public Task<GetCustomerIdResult> GetCustomerIdAsync(GetCustomerIdRequest request);
 

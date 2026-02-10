@@ -8,6 +8,7 @@ using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.Email;
 using BankRUs.Application.Services.Identity;
 using BankRUs.Application.Services.TransactionService;
+using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.ListTransactionsForBankAccount;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount;
@@ -78,13 +79,14 @@ builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();
 builder.Services.AddScoped<OpenCustomerAccountHandler>();
 builder.Services.AddScoped<AuthenticateUserHandler>();
 builder.Services.AddScoped<GetBankAccountsForCustomerHandler>();
-builder.Services.AddScoped<IHandler<ListTransactionsForBankAccountQuery, ListTransactionsForBankAccountResult>, ListTransactionsForBankAccountHandler>();
-builder.Services.AddScoped<IHandler
-    <MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, 
+builder.Services.AddScoped<IHandler<ListTransactionsForBankAccountQuery, ListTransactionsForBankAccountResult>, 
+    ListTransactionsForBankAccountHandler>();
+builder.Services.AddScoped<IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, 
     MakeDepositToBankAccountHandler>();
-builder.Services.AddScoped<IHandler
-    <MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult>, 
+builder.Services.AddScoped<IHandler<MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult>, 
     MakeWithdrawalFromBankAccountHandler>();
+builder.Services.AddScoped<IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult>,
+    ListCustomerAccountsHandler>();
 
 // Jwt config
 builder.Services.AddOptions<JwtOptions>()

@@ -2,7 +2,7 @@
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.GuardClause;
 using BankRUs.Application.Guards;
-using BankRUs.Application.Pagination;
+using BankRUs.Application.Paginatioin;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.TransactionService;
 

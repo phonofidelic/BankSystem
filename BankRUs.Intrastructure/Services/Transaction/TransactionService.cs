@@ -1,4 +1,4 @@
-﻿using BankRUs.Application.Pagination;
+﻿using BankRUs.Application.Paginatioin;
 using BankRUs.Application.Services.TransactionService;
 using BankRUs.Domain.Entities;
 using BankRUs.Infrastructure.Persistence;
@@ -42,7 +42,7 @@ namespace BankRUs.Infrastructure.Services.TransactionService
             throw new NotImplementedException();
         }
 
-        public async Task<PagedResult<Transaction>> GetTransactionsAsPagedResultAsync(TransactionsPageQuery query)
+        public async Task<BasePagedResult<Transaction>> GetTransactionsAsPagedResultAsync(TransactionsPageQuery query)
         {
             var transactions = _context.Transactions.AsQueryable();
 
@@ -69,7 +69,7 @@ namespace BankRUs.Infrastructure.Services.TransactionService
                 .Skip(query.Skip).Take(query.PageSize)
                 .ToListAsync();
 
-            return new PagedResult<Transaction>
+            return new BasePagedResult<Transaction>
             (
                 Items: items,
                 Meta: new PagedResultMetadata(

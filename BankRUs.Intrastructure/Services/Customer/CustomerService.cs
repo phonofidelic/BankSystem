@@ -1,5 +1,6 @@
 ﻿using BankRUs.Application;
 using BankRUs.Application.Exceptions;
+using BankRUs.Application.Paginatioin;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.CustomerService.GetCustomer;
 using BankRUs.Domain.Entities;
@@ -23,13 +24,11 @@ namespace BankRUs.Infrastructure.Services.CustomerService
                 var newCustomer = new Customer
                 {
                     Id = Guid.NewGuid(),
-                    //ApplicationUserId = request.ApplicationUserId,
                     Email = request.Email,
                     SocialSecurityNumber = request.SocialSecurityNumber
                 };
 
                 await _context.Customers.AddAsync(newCustomer);
-                //await _context.SaveChangesAsync();
 
                 return new CreateCustomerResult(newCustomer);
 
@@ -63,7 +62,6 @@ namespace BankRUs.Infrastructure.Services.CustomerService
                 };
 
                 _context.BankAccounts.Add(newBankAccount);
-                //await _context.SaveChangesAsync();
                 return new CreateBankAccountResult(newBankAccount);
             }
             catch
@@ -82,6 +80,17 @@ namespace BankRUs.Infrastructure.Services.CustomerService
         {
             var result = _context.Customers.Where(c => c.SocialSecurityNumber == ssn).FirstOrDefault();
             return result != null;
+        }
+
+        public async Task<BasePagedResult<Customer>> GetCustomersAsPagedResult(CustomersPageQuery query)
+        {
+            var customers = _context.Customers.AsQueryable();
+
+            customers = query.SortOrder == SortOrder.Ascending
+                ? customers.OrderBy(c => c.CreatedAt)
+                : customers.OrderByDescending(c => c.CreatedAt);
+
+            throw new NotImplementedException();
         }
     }
 }

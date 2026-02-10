@@ -1,7 +1,7 @@
 ﻿using BankRUs.Api.Dtos.BankAccounts;
 using BankRUs.Application;
 using BankRUs.Application.Exceptions;
-using BankRUs.Application.Pagination;
+using BankRUs.Application.Paginatioin;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.CustomerService.GetCustomer;

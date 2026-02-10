@@ -1,4 +1,4 @@
-﻿using BankRUs.Application.Pagination;
+﻿using BankRUs.Application.Paginatioin;
 using BankRUs.Domain.Entities;
 
 namespace BankRUs.Application.UseCases.ListTransactionsForBankAccount;

@@ -1,4 +1,4 @@
-﻿using BankRUs.Application.Pagination;
+﻿using BankRUs.Application.Paginatioin;
 using BankRUs.Domain.Entities;
 using System;
 using System.Collections.Generic;

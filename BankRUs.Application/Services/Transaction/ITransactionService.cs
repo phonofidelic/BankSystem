@@ -1,4 +1,4 @@
-﻿using BankRUs.Application.Pagination;
+﻿using BankRUs.Application.Paginatioin;
 using BankRUs.Domain.Entities;
 
 namespace BankRUs.Application.Services.TransactionService
@@ -7,7 +7,7 @@ namespace BankRUs.Application.Services.TransactionService
     {
         public Task<CreateTransactionResult> CreateTransactionAsync(CreateTransactionRequest request);
 
-        public Task<PagedResult<Transaction>> GetTransactionsAsPagedResultAsync(TransactionsPageQuery query);
+        public Task<BasePagedResult<Transaction>> GetTransactionsAsPagedResultAsync(TransactionsPageQuery query);
 
         public Task<decimal> GetBalanceAfterAsync(Guid bankAccountId, Guid transactionId);
     }
