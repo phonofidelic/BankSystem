@@ -57,8 +57,6 @@ public class BankAccountsRepository(ApplicationDbContext context) : IBankAccount
         var changeMultiplier = transaction.Type == TransactionType.Deposit ? 1 : -1;
 
         bankAccount.Balance += (transaction.Amount * changeMultiplier);
-
-        //await _context.SaveChangesAsync();
     }
 
     public async Task<BankAccount> GetBankAccountAsync(Guid bankAccountId)

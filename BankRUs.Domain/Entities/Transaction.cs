@@ -20,7 +20,7 @@ public class Transaction(TransactionType type) : BaseCreatableEntity<Guid>
 
     public decimal Amount { get; set; }
 
-    public decimal BalanceAfter { get; set; }
+    public decimal BalanceAfter { get; private set; }
 
     public required Currency Currency { get; set; }
 
@@ -30,6 +30,10 @@ public class Transaction(TransactionType type) : BaseCreatableEntity<Guid>
 
     public decimal Value { get => Amount * _multiplyer; }
 
+    public void UpdateBalanceAfter(decimal balance)
+    {
+        BalanceAfter = balance;
+    }
 }
 
 public enum TransactionType

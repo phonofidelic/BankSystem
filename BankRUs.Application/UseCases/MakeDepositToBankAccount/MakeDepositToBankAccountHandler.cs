@@ -60,8 +60,7 @@ public class MakeDepositToBankAccountHandler(
         var balanceAfter = await _bankAccountRepository.GetBankAccountBalance(createTransactionResult.Transaction.BankAccountId);
 
         // Update the Transaction with updated balanceAfter
-        createdTransaction.BalanceAfter = balanceAfter;
-        //await _transactionService.UpdateBalanceAfterAsync()
+        createdTransaction.UpdateBalanceAfter(balanceAfter);
 
         // Complete unit of work
         await _unitOfWork.SaveAsync();
