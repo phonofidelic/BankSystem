@@ -1,4 +1,5 @@
 ﻿using BankRUs.Api.Attributes;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace BankRUs.Api.Dtos.Accounts;
@@ -22,12 +23,16 @@ public record CreateAccountRequestDto(
     [Required]
     [EmailAddress]
     [MaxLength(256)]
-    string Email
+    string Email,
+
+    [Required]
+    [PasswordPropertyText]
+    string Password
 )
 {
     public string FirstName { get; init; } = FirstName.Trim();
     public string LastName { get; init; } = LastName.Trim();
     public string SocialSecurityNumber { get; init; } = SocialSecurityNumber.Trim();
     public string Email { get; init; } = Email.Trim();
-
+    public string Password { get; init; } = Password.Trim();
 };

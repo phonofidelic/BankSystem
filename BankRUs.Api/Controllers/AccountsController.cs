@@ -72,7 +72,7 @@ public class AccountsController : ControllerBase
     }
 
     // POST /api/accounts (Endpoint /  API endpoint)
-    [HttpPost]
+    [HttpPost("customers/create")]
     public async Task<IActionResult> Create(CreateAccountRequestDto request)
     {
         try
@@ -82,7 +82,8 @@ public class AccountsController : ControllerBase
                     FirstName: request.FirstName,
                     LastName: request.LastName,
                     SocialSecurityNumber: request.SocialSecurityNumber,
-                    Email: request.Email));
+                    Email: request.Email,
+                    Password: request.Password));
 
             var response = new CreateAccountResponseDto(openAccountResult.UserId);
 

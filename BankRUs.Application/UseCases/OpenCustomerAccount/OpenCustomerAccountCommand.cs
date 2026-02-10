@@ -6,5 +6,6 @@ public record OpenCustomerAccountCommand(
     string FirstName,
     string LastName,
     string SocialSecurityNumber,
-    string Email
+    string Email,
+    string Password
 );

@@ -30,7 +30,8 @@ public class OpenCustomerAccountHandler : IHandler<OpenCustomerAccountCommand, O
         var createApplicationUserResult = await _identityService.CreateApplicationUserAsync(new CreateApplicationUserRequest(
             FirstName: command.FirstName,
             LastName: command.LastName,
-            Email: command.Email
+            Email: command.Email,
+            Password: command.Password
          ));
 
         // Create new Customer
