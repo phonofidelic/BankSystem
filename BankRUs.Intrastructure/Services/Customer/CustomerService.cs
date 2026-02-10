@@ -23,15 +23,15 @@ namespace BankRUs.Infrastructure.Services.CustomerService
                 var newCustomer = new Customer
                 {
                     Id = Guid.NewGuid(),
-                    ApplicationUserId = request.ApplicationUserId,
+                    //ApplicationUserId = request.ApplicationUserId,
                     Email = request.Email,
                     SocialSecurityNumber = request.SocialSecurityNumber
                 };
 
                 await _context.Customers.AddAsync(newCustomer);
-                await _context.SaveChangesAsync();
+                //await _context.SaveChangesAsync();
 
-                return new CreateCustomerResult(newCustomer.Id);
+                return new CreateCustomerResult(newCustomer);
 
             } catch (Exception ex)
             {
@@ -63,7 +63,7 @@ namespace BankRUs.Infrastructure.Services.CustomerService
                 };
 
                 _context.BankAccounts.Add(newBankAccount);
-                await _context.SaveChangesAsync();
+                //await _context.SaveChangesAsync();
                 return new CreateBankAccountResult(newBankAccount);
             }
             catch

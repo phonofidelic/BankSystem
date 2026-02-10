@@ -4,6 +4,8 @@ using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.Identity;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.OpenAccount;
+using BankRUs.Infrastructure.Services.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BankRUs.Api.Controllers;
 
 [Route("api/[controller]")]
+[Authorize(Roles = Roles.CustomerServiceRepresentative)]
 [ApiController]
 public class AccountsController(
     ILogger<AccountsController> logger,
