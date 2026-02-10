@@ -11,4 +11,7 @@ public interface ICustomerService
     Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request);
     public Task<CreateBankAccountResult> CreateBankAccountAsync(CreateBankAccountRequest request);
     public Task<GetCustomerIdResult> GetCustomerIdAsync(GetCustomerIdRequest request);
+
+    public bool EmailExists(string email);
+    public bool SsnExists(string ssn);
 }

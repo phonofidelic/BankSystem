@@ -1,6 +1,8 @@
-﻿using BankRUs.Application.Services.CustomerService;
+﻿using BankRUs.Application.GuardClause;
+using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.Email;
 using BankRUs.Application.Services.Identity;
+using BankRUs.Application.UseCases.OpenCustomerAccount;
 
 namespace BankRUs.Application.UseCases.OpenAccount;
 
@@ -19,13 +21,18 @@ public class OpenCustomerAccountHandler(
 
     public async Task<OpenCustomerAccountResponseDto> HandleAsync(OpenCustomerAccountCommand command)
     {
-        // ToDo: Validate business rules for Customer Account Creation
+        // A Customer Account can be opened if...
+
+        // 1) There is no Customer with the same Email
+        var sanitizedEmail = Guard.Against.DuplicateCustomer(command.Email, _customerService.EmailExists);
+
+        // 2) There is no Customer with the same SSN
+        var sanitizedSocialSecurityNumber = Guard.Against.DuplicateCustomer(command.SocialSecurityNumber, _customerService.SsnExists);
 
         // Create new Customer
         var createCustomerResult = await _customerService.CreateCustomerAsync(new CreateCustomerRequest(
-            SocialSecurityNumber: command.SocialSecurityNumber,
-            Email: command.Email));
-
+            Email: sanitizedEmail,
+            SocialSecurityNumber: sanitizedSocialSecurityNumber));
 
         // Create new ApplicationUser
         var createApplicationUserResult = await _identityService.CreateApplicationUserAsync(new CreateApplicationUserRequest(

@@ -71,5 +71,17 @@ namespace BankRUs.Infrastructure.Services.CustomerService
                 throw;
             }
         }
+
+        public bool EmailExists(string email)
+        {
+            var result = _context.Customers.Where(c => c.Email == email).FirstOrDefault();
+            return result != null;
+        }
+
+        public bool SsnExists(string ssn)
+        {
+            var result = _context.Customers.Where(c => c.SocialSecurityNumber == ssn).FirstOrDefault();
+            return result != null;
+        }
     }
 }

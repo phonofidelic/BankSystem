@@ -94,7 +94,7 @@ public class AccountsController(
 
             if (ex.GetType() == typeof(DuplicateCustomerException))
             {
-                ModelState.AddModelError("Email", "Invalid Email");
+                ModelState.AddModelError("Account", "Customer account already exists");
                 // Return 400 Bad Request
                 return BadRequest(ModelState);
             }
