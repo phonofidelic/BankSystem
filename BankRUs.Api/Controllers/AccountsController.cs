@@ -1,7 +1,10 @@
 ﻿using BankRUs.Api.Dtos.Accounts;
 using BankRUs.Api.Dtos.BankAccounts;
+using BankRUs.Application;
 using BankRUs.Application.Exceptions;
+using BankRUs.Application.Paginatioin;
 using BankRUs.Application.Services.Identity;
+using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.OpenAccount;
 using BankRUs.Infrastructure.Services.Identity;
@@ -18,11 +21,13 @@ namespace BankRUs.Api.Controllers;
 public class AccountsController(
     ILogger<AccountsController> logger,
     IIdentityService identityService,
+    IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> listCustomerAccountsHandler,
     OpenCustomerAccountHandler openAccountHandler,
     GetBankAccountsForCustomerHandler getBankAccountsForCustomerHandler) : ControllerBase
 {
     private readonly ILogger<AccountsController> _logger = logger;
     private readonly IIdentityService _identityService = identityService;
+    private readonly IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> _listCustomerAccountsHandler = listCustomerAccountsHandler;
     private readonly OpenCustomerAccountHandler _openAccountHandler = openAccountHandler;
     private readonly GetBankAccountsForCustomerHandler _getBankAccountsForCustomerHandler = getBankAccountsForCustomerHandler;
 
@@ -68,6 +73,26 @@ public class AccountsController(
 
             return NotFound();
         }
+    }
+
+    // GET /api/accounts/customers
+    [HttpGet("customers")]
+    public async Task<IActionResult> GetCustomers([FromQuery] BasePageQuery query)
+    {
+        var result = await _listCustomerAccountsHandler.HandleAsync(new ListCustomerAccountsQuery(
+            Page: query.Page,
+            PageSize: query.PageSize,
+            SortOrder: query.SortOrder));
+
+        var customerItems = result.Items.Select(customer => new CustomerAccountsListItemDto(
+            CustomerId: customer.Id,
+            FirstName: customer.FirstName,
+            LastName: customer.LastName,
+            Email: customer.Email)).ToList();
+
+        return Ok(new GetCustomerAccountsResponseDto(
+            Paging: result.Meta,
+            Items: customerItems));
     }
 
     // POST /api/accounts/customers/create (Endpoint /  API endpoint)

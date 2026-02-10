@@ -87,7 +87,7 @@ public class BankAccountsController(
                 SortOrder: sort
                 ));
 
-            var transactionItems = result.QueryResult.Items.Select(transaction => new CustomerTransactionDto(
+            var transactionItems = result.QueryResult.Items.Select(transaction => new CustomerTransactionsListItemDto(
                 TransationId: transaction.Id,
                 Type: transaction.Type.ToString().ToLower(),
                 Amount: transaction.Amount,

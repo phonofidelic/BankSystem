@@ -11,6 +11,9 @@ namespace BankRUs.Domain.Entities
 
         public Guid ApplicationUserId { get; private set; }
 
+        public string FirstName { get; set; } = string.Empty;
+
+        public string LastName { get; set; } = string.Empty;
 
         [EmailAddress]
         public required string Email { get; set; }

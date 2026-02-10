@@ -9,9 +9,9 @@ public record ListTransactionsResponseDto(
     string Currency,
     decimal Balance,
     PagedResultMetadata Paging,
-    IReadOnlyList<CustomerTransactionDto> Items);
+    IReadOnlyList<CustomerTransactionsListItemDto> Items);
 
-public record CustomerTransactionDto(
+public record CustomerTransactionsListItemDto(
     Guid TransationId,
     string Type,
     decimal Amount,

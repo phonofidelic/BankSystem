@@ -9,6 +9,13 @@ public class ListCustomerAccountsHandler(ICustomerService customerService) : IHa
     private readonly ICustomerService _customerService = customerService;
     public async Task<ListCustomerAccountsResult> HandleAsync(ListCustomerAccountsQuery query)
     {
-        throw new NotImplementedException();
+        var result = await _customerService.GetCustomersAsPagedResult(new CustomersPageQuery(
+            Page: query.Page,
+            PageSize: query.PageSize,
+            SortOrder: query.SortOrder));
+
+        return new ListCustomerAccountsResult(
+            Items: result.Items,
+            Meta: result.Meta);
     }
 }
