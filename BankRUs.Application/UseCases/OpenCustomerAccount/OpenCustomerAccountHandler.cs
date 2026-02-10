@@ -4,7 +4,7 @@ using BankRUs.Application.Services.Identity;
 
 namespace BankRUs.Application.UseCases.OpenAccount;
 
-public class OpenCustomerAccountHandler : IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResult>
+public class OpenCustomerAccountHandler : IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto>
 {
     // ToDo: Add ILoggerService?
     //private readonly ILoggerService<OpenCustomerAccountHandler> _logger;
@@ -22,7 +22,7 @@ public class OpenCustomerAccountHandler : IHandler<OpenCustomerAccountCommand, O
         _emailSender = emailSender;
     }
 
-    public async Task<OpenCustomerAccountResult> HandleAsync(OpenCustomerAccountCommand command)
+    public async Task<OpenCustomerAccountResponseDto> HandleAsync(OpenCustomerAccountCommand command)
     {
         // ToDo: Validate business rules for Customer Account Creation
 
@@ -69,6 +69,6 @@ public class OpenCustomerAccountHandler : IHandler<OpenCustomerAccountCommand, O
             // ToDo: Log email sender error
         }
 
-        return new OpenCustomerAccountResult(UserId: createApplicationUserResult.UserId);
+        return new OpenCustomerAccountResponseDto(UserId: createApplicationUserResult.UserId);
     }
 }

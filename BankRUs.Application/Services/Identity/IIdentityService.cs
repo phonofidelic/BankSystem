@@ -6,5 +6,6 @@ public interface IIdentityService
 {
     Task<CreateApplicationUserResult> CreateApplicationUserAsync(CreateApplicationUserRequest request);
 
-    Task DeleteApplicationUserAsync(Guid ApplicationUserId);
+    Task AssignCustomerServiceRepresentativeRoleToUser(Guid applicationUserId);
+    Task DeleteApplicationUserAsync(Guid applicationUserId);
 }

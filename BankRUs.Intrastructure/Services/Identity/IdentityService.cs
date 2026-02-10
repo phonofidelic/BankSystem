@@ -16,6 +16,12 @@ public class IdentityService : IIdentityService
         _context = context;
     }
 
+    public async Task AssignCustomerServiceRepresentativeRoleToUser(Guid applicationUserId)
+    {
+        var user = await _userManager.FindByIdAsync(applicationUserId.ToString()) ?? throw new ApplicationUserNotFoundException();
+        await _userManager.AddToRoleAsync(user, Roles.CustomerServiceRepresentative);
+    }
+
     public async Task<CreateApplicationUserResult> CreateApplicationUserAsync(CreateApplicationUserRequest request)
     {
         var user = new ApplicationUser
