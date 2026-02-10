@@ -1,21 +1,20 @@
-﻿using BankRUs.Application.Exceptions;
+﻿using BankRUs.Application;
+using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.CustomerService.GetCustomer;
 using BankRUs.Domain.Entities;
 using BankRUs.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace BankRUs.Infrastructure.Services.CustomerService
 {
-    public class CustomerService : ICustomerService
+    public class CustomerService(
+        IOptions<AppSettings> appSettings,
+        ApplicationDbContext context) : ICustomerService
     {
-        private readonly ApplicationDbContext _context;
-
-        public CustomerService(
-            ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly AppSettings _appSettings = appSettings.Value;
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request)
         {
@@ -59,7 +58,8 @@ namespace BankRUs.Infrastructure.Services.CustomerService
                 BankAccount newBankAccount = new()
                 {
                     Name = request.BankAccountName,
-                    CustomerId = customer.Id
+                    CustomerId = customer.Id,
+                    Currency = _appSettings.DefaultCurrency
                 };
 
                 _context.BankAccounts.Add(newBankAccount);

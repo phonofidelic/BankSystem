@@ -1,6 +1,7 @@
 ﻿using BankRUs.Application.BankAccounts;
 using BankRUs.Application.Exceptions;
 using BankRUs.Domain.Entities;
+using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -57,7 +58,16 @@ public class BankAccountsRepository(ApplicationDbContext context) : IBankAccount
         var changeMultiplier = transaction.Type == TransactionType.Deposit ? 1 : -1;
 
         bankAccount.Balance += (transaction.Amount * changeMultiplier);
+    }
 
-        await _context.SaveChangesAsync();
+    public async Task<BankAccount> GetBankAccountAsync(Guid bankAccountId)
+    {
+        return await _context.BankAccounts.FindAsync(bankAccountId) ?? throw new BankAccountNotFoundException();
+    }
+
+    public async Task<Currency> GetBankAccountCurrency(Guid bankAccountId)
+    {
+        var bankAccount = await GetBankAccountAsync(bankAccountId);
+        return bankAccount.Currency;
     }
 }

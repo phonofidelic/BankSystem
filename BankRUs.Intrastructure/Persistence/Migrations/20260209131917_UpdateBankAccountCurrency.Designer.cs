@@ -4,6 +4,7 @@ using BankRUs.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BankRUs.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260209131917_UpdateBankAccountCurrency")]
+    partial class UpdateBankAccountCurrency
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -93,14 +96,15 @@ namespace BankRUs.Infrastructure.Migrations
                         .HasPrecision(19, 2)
                         .HasColumnType("decimal(19,2)");
 
-                    b.Property<decimal>("BalanceAfter")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<Guid>("BankAccountId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
@@ -417,72 +421,7 @@ namespace BankRUs.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.OwnsOne("BankRUs.Domain.ValueObjects.Currency", "Currency", b1 =>
-                        {
-                            b1.Property<Guid>("TransactionId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("EnglishName")
-                                .IsRequired()
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("nvarchar(max)")
-                                .HasDefaultValue("Placeholder Currency")
-                                .HasColumnName("Currency_EnglishName");
-
-                            b1.Property<string>("ISOSymbol")
-                                .IsRequired()
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("nvarchar(max)")
-                                .HasDefaultValue("DEF")
-                                .HasColumnName("Currency_ISOSymbol");
-
-                            b1.Property<string>("NativeName")
-                                .IsRequired()
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("nvarchar(max)")
-                                .HasDefaultValue("Placeholder Currency")
-                                .HasColumnName("Currency_NativeName");
-
-                            b1.Property<DateTime>("PeriodEnd")
-                                .ValueGeneratedOnAddOrUpdate()
-                                .HasColumnType("datetime2")
-                                .HasColumnName("PeriodEnd");
-
-                            b1.Property<DateTime>("PeriodStart")
-                                .ValueGeneratedOnAddOrUpdate()
-                                .HasColumnType("datetime2")
-                                .HasColumnName("PeriodStart");
-
-                            b1.Property<string>("Symbol")
-                                .IsRequired()
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("nvarchar(max)")
-                                .HasDefaultValue("def")
-                                .HasColumnName("Currency_Symbol");
-
-                            b1.HasKey("TransactionId");
-
-                            b1.ToTable("Transactions", (string)null);
-
-                            b1.ToTable(tb => tb.IsTemporal(ttb =>
-                                    {
-                                        ttb.UseHistoryTable("TransactionHistory");
-                                        ttb
-                                            .HasPeriodStart("PeriodStart")
-                                            .HasColumnName("PeriodStart");
-                                        ttb
-                                            .HasPeriodEnd("PeriodEnd")
-                                            .HasColumnName("PeriodEnd");
-                                    }));
-
-                            b1.WithOwner()
-                                .HasForeignKey("TransactionId");
-                        });
-
                     b.Navigation("BankAccount");
-
-                    b.Navigation("Currency")
-                        .IsRequired();
 
                     b.Navigation("Customer");
                 });

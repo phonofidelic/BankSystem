@@ -1,6 +1,7 @@
 ﻿using BankRUs.Application.Exceptions;
 using BankRUs.Application.GuardClause;
 using BankRUs.Application.Services.AuditLog;
+using BankRUs.Domain.ValueObjects;
 
 namespace BankRUs.Application.Guards;
 
@@ -8,15 +9,24 @@ namespace BankRUs.Application.Guards;
 // Implementation should live in the entities and value objects of the Domain?
 public static class TransactionGuardExtension
 {
+    public static Currency BankAccountUnsupportedCurrency(this IGuardClause _, Currency inputCurrency, Currency supportedCurrency)
+    {
+        if (inputCurrency != supportedCurrency)
+            throw new BankAccountUnsupportedCurrencyException();
+
+        return inputCurrency;
+    }
     public static void BankAccountOverdraft(this IGuardClause _, decimal currentBalance, decimal withdrawalAmount)
     {
         if (currentBalance < withdrawalAmount)
             throw new BankAccountTransactionException("Insufficient funds");
     }
-    public static void BankAccountNotOwned(this IGuardClause _, Guid bankAccountOwnerId, Guid customerId)
+    public static Guid BankAccountNotOwned(this IGuardClause _, Guid providedCustomerId, Guid bankAccountOwnerId)
     {
-        if (bankAccountOwnerId != customerId)
-            throw new BankAccountTransactionException(string.Format("The provided Bank account is not owned by Customer with Id {0}", customerId));
+        if (providedCustomerId != bankAccountOwnerId)
+            throw new BankAccountNotOwnedException(string.Format("The provided Bank account is not owned by Customer with Id {0}", providedCustomerId));
+
+        return providedCustomerId;
     }
     public static string? MaxReferenceLength(this IGuardClause guardClause, string? input)
     {

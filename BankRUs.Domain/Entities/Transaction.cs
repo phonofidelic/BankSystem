@@ -9,6 +9,7 @@ namespace BankRUs.Domain.Entities;
 
 public class Transaction(TransactionType type) : BaseCreatableEntity<Guid>
 {
+    private int _multiplyer { get; init; } = type == TransactionType.Deposit ? 1 : -1;
     public override Guid Id { get; set; } = Guid.NewGuid();
 
     public required Guid  CustomerId { get; set; }
@@ -19,13 +20,20 @@ public class Transaction(TransactionType type) : BaseCreatableEntity<Guid>
 
     public decimal Amount { get; set; }
 
-    // Stored as Currency ISOSymbol
-    [NotMapped]
+    public decimal BalanceAfter { get; private set; }
+
     public required Currency Currency { get; set; }
 
     public string? Reference { get; set; } = string.Empty;
 
     public TransactionType Type { get; init; } = type;
+
+    public decimal Value { get => Amount * _multiplyer; }
+
+    public void UpdateBalanceAfter(decimal balance)
+    {
+        BalanceAfter = balance;
+    }
 }
 
 public enum TransactionType

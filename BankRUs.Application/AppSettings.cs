@@ -12,6 +12,10 @@ namespace BankRUs.Application
         public string SystemCulture { get; set; } = string.Empty;
 
         [Required]
-        public Dictionary<string, Currency> SupportedCurrencies { get; set; } = default!;
+        public IEnumerable<Currency> SupportedCurrencies { get; set; } = [];
+        //public Dictionary<string, Currency> SupportedCurrencies { get; set; } = default!;
+
+        [Required]
+        public Currency DefaultCurrency { get; set; } = default!;
     }
 }
