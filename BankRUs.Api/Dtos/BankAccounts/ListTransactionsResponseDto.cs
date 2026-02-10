@@ -8,5 +8,13 @@ public record ListTransactionsResponseDto(
     Guid AccountId,
     string Currency,
     decimal Balance,
-    IReadOnlyList<Transaction> Items,
+    IReadOnlyList<CustomerTransactionDto> Items,
     PagedResultMetadata Paging);
+
+public record CustomerTransactionDto(
+    Guid TransationId,
+    string Type,
+    decimal Amount,
+    DateTime CreatedAt,
+    decimal BalanceAfter,
+    string? Reference);

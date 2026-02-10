@@ -51,6 +51,7 @@ public class BankAccountsController(
         {
             return NotFound();
         }
+        _logger.LogInformation("### bankAccountId: {0}", bankAccountId);
 
         // ToDo: Move MAX_PAGE_SIZE const to app settings
         if (pageSize > 100)
@@ -82,12 +83,20 @@ public class BankAccountsController(
                 Type: type
                 ));
 
+            var transactionItems = result.QueryResult.Items.Select(transaction => new CustomerTransactionDto(
+                TransationId: transaction.Id,
+                Type: transaction.Type.ToString().ToLower(),
+                Amount: transaction.Amount,
+                CreatedAt: transaction.CreatedAt,
+                BalanceAfter: transaction.BalanceAfter,
+                Reference: transaction.Reference)).ToList();
+
             return Ok(new ListTransactionsResponseDto(
                 AccountId: result.BankAccountId,
                 Currency: result.Currency.ToString(),
                 Balance: result.CurrentBalance,
                 Paging: result.QueryResult.Meta,
-                Items: result.QueryResult.Items));
+                Items: transactionItems));
         }
         catch (Exception ex) {
             if (ex is NotFoundException)

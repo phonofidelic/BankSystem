@@ -1,4 +1,5 @@
 ﻿using BankRUs.Application;
+using BankRUs.Application.Exceptions;
 using BankRUs.Application.Pagination;
 using BankRUs.Application.Services.TransactionService;
 using BankRUs.Domain.Entities;
@@ -24,9 +25,27 @@ namespace BankRUs.Infrastructure.Services.TransactionService
             };
 
             await _context.Transactions.AddAsync(transaction);
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
 
             return new CreateTransactionResult(transaction);
+        }
+
+        public async Task<decimal> GetBalanceAfter(Guid bankAccountId, Guid transactionId)
+        {
+            var targetTransaction = await _context.Transactions.FindAsync(transactionId) ?? throw new TransactionNotFoundException();
+            
+            return await _context.Transactions
+                .Where(t => t.BankAccountId == bankAccountId)
+                .OrderBy(t => t.CreatedAt)
+                .Where(t => t.BalanceAfter == null)
+                .Where(t => t.CreatedAt <= targetTransaction.CreatedAt)
+                .Where(t => t.Type == TransactionType.Deposit)
+                .SumAsync(t => t.Value);
+        }
+
+        public Task<decimal> GetBalanceAfterAsync(Guid bankAccountId, Guid transactionId)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<PagedResult<Transaction>> GetTransactionsAsPagedResultAsync(TransactionsPageQuery query)
@@ -65,6 +84,11 @@ namespace BankRUs.Infrastructure.Services.TransactionService
                     TotalPages: totalPages
                     )
             );
+        }
+
+        public Task UpdateBalanceAfterAsync()
+        {
+            throw new NotImplementedException();
         }
 
         // ToDo: Move to CurrencyService?

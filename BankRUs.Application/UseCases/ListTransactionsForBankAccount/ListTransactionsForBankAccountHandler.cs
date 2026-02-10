@@ -26,7 +26,7 @@ public class ListTransactionsForBankAccountHandler(
         // 2) The Customer owns the Bank Account
         var bankAccountOwnerId = await _bankAccountRepository.GetCustomerIdForBankAccountAsync(query.BankAccountId);
         Guard.Against.BankAccountNotOwned(bankAccountOwnerId, query.CustomerId);
-        var bankAccount = await _bankAccountRepository.GetBankAccountAsync(query.CustomerId);
+        var bankAccount = await _bankAccountRepository.GetBankAccountAsync(query.BankAccountId);
 
         var queryResult = await _transactionService.GetTransactionsAsPagedResultAsync(new TransactionsPageQuery(
             BankAccountId: query.BankAccountId,

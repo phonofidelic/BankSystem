@@ -10,10 +10,12 @@ using BankRUs.Domain.ValueObjects;
 namespace BankRUs.Application.UseCases.MakeDepositToBankAccount;
 
 public class MakeDepositToBankAccountHandler(
+    IUnitOfWork unitOfWork,
     IBankAccountsRepository bankAccountsRepository,
     ITransactionService transactionService,
     IAuditLogger auditLogger) : IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>
 {
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IBankAccountsRepository _bankAccountRepository = bankAccountsRepository;
     private readonly ITransactionService _transactionService = transactionService;
 
@@ -39,6 +41,7 @@ public class MakeDepositToBankAccountHandler(
         string? sanitizedReference = command.Reference;
         sanitizedReference = Guard.Against.MaxReferenceLength(sanitizedReference);
 
+        // Get the result from the Transaction service
         var createTransactionResult = await _transactionService.CreateTransactionAsync(new CreateTransactionRequest(
             CustomerId: command.CustomerId,
             BankAccountId: command.BankAccountId,
@@ -47,22 +50,32 @@ public class MakeDepositToBankAccountHandler(
             Currency: command.Currency,
             Reference: sanitizedReference));
 
+        // Get the Transaction instance
+        var createdTransaction = createTransactionResult.Transaction;
+
         // Post the transaction to update the bank account balance
-        await _bankAccountRepository.UpdateBankAccountBalanceWithTransactionAsync(createTransactionResult.Transaction);
+        await _bankAccountRepository.UpdateBankAccountBalanceWithTransactionAsync(createdTransaction);
 
         // Retrieve the new balance
         var balanceAfter = await _bankAccountRepository.GetBankAccountBalance(createTransactionResult.Transaction.BankAccountId);
 
+        // Update the Transaction with updated balanceAfter
+        createdTransaction.BalanceAfter = balanceAfter;
+        //await _transactionService.UpdateBalanceAfterAsync()
+
+        // Complete unit of work
+        await _unitOfWork.SaveAsync();
+
         return createTransactionResult == null
             ? throw new Exception("Deposit transaction could not be made")
             : new MakeDepositToBankAccountResult(
-                TransactionId: createTransactionResult.Transaction.Id,
-                CustomerId: createTransactionResult.Transaction.CustomerId,
-                Type: createTransactionResult.Transaction.Type,
-                Amount: createTransactionResult.Transaction.Amount,
-                BalanceAfter: balanceAfter,
-                Currency: createTransactionResult.Transaction.Currency.ToString(),
-                Reference: createTransactionResult.Transaction.Reference,
-                CreatedAt: createTransactionResult.Transaction.CreatedAt);
+                TransactionId: createdTransaction.Id,
+                CustomerId: createdTransaction.CustomerId,
+                Type: createdTransaction.Type,
+                Amount: createdTransaction.Amount,
+                BalanceAfter: createdTransaction.BalanceAfter,
+                Currency: createdTransaction.Currency.ToString(),
+                Reference: createdTransaction.Reference,
+                CreatedAt: createdTransaction.CreatedAt);
     }
 }
