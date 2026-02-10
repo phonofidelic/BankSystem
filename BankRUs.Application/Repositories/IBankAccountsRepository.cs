@@ -1,4 +1,5 @@
 ﻿using BankRUs.Domain.Entities;
+using BankRUs.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -19,6 +20,8 @@ namespace BankRUs.Application.BankAccounts
         public Task UpdateBankAccountBalanceWithTransactionAsync(Transaction transaction);
 
         public Task<decimal> GetBankAccountBalance(Guid bankAccountId);
+
+        public Task<Currency> GetBankAccountCurrency(Guid bankAccountId);
 
         public bool BankAccountExists(Guid bankAccountId);
     }

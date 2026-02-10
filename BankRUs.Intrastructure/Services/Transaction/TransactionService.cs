@@ -20,7 +20,7 @@ namespace BankRUs.Infrastructure.Services.TransactionService
                 CustomerId = request.CustomerId,
                 BankAccountId = request.BankAccountId,
                 Amount = request.Amount,
-                Currency = ParseCurrency(request.Currency),
+                Currency = request.Currency,
                 Reference = request.Reference
             };
 
@@ -85,19 +85,6 @@ namespace BankRUs.Infrastructure.Services.TransactionService
                     TotalPages: totalPages,
                     Sort: query.SortOrder.ToString().ToLower())
             );
-        }
-
-        public Task UpdateBalanceAfterAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        // ToDo: Move to CurrencyService?
-        private Currency ParseCurrency(string isoSymbol)
-        {
-            var currency = _appSettings.SupportedCurrencies.FirstOrDefault(currency => currency.ISOSymbol == isoSymbol);
-
-            return currency ?? throw new Exception("Unsupported currency");
         }
     }
 }

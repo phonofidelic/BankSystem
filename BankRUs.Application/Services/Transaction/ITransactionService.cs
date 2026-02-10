@@ -10,7 +10,5 @@ namespace BankRUs.Application.Services.TransactionService
         public Task<PagedResult<Transaction>> GetTransactionsAsPagedResultAsync(TransactionsPageQuery query);
 
         public Task<decimal> GetBalanceAfterAsync(Guid bankAccountId, Guid transactionId);
-
-        public Task UpdateBalanceAfterAsync();
     }
 }

@@ -3,6 +3,7 @@ using BankRUs.Application.Exceptions;
 using BankRUs.Application.GuardClause;
 using BankRUs.Application.Guards;
 using BankRUs.Application.Services.AuditLog;
+using BankRUs.Application.Services.CurrencyService;
 using BankRUs.Application.Services.TransactionService;
 using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
@@ -12,11 +13,13 @@ namespace BankRUs.Application.UseCases.MakeDepositToBankAccount;
 public class MakeDepositToBankAccountHandler(
     IUnitOfWork unitOfWork,
     IBankAccountsRepository bankAccountsRepository,
+    ICurrencyService currencyService,
     ITransactionService transactionService,
     IAuditLogger auditLogger) : IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IBankAccountsRepository _bankAccountRepository = bankAccountsRepository;
+    private readonly ICurrencyService _currencyService = currencyService;
     private readonly ITransactionService _transactionService = transactionService;
 
     public async Task<MakeDepositToBankAccountResult> HandleAsync(MakeDepositToBankAccountCommand command)
@@ -29,7 +32,7 @@ public class MakeDepositToBankAccountHandler(
 
         // 2) The Customer owns the Bank Account
         var bankAccountOwnerId = await _bankAccountRepository.GetCustomerIdForBankAccountAsync(command.BankAccountId);
-        Guard.Against.BankAccountNotOwned(bankAccountOwnerId, command.CustomerId);
+        var sanitizedCustomerId = Guard.Against.BankAccountNotOwned(command.CustomerId, bankAccountOwnerId);
 
         // 3) The Deposit Amount is a positive decimal
         decimal sanitizedAmount = command.Amount;
@@ -41,13 +44,18 @@ public class MakeDepositToBankAccountHandler(
         string? sanitizedReference = command.Reference;
         sanitizedReference = Guard.Against.MaxReferenceLength(sanitizedReference);
 
+        // 5) The Bank Account supports the provided Currency
+        var parsedCurrency = _currencyService.ParseIsoSymbol(command.Currency);
+        var bankAccounCurrency = await _bankAccountRepository.GetBankAccountCurrency(command.BankAccountId);
+        var sanitizedTransactionCurrency = Guard.Against.BankAccountUnsupportedCurrency(parsedCurrency, bankAccounCurrency);
+
         // Get the result from the Transaction service
         var createTransactionResult = await _transactionService.CreateTransactionAsync(new CreateTransactionRequest(
-            CustomerId: command.CustomerId,
+            CustomerId: sanitizedCustomerId,
             BankAccountId: command.BankAccountId,
             Type: TransactionType.Deposit,
             Amount: sanitizedAmount,
-            Currency: command.Currency,
+            Currency: sanitizedTransactionCurrency,
             Reference: sanitizedReference));
 
         // Get the Transaction instance
