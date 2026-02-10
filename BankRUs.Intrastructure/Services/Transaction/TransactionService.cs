@@ -62,23 +62,7 @@ namespace BankRUs.Infrastructure.Services.TransactionService
             if (query.Type != null)
                 transactions = transactions.Where(t => t.Type == query.Type);
 
-            var totalItems = transactions.Count();
-            var totalPages = (totalItems / query.PageSize) + 1;
-
-            var items = await transactions
-                .Skip(query.Skip).Take(query.PageSize)
-                .ToListAsync();
-
-            return new BasePagedResult<Transaction>
-            (
-                Items: items,
-                Meta: new PagedResultMetadata(
-                    Page: query.Page,
-                    PageSize: query.PageSize,
-                    TotalCount: totalItems,
-                    TotalPages: totalPages,
-                    Sort: query.SortOrder.ToString().ToLower())
-            );
+            return Pagination.GetPagedResult(query, transactions);
         }
     }
 }

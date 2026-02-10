@@ -1,12 +1,8 @@
 ﻿using BankRUs.Application;
-using BankRUs.Application.Pagination;
 using BankRUs.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BankRUs.Infrastructure.Persistence;
 

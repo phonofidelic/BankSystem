@@ -86,11 +86,7 @@ namespace BankRUs.Infrastructure.Services.CustomerService
         {
             var customers = _context.Customers.AsQueryable();
 
-            customers = query.SortOrder == SortOrder.Ascending
-                ? customers.OrderBy(c => c.CreatedAt)
-                : customers.OrderByDescending(c => c.CreatedAt);
-
-            throw new NotImplementedException();
+            return Pagination.GetPagedResult(query, customers);
         }
     }
 }
