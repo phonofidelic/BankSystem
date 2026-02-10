@@ -43,7 +43,7 @@ public class BankAccountsController(
     public async Task<IActionResult> Get(
         [FromRoute] string id,
         [FromQuery(Name = "page")] int page = 1,
-        [FromQuery(Name = "pageSize")] int? pageSize = 20,
+        [FromQuery(Name = "size")] int pageSize = 20,
         [FromQuery(Name = "from")] DateTime? from = null,
         [FromQuery(Name = "to")] DateTime? to = null,
         [FromQuery(Name = "type")] TransactionType? type = null,
@@ -83,6 +83,7 @@ public class BankAccountsController(
                 EndPeriodUdc: to,
                 Type: type,
                 Page: page,
+                PageSize: pageSize,
                 SortOrder: sort
                 ));
 

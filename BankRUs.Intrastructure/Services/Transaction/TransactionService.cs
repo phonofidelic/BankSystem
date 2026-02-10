@@ -68,8 +68,7 @@ namespace BankRUs.Infrastructure.Services.TransactionService
                 transactions = transactions.Where(t => t.Type == query.Type);
 
             var totalItems = transactions.Count();
-            var totalPages = totalItems / query.PageSize;
-            if (totalPages < 1) totalPages = 1;
+            var totalPages = (totalItems / query.PageSize) + 1;
 
             var items = await transactions
                 .Skip(query.Skip).Take(query.PageSize)
