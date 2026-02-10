@@ -85,10 +85,8 @@ public class AccountsController : ControllerBase
                     Email: request.Email,
                     Password: request.Password));
 
-            var response = new CreateAccountResponseDto(openAccountResult.UserId);
-
             // Return 201 Created
-            return Created(string.Empty, response);
+            return Created(string.Empty, new CreateAccountResponseDto(openAccountResult.UserId));
         } catch (Exception ex)
         {
             // Log error
@@ -99,12 +97,10 @@ public class AccountsController : ControllerBase
             {
                 ModelState.AddModelError("Email", "Invalid Email");
                 // Return 400 Bad Request
-                
-                return BadRequest();
+                return BadRequest(ModelState);
             }
 
-            return NotFound();
+            return BadRequest();
         }
-
     }
 }

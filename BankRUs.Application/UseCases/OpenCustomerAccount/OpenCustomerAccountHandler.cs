@@ -34,11 +34,20 @@ public class OpenCustomerAccountHandler : IHandler<OpenCustomerAccountCommand, O
             Password: command.Password
          ));
 
-        // Create new Customer
-        var createCustomerResult = await _customerService.CreateCustomerAsync(new CreateCustomerRequest(
-            ApplicationUserId: createApplicationUserResult.UserId,
-            SocialSecurityNumber: command.SocialSecurityNumber,
-            Email: command.Email));
+        CreateCustomerResult createCustomerResult;
+        try
+        {
+            // Create new Customer
+            createCustomerResult = await _customerService.CreateCustomerAsync(new CreateCustomerRequest(
+                ApplicationUserId: createApplicationUserResult.UserId,
+                SocialSecurityNumber: command.SocialSecurityNumber,
+                Email: command.Email));
+        } catch
+        {
+            // Delete the created ApplicationUser if a Customer could not be created
+            await _identityService.DeleteApplicationUserAsync(createApplicationUserResult.UserId);
+            throw;
+        }
 
         // Create default bank account for new Customer
         var createdDefaultBankAccountResult = await _customerService.CreateBankAccountAsync(new CreateBankAccountRequest(

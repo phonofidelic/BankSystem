@@ -35,7 +35,7 @@ namespace BankRUs.Infrastructure.Services.CustomerService
 
             } catch (Exception ex)
             {
-                throw new Exception("Could not create Customer");
+                throw;
             }
         }
 

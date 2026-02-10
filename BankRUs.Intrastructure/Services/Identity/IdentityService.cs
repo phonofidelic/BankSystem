@@ -40,6 +40,20 @@ public class IdentityService : IIdentityService
 
         await _userManager.AddToRoleAsync(user, Roles.Customer);
 
+
         return new CreateApplicationUserResult(UserId: Guid.Parse(user.Id));
+    }
+
+    public async Task DeleteApplicationUserAsync(Guid ApplicationUserId)
+    {
+        try
+        {
+            var user = await _userManager.FindByIdAsync(ApplicationUserId.ToString()) ?? throw new ApplicationUserNotFoundException();
+            await _userManager.DeleteAsync(user);
+        }
+        catch
+        {
+            throw;
+        }
     }
 }
