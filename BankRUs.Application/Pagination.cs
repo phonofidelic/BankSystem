@@ -1,4 +1,7 @@
-﻿namespace BankRUs.Application.Pagination;
+﻿
+using System.ComponentModel.DataAnnotations;
+
+namespace BankRUs.Application.Pagination;
 
 public record BasePageQuery(
     int Page,
@@ -17,7 +20,8 @@ public record PagedResultMetadata(
     int Page,
     int PageSize,
     int TotalPages,
-    int TotalCount);
+    int TotalCount,
+    string? Sort);
 
 public enum SortOrder
 {

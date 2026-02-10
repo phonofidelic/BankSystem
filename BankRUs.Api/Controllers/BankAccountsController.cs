@@ -1,6 +1,7 @@
 ﻿using BankRUs.Api.Dtos.BankAccounts;
 using BankRUs.Application;
 using BankRUs.Application.Exceptions;
+using BankRUs.Application.Pagination;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.CustomerService.GetCustomer;
@@ -41,17 +42,17 @@ public class BankAccountsController(
     [HttpGet("{id}/transactions")]
     public async Task<IActionResult> Get(
         [FromRoute] string id,
-        [FromQuery(Name = "page")] int? page = 1,
+        [FromQuery(Name = "page")] int page = 1,
         [FromQuery(Name = "pageSize")] int? pageSize = 20,
-        [FromQuery(Name = "from")] DateTime? startPeriod = null,
-        [FromQuery(Name = "end")] DateTime? endPeriod = null,
-        [FromQuery(Name = "type")] TransactionType? type = null)
+        [FromQuery(Name = "from")] DateTime? from = null,
+        [FromQuery(Name = "to")] DateTime? to = null,
+        [FromQuery(Name = "type")] TransactionType? type = null,
+        [FromQuery(Name = "sort")] SortOrder sort = SortOrder.Descending)
     {
         if (!Guid.TryParse(id, out Guid bankAccountId))
         {
             return NotFound();
         }
-        _logger.LogInformation("### bankAccountId: {0}", bankAccountId);
 
         // ToDo: Move MAX_PAGE_SIZE const to app settings
         if (pageSize > 100)
@@ -78,9 +79,11 @@ public class BankAccountsController(
             var result = await _listTransactionsForBankAccountHandler.HandleAsync(new ListTransactionsForBankAccountQuery(
                 CustomerId: getCustomerIdResult.CustomerId,
                 BankAccountId: bankAccountId,
-                StartPeriodUtc: startPeriod,
-                EndPeriodUdc: endPeriod,
-                Type: type
+                StartPeriodUtc: from,
+                EndPeriodUdc: to,
+                Type: type,
+                Page: page,
+                SortOrder: sort
                 ));
 
             var transactionItems = result.QueryResult.Items.Select(transaction => new CustomerTransactionDto(

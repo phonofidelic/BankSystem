@@ -25,7 +25,6 @@ namespace BankRUs.Infrastructure.Services.TransactionService
             };
 
             await _context.Transactions.AddAsync(transaction);
-            //await _context.SaveChangesAsync();
 
             return new CreateTransactionResult(transaction);
         }
@@ -70,6 +69,8 @@ namespace BankRUs.Infrastructure.Services.TransactionService
 
             var totalItems = transactions.Count();
             var totalPages = totalItems / query.PageSize;
+            if (totalPages < 1) totalPages = 1;
+
             var items = await transactions
                 .Skip(query.Skip).Take(query.PageSize)
                 .ToListAsync();
@@ -81,8 +82,8 @@ namespace BankRUs.Infrastructure.Services.TransactionService
                     Page: query.Page,
                     PageSize: query.PageSize,
                     TotalCount: totalItems,
-                    TotalPages: totalPages
-                    )
+                    TotalPages: totalPages,
+                    Sort: query.SortOrder.ToString().ToLower())
             );
         }
 
