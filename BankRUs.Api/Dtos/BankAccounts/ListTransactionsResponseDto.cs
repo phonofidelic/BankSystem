@@ -1,5 +1,4 @@
-﻿
-using BankRUs.Application.Paginatioin;
+﻿using BankRUs.Application.Services.PaginationService;
 using BankRUs.Domain.Entities;
 
 namespace BankRUs.Api.Dtos.BankAccounts;

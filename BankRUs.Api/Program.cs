@@ -7,6 +7,7 @@ using BankRUs.Application.Services.CurrencyService;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.Email;
 using BankRUs.Application.Services.Identity;
+using BankRUs.Application.Services.PaginationService;
 using BankRUs.Application.Services.TransactionService;
 using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
@@ -25,6 +26,7 @@ using BankRUs.Infrastructure.Services.CurrencyService;
 using BankRUs.Infrastructure.Services.CustomerService;
 using BankRUs.Infrastructure.Services.Email;
 using BankRUs.Infrastructure.Services.Identity;
+using BankRUs.Infrastructure.Services.PaginationService;
 using BankRUs.Infrastructure.Services.TransactionService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -65,6 +67,7 @@ builder.Services
 
 // Scoped services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IPaginationService, PaginationService>();
 builder.Services.AddScoped<ICurrencyService, CurrencyService>();
 builder.Services.AddScoped<IAuditLogger, AuditLogger>();
 builder.Services.AddScoped<IIdentityService, IdentityService>();

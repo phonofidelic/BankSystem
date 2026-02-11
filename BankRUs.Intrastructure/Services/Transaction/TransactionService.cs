@@ -1,4 +1,4 @@
-﻿using BankRUs.Application.Paginatioin;
+﻿using BankRUs.Application.Services.PaginationService;
 using BankRUs.Application.Services.TransactionService;
 using BankRUs.Domain.Entities;
 using BankRUs.Infrastructure.Persistence;
@@ -42,14 +42,37 @@ namespace BankRUs.Infrastructure.Services.TransactionService
             throw new NotImplementedException();
         }
 
-        public async Task<BasePagedResult<Transaction>> GetTransactionsAsPagedResultAsync(TransactionsPageQuery query)
+        //public async Task<BasePagedResult<Transaction>> GetTransactionsAsPagedResultAsync(TransactionsPageQuery query)
+        //{
+        //    var transactions = _context.Transactions.AsQueryable();
+
+        //    if (query.BankAccountId != null)
+        //        transactions = transactions.Where(t => t.BankAccountId == query.BankAccountId);
+
+        //    transactions = query.SortOrder == SortOrder.Ascending 
+        //        ? transactions.OrderBy(t => t.CreatedAt)
+        //        : transactions.OrderByDescending(t => t.CreatedAt);
+
+        //    if (query.StartPeriodUtc != null)
+        //        transactions = transactions.Where(t => t.CreatedAt >= query.StartPeriodUtc);
+
+        //    if (query.EndPeriodUtc != null)
+        //        transactions = transactions.Where(t => t.CreatedAt <= query.EndPeriodUtc);
+
+        //    if (query.Type != null)
+        //        transactions = transactions.Where(t => t.Type == query.Type);
+
+        //    return PaginationService.GetPagedResult(query, transactions);
+        //}
+
+        public async Task<IQueryable<Transaction>> GetTransactionsAsync(TransactionsPageQuery query)
         {
             var transactions = _context.Transactions.AsQueryable();
 
             if (query.BankAccountId != null)
                 transactions = transactions.Where(t => t.BankAccountId == query.BankAccountId);
 
-            transactions = query.SortOrder == SortOrder.Ascending 
+            transactions = query.SortOrder == SortOrder.Ascending
                 ? transactions.OrderBy(t => t.CreatedAt)
                 : transactions.OrderByDescending(t => t.CreatedAt);
 
@@ -62,7 +85,7 @@ namespace BankRUs.Infrastructure.Services.TransactionService
             if (query.Type != null)
                 transactions = transactions.Where(t => t.Type == query.Type);
 
-            return Pagination.GetPagedResult(query, transactions);
+            return transactions;
         }
     }
 }

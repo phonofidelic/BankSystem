@@ -2,8 +2,8 @@
 using BankRUs.Api.Dtos.BankAccounts;
 using BankRUs.Application;
 using BankRUs.Application.Exceptions;
-using BankRUs.Application.Paginatioin;
 using BankRUs.Application.Services.Identity;
+using BankRUs.Application.Services.PaginationService;
 using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.OpenAccount;
@@ -81,7 +81,7 @@ public class AccountsController(
     {
         var result = await _listCustomerAccountsHandler.HandleAsync(new ListCustomerAccountsQuery(
             Page: query.Page,
-            PageSize: query.PageSize,
+            PageSize: query.Size,
             SortOrder: query.SortOrder));
 
         var customerItems = result.Items.Select(customer => new CustomerAccountsListItemDto(

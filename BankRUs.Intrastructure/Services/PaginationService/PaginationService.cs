@@ -1,18 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BankRUs.Application.Services.PaginationService;
 
-namespace BankRUs.Application.Paginatioin;
+namespace BankRUs.Infrastructure.Services.PaginationService;
 
 
-public static class Pagination {
+public class PaginationService : IPaginationService 
+{
     private const int MAX_PAGE_SIZE = 50;
-    public static BasePagedResult<T> GetPagedResult<T>(BasePageQuery query, IQueryable<T> items)
+    public BasePagedResult<T> GetPagedResult<T>(BasePageQuery query, IQueryable<T> items)
     {
-        int pageSize = query.PageSize < MAX_PAGE_SIZE ? query.PageSize : MAX_PAGE_SIZE;
+        int pageSize = query.Size < MAX_PAGE_SIZE ? query.Size : MAX_PAGE_SIZE;
         var totalItems = items.Count();
-        var totalPages = (totalItems / pageSize) + 1;
+        var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
 
         var result = items
-            .Skip(query.Skip).Take(query.PageSize)
+            .Skip(query.Skip).Take(query.Size)
             .ToList();
 
         return new BasePagedResult<T>

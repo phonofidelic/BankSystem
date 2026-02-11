@@ -1,6 +1,5 @@
 ﻿using BankRUs.Application;
 using BankRUs.Application.Exceptions;
-using BankRUs.Application.Paginatioin;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.CustomerService.GetCustomer;
 using BankRUs.Domain.Entities;
@@ -82,11 +81,11 @@ namespace BankRUs.Infrastructure.Services.CustomerService
             return result != null;
         }
 
-        public async Task<BasePagedResult<Customer>> GetCustomersAsPagedResult(CustomersPageQuery query)
+        public async Task<IQueryable<Customer>> GetCustomersQueryAsync()
         {
-            var customers = _context.Customers.AsQueryable();
+            var customersQuery = _context.Customers.AsQueryable();
 
-            return Pagination.GetPagedResult(query, customers);
+            return customersQuery;
         }
     }
 }

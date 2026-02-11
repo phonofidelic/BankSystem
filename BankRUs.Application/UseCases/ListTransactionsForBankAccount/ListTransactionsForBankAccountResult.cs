@@ -1,4 +1,4 @@
-﻿using BankRUs.Application.Paginatioin;
+﻿using BankRUs.Application.Services.PaginationService;
 using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 
