@@ -54,12 +54,6 @@ public class BankAccountsController(
             return NotFound();
         }
 
-        // ToDo: Move MAX_PAGE_SIZE const to app settings
-        if (pageSize > 100)
-        {
-            pageSize = 100;
-        }
-
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         if (userId == null)
