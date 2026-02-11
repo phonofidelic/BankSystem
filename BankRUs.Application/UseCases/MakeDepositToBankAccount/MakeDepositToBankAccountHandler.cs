@@ -61,14 +61,10 @@ public class MakeDepositToBankAccountHandler(
         // Get the Transaction instance
         var createdTransaction = createTransactionResult.Transaction;
 
-        // Post the transaction to update the bank account balance
-        await _bankAccountRepository.UpdateBankAccountBalanceWithTransactionAsync(createdTransaction);
+        var bankAccount = await _bankAccountRepository.GetBankAccountAsync(command.BankAccountId);
 
-        // Retrieve the new balance
-        var balanceAfter = await _bankAccountRepository.GetBankAccountBalance(createTransactionResult.Transaction.BankAccountId);
-
-        // Update the Transaction with updated balanceAfter
-        createdTransaction.UpdateBalanceAfter(balanceAfter);
+        // Transaction functionality is implemented in BankAccount and Transaction entities
+        bankAccount.AddTransaction(createdTransaction);
 
         // Complete unit of work
         await _unitOfWork.SaveAsync();

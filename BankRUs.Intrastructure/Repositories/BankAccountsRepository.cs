@@ -50,16 +50,6 @@ public class BankAccountsRepository(ApplicationDbContext context) : IBankAccount
         return bankAccount.Balance;
     }
 
-    public async Task UpdateBankAccountBalanceWithTransactionAsync(Transaction transaction)
-    {
-        var bankAccount = await _context.BankAccounts.FindAsync(transaction.BankAccountId) 
-            ?? throw new BankAccountNotFoundException();
-
-        var changeMultiplier = transaction.Type == TransactionType.Deposit ? 1 : -1;
-
-        bankAccount.Balance += (transaction.Amount * changeMultiplier);
-    }
-
     public async Task<BankAccount> GetBankAccountAsync(Guid bankAccountId)
     {
         return await _context.BankAccounts.FindAsync(bankAccountId) ?? throw new BankAccountNotFoundException();
