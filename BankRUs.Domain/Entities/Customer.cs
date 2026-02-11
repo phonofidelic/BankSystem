@@ -9,8 +9,11 @@ namespace BankRUs.Domain.Entities
     {
         public override Guid Id { get; set; } = Guid.NewGuid();
 
-        public required Guid ApplicationUserId { get; init; }
+        public Guid ApplicationUserId { get; private set; }
 
+        public string FirstName { get; set; } = string.Empty;
+
+        public string LastName { get; set; } = string.Empty;
 
         [EmailAddress]
         public required string Email { get; set; }
@@ -18,6 +21,9 @@ namespace BankRUs.Domain.Entities
         public required string SocialSecurityNumber { get; set; }
 
         public ICollection<BankAccount> BankAccounts { get; set; } = [];
+
         public ICollection<Transaction> Transactions { get; set; } = [];
+
+        public void SetApplicationUserId(Guid applicationUserId) => ApplicationUserId = applicationUserId; 
     }
 }

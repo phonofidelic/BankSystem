@@ -1,7 +1,6 @@
 ﻿using BankRUs.Api.Dtos.BankAccounts;
 using BankRUs.Application;
 using BankRUs.Application.Exceptions;
-using BankRUs.Application.Pagination;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.CustomerService.GetCustomer;
@@ -54,12 +53,6 @@ public class BankAccountsController(
             return NotFound();
         }
 
-        // ToDo: Move MAX_PAGE_SIZE const to app settings
-        if (pageSize > 100)
-        {
-            pageSize = 100;
-        }
-
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         if (userId == null)
@@ -87,7 +80,7 @@ public class BankAccountsController(
                 SortOrder: sort
                 ));
 
-            var transactionItems = result.QueryResult.Items.Select(transaction => new CustomerTransactionDto(
+            var transactionItems = result.QueryResult.Items.Select(transaction => new CustomerTransactionsListItemDto(
                 TransationId: transaction.Id,
                 Type: transaction.Type.ToString().ToLower(),
                 Amount: transaction.Amount,

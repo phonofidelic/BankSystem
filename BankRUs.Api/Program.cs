@@ -7,7 +7,9 @@ using BankRUs.Application.Services.CurrencyService;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.Email;
 using BankRUs.Application.Services.Identity;
+using BankRUs.Application.Services.PaginationService;
 using BankRUs.Application.Services.TransactionService;
+using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.ListTransactionsForBankAccount;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount;
@@ -24,6 +26,7 @@ using BankRUs.Infrastructure.Services.CurrencyService;
 using BankRUs.Infrastructure.Services.CustomerService;
 using BankRUs.Infrastructure.Services.Email;
 using BankRUs.Infrastructure.Services.Identity;
+using BankRUs.Infrastructure.Services.PaginationService;
 using BankRUs.Infrastructure.Services.TransactionService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -64,6 +67,7 @@ builder.Services
 
 // Scoped services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IPaginationService, PaginationService>();
 builder.Services.AddScoped<ICurrencyService, CurrencyService>();
 builder.Services.AddScoped<IAuditLogger, AuditLogger>();
 builder.Services.AddScoped<IIdentityService, IdentityService>();
@@ -78,13 +82,14 @@ builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();
 builder.Services.AddScoped<OpenCustomerAccountHandler>();
 builder.Services.AddScoped<AuthenticateUserHandler>();
 builder.Services.AddScoped<GetBankAccountsForCustomerHandler>();
-builder.Services.AddScoped<IHandler<ListTransactionsForBankAccountQuery, ListTransactionsForBankAccountResult>, ListTransactionsForBankAccountHandler>();
-builder.Services.AddScoped<IHandler
-    <MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, 
+builder.Services.AddScoped<IHandler<ListTransactionsForBankAccountQuery, ListTransactionsForBankAccountResult>, 
+    ListTransactionsForBankAccountHandler>();
+builder.Services.AddScoped<IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, 
     MakeDepositToBankAccountHandler>();
-builder.Services.AddScoped<IHandler
-    <MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult>, 
+builder.Services.AddScoped<IHandler<MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult>, 
     MakeWithdrawalFromBankAccountHandler>();
+builder.Services.AddScoped<IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult>,
+    ListCustomerAccountsHandler>();
 
 // Jwt config
 builder.Services.AddOptions<JwtOptions>()

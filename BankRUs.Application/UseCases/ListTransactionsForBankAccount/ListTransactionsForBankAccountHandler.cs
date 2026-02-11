@@ -2,18 +2,18 @@
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.GuardClause;
 using BankRUs.Application.Guards;
-using BankRUs.Application.Pagination;
-using BankRUs.Application.Services.AuditLog;
+using BankRUs.Application.Services.PaginationService;
 using BankRUs.Application.Services.TransactionService;
 
 namespace BankRUs.Application.UseCases.ListTransactionsForBankAccount;
 
 public class ListTransactionsForBankAccountHandler(
     IBankAccountsRepository bankAccountsRepository,
-    ITransactionService transactionService,
-    IAuditLogger auditLogger) : IHandler<ListTransactionsForBankAccountQuery, ListTransactionsForBankAccountResult>
+    IPaginationService paginationService,
+    ITransactionService transactionService) : IHandler<ListTransactionsForBankAccountQuery, ListTransactionsForBankAccountResult>
 {
     private readonly IBankAccountsRepository _bankAccountRepository = bankAccountsRepository;
+    private readonly IPaginationService _paginationService = paginationService;
     private readonly ITransactionService _transactionService = transactionService;
     public async Task<ListTransactionsForBankAccountResult> HandleAsync(ListTransactionsForBankAccountQuery query)
     {
@@ -28,19 +28,23 @@ public class ListTransactionsForBankAccountHandler(
         Guard.Against.BankAccountNotOwned(bankAccountOwnerId, query.CustomerId);
         var bankAccount = await _bankAccountRepository.GetBankAccountAsync(query.BankAccountId);
 
-        var queryResult = await _transactionService.GetTransactionsAsPagedResultAsync(new TransactionsPageQuery(
+        var transactionsQuery = new TransactionsPageQuery(
             BankAccountId: query.BankAccountId,
             StartPeriodUtc: query.StartPeriodUtc,
             EndPeriodUtc: query.EndPeriodUdc,
             Type: query.Type,
             Page: query.Page,
             PageSize: query.PageSize,
-            SortOrder: query.SortOrder ?? SortOrder.Descending));
+            SortOrder: query.SortOrder ?? SortOrder.Descending);
+
+        var queryResult = await _transactionService.GetTransactionsAsync(transactionsQuery);
+
+        var paginationResult = _paginationService.GetPagedResult(transactionsQuery, queryResult);
 
         return new ListTransactionsForBankAccountResult(
             BankAccountId: bankAccount.Id,
             Currency: bankAccount.Currency,
             CurrentBalance: bankAccount.Balance,
-            QueryResult: queryResult);
+            QueryResult: paginationResult);
     }
 }

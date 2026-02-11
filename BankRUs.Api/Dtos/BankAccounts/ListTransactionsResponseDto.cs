@@ -1,5 +1,4 @@
-﻿
-using BankRUs.Application.Pagination;
+﻿using BankRUs.Application.Services.PaginationService;
 using BankRUs.Domain.Entities;
 
 namespace BankRUs.Api.Dtos.BankAccounts;
@@ -9,9 +8,9 @@ public record ListTransactionsResponseDto(
     string Currency,
     decimal Balance,
     PagedResultMetadata Paging,
-    IReadOnlyList<CustomerTransactionDto> Items);
+    IReadOnlyList<CustomerTransactionsListItemDto> Items);
 
-public record CustomerTransactionDto(
+public record CustomerTransactionsListItemDto(
     Guid TransationId,
     string Type,
     decimal Amount,

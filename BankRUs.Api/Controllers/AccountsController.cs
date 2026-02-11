@@ -1,8 +1,15 @@
 ﻿using BankRUs.Api.Dtos.Accounts;
 using BankRUs.Api.Dtos.BankAccounts;
+using BankRUs.Application;
 using BankRUs.Application.Exceptions;
+using BankRUs.Application.Services.CustomerService;
+using BankRUs.Application.Services.Identity;
+using BankRUs.Application.Services.PaginationService;
+using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.OpenAccount;
+using BankRUs.Infrastructure.Services.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,22 +17,22 @@ using Microsoft.EntityFrameworkCore;
 namespace BankRUs.Api.Controllers;
 
 [Route("api/[controller]")]
+[Authorize(Roles = Roles.CustomerServiceRepresentative)]
 [ApiController]
-public class AccountsController : ControllerBase
+public class AccountsController(
+    ILogger<AccountsController> logger,
+    ICustomerService customerService,
+    IIdentityService identityService,
+    IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> listCustomerAccountsHandler,
+    OpenCustomerAccountHandler openAccountHandler,
+    GetBankAccountsForCustomerHandler getBankAccountsForCustomerHandler) : ControllerBase
 {
-    private readonly ILogger<AccountsController> _logger;
-    private readonly OpenCustomerAccountHandler _openAccountHandler;
-    private readonly GetBankAccountsForCustomerHandler _getBankAccountsForCustomerHandler;
-
-    public AccountsController(
-        ILogger<AccountsController> logger,
-        OpenCustomerAccountHandler openAccountHandler,
-        GetBankAccountsForCustomerHandler getBankAccountsForCustomerHandler)
-    {
-        _logger = logger;
-        _openAccountHandler = openAccountHandler;
-        _getBankAccountsForCustomerHandler = getBankAccountsForCustomerHandler;
-    }
+    private readonly ILogger<AccountsController> _logger = logger;
+    private readonly ICustomerService _customerService = customerService;
+    private readonly IIdentityService _identityService = identityService;
+    private readonly IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> _listCustomerAccountsHandler = listCustomerAccountsHandler;
+    private readonly OpenCustomerAccountHandler _openAccountHandler = openAccountHandler;
+    private readonly GetBankAccountsForCustomerHandler _getBankAccountsForCustomerHandler = getBankAccountsForCustomerHandler;
 
     // ToDo: Move to BankAccountsController
     // GET /api/accounts/{customerId}
@@ -71,9 +78,61 @@ public class AccountsController : ControllerBase
         }
     }
 
-    // POST /api/accounts (Endpoint /  API endpoint)
-    [HttpPost]
-    public async Task<IActionResult> Create(CreateAccountRequestDto request)
+    // GET /api/accounts/customers
+    [HttpGet("customers")]
+    public async Task<IActionResult> GetCustomerAccounts([FromQuery] BasePageQuery query)
+    {
+        var result = await _listCustomerAccountsHandler.HandleAsync(new ListCustomerAccountsQuery(
+            Page: query.Page,
+            PageSize: query.Size,
+            SortOrder: query.SortOrder));
+
+        var customerItems = result.Items.Select(customer => new CustomerAccountsListItemDto(
+            CustomerId: customer.Id,
+            FirstName: customer.FirstName,
+            LastName: customer.LastName,
+            Email: customer.Email)).ToList();
+
+        return Ok(new GetCustomerAccountsResponseDto(
+            Paging: result.Meta,
+            Items: customerItems));
+    }
+
+    // GET /api/accounts/customers/{customerId}
+    [HttpGet("customers/{customerId}")]
+    public async Task<IActionResult> GetCustomerAccount(Guid customerId)
+    {
+        try
+        {
+            var customer = await _customerService.GetCustomerAsync(customerId);
+            var bankAccountListItems = customer.BankAccounts.Select(b => new CustomerBankAccountListItemDto(
+                Id: b.Id,
+                Name: b.Name,
+                CurrentBalance: b.Balance,
+                Currency: b.Currency.ToString(),
+                OpenedAt: b.CreatedAt)).ToList();
+
+            return Ok(new GetCustomerAccountResponseDto(
+                Id: customer.Id,
+                FirstName: customer.FirstName,
+                LastName: customer.LastName,
+                Ssn: customer.SocialSecurityNumber,
+                Email: customer.Email,
+                BankAccounts: bankAccountListItems));
+        } 
+        catch (Exception ex)
+        {
+            if (ex is NotFoundException)
+            {
+                return NotFound();
+            }
+            return BadRequest();
+        }
+    }
+
+    // POST /api/accounts/customers/create (Endpoint /  API endpoint)
+    [HttpPost("customers/create")]
+    public async Task<IActionResult> CreateCustomer(CreateAccountRequestDto request)
     {
         try
         {
@@ -82,12 +141,11 @@ public class AccountsController : ControllerBase
                     FirstName: request.FirstName,
                     LastName: request.LastName,
                     SocialSecurityNumber: request.SocialSecurityNumber,
-                    Email: request.Email));
-
-            var response = new CreateAccountResponseDto(openAccountResult.UserId);
+                    Email: request.Email,
+                    Password: request.Password));
 
             // Return 201 Created
-            return Created(string.Empty, response);
+            return Created(string.Empty, new CreateAccountResponseDto(openAccountResult.UserId));
         } catch (Exception ex)
         {
             // Log error
@@ -96,14 +154,42 @@ public class AccountsController : ControllerBase
 
             if (ex.GetType() == typeof(DuplicateCustomerException))
             {
-                ModelState.AddModelError("Email", "Invalid Email");
+                ModelState.AddModelError("Account", "Customer account already exists");
                 // Return 400 Bad Request
-                
-                return BadRequest();
+                return BadRequest(ModelState);
             }
 
-            return NotFound();
+            return BadRequest();
+        }
+    }
+
+    //POST /api/accounts/employees/create
+    [HttpPost("employees/create")]
+    public async Task<IActionResult> CreateEmployee(CreateEmployeeAccountRequestDto request)
+    {
+        var createApplicationUserResult = await _identityService.CreateApplicationUserAsync(new CreateApplicationUserRequest(
+            FirstName: request.FirstName,
+            LastName: request.LastName,
+            Email: request.Email,
+            Password: request.Password));
+
+        if (createApplicationUserResult == null)
+        {
+            return BadRequest(ModelState);
         }
 
+        try
+        {
+            await _identityService.AssignCustomerServiceRepresentativeRoleToUser(createApplicationUserResult.UserId);
+
+            return Created(string.Empty, createApplicationUserResult.UserId);
+        } catch (Exception ex)
+        {
+            // Log error
+            EventId eventId = new();
+            _logger.LogError(eventId, ex, message: ex.Message);
+
+            return BadRequest();
+        }
     }
 }

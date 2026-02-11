@@ -16,6 +16,12 @@ public class IdentityService : IIdentityService
         _context = context;
     }
 
+    public async Task AssignCustomerServiceRepresentativeRoleToUser(Guid applicationUserId)
+    {
+        var user = await _userManager.FindByIdAsync(applicationUserId.ToString()) ?? throw new ApplicationUserNotFoundException();
+        await _userManager.AddToRoleAsync(user, Roles.CustomerServiceRepresentative);
+    }
+
     public async Task<CreateApplicationUserResult> CreateApplicationUserAsync(CreateApplicationUserRequest request)
     {
         var user = new ApplicationUser
@@ -26,9 +32,8 @@ public class IdentityService : IIdentityService
             Email = request.Email.Trim()
         };
 
-        string password = "Secret#1";
+        string password = request.Password.Trim();
 
-        // TODO: Skapa användaren i databasen (ASP.NET Core Identity)
         var result = await _userManager.CreateAsync(user, password);
 
         if (!result.Succeeded)
@@ -41,6 +46,20 @@ public class IdentityService : IIdentityService
 
         await _userManager.AddToRoleAsync(user, Roles.Customer);
 
+
         return new CreateApplicationUserResult(UserId: Guid.Parse(user.Id));
+    }
+
+    public async Task DeleteApplicationUserAsync(Guid ApplicationUserId)
+    {
+        try
+        {
+            var user = await _userManager.FindByIdAsync(ApplicationUserId.ToString()) ?? throw new ApplicationUserNotFoundException();
+            await _userManager.DeleteAsync(user);
+        }
+        catch
+        {
+            throw;
+        }
     }
 }

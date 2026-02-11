@@ -16,27 +16,18 @@ namespace BankRUs.Infrastructure.Services.CustomerService
         private readonly AppSettings _appSettings = appSettings.Value;
         private readonly ApplicationDbContext _context = context;
 
-        public async Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request)
+        public async Task<IQueryable<Customer>> GetCustomersAsync()
         {
-            try
-            {
-                var newCustomer = new Customer
-                {
-                    Id = Guid.NewGuid(),
-                    ApplicationUserId = request.ApplicationUserId,
-                    Email = request.Email,
-                    SocialSecurityNumber = request.SocialSecurityNumber
-                };
+            var customersQuery = _context.Customers.AsQueryable();
 
-                await _context.Customers.AddAsync(newCustomer);
-                await _context.SaveChangesAsync();
+            return customersQuery;
+        }
 
-                return new CreateCustomerResult(newCustomer.Id);
-
-            } catch (Exception ex)
-            {
-                throw new Exception("Could not create Customer");
-            }
+        public async Task<Customer> GetCustomerAsync(Guid customerId)
+        {
+            return await _context.Customers.Include(c => c.BankAccounts)
+                .Where(c => c.Id == customerId)
+                .FirstOrDefaultAsync() ?? throw new CustomerNotFoundException();
         }
 
         public async Task<GetCustomerIdResult> GetCustomerIdAsync(GetCustomerIdRequest request)
@@ -46,6 +37,27 @@ namespace BankRUs.Infrastructure.Services.CustomerService
                 .FirstAsync() ?? throw new CustomerNotFoundException(string.Format("Customer not found with user Id {0}", request.ApplicationUserId));
 
             return new GetCustomerIdResult(CustomerId: customer.Id);
+        }
+
+        public async Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request)
+        {
+            try
+            {
+                var newCustomer = new Customer
+                {
+                    Id = Guid.NewGuid(),
+                    Email = request.Email,
+                    SocialSecurityNumber = request.SocialSecurityNumber
+                };
+
+                await _context.Customers.AddAsync(newCustomer);
+
+                return new CreateCustomerResult(newCustomer);
+
+            } catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task<CreateBankAccountResult> CreateBankAccountAsync(CreateBankAccountRequest request)
@@ -63,13 +75,24 @@ namespace BankRUs.Infrastructure.Services.CustomerService
                 };
 
                 _context.BankAccounts.Add(newBankAccount);
-                await _context.SaveChangesAsync();
                 return new CreateBankAccountResult(newBankAccount);
             }
             catch
             {
                 throw;
             }
+        }
+
+        public bool EmailExists(string email)
+        {
+            var result = _context.Customers.Where(c => c.Email == email).FirstOrDefault();
+            return result != null;
+        }
+
+        public bool SsnExists(string ssn)
+        {
+            var result = _context.Customers.Where(c => c.SocialSecurityNumber == ssn).FirstOrDefault();
+            return result != null;
         }
     }
 }
