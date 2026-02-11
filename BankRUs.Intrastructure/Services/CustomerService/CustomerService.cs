@@ -16,6 +16,29 @@ namespace BankRUs.Infrastructure.Services.CustomerService
         private readonly AppSettings _appSettings = appSettings.Value;
         private readonly ApplicationDbContext _context = context;
 
+        public async Task<IQueryable<Customer>> GetCustomersAsync()
+        {
+            var customersQuery = _context.Customers.AsQueryable();
+
+            return customersQuery;
+        }
+
+        public async Task<Customer> GetCustomerAsync(Guid customerId)
+        {
+            return await _context.Customers.Include(c => c.BankAccounts)
+                .Where(c => c.Id == customerId)
+                .FirstOrDefaultAsync() ?? throw new CustomerNotFoundException();
+        }
+
+        public async Task<GetCustomerIdResult> GetCustomerIdAsync(GetCustomerIdRequest request)
+        {
+            var customer = await _context
+                .Customers.Where(customer => customer.ApplicationUserId == request.ApplicationUserId)
+                .FirstAsync() ?? throw new CustomerNotFoundException(string.Format("Customer not found with user Id {0}", request.ApplicationUserId));
+
+            return new GetCustomerIdResult(CustomerId: customer.Id);
+        }
+
         public async Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request)
         {
             try
@@ -35,15 +58,6 @@ namespace BankRUs.Infrastructure.Services.CustomerService
             {
                 throw;
             }
-        }
-
-        public async Task<GetCustomerIdResult> GetCustomerIdAsync(GetCustomerIdRequest request)
-        {
-            var customer = await _context
-                .Customers.Where(customer => customer.ApplicationUserId == request.ApplicationUserId)
-                .FirstAsync() ?? throw new CustomerNotFoundException(string.Format("Customer not found with user Id {0}", request.ApplicationUserId));
-
-            return new GetCustomerIdResult(CustomerId: customer.Id);
         }
 
         public async Task<CreateBankAccountResult> CreateBankAccountAsync(CreateBankAccountRequest request)
@@ -79,13 +93,6 @@ namespace BankRUs.Infrastructure.Services.CustomerService
         {
             var result = _context.Customers.Where(c => c.SocialSecurityNumber == ssn).FirstOrDefault();
             return result != null;
-        }
-
-        public async Task<IQueryable<Customer>> GetCustomersQueryAsync()
-        {
-            var customersQuery = _context.Customers.AsQueryable();
-
-            return customersQuery;
         }
     }
 }

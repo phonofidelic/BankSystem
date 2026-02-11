@@ -2,6 +2,7 @@
 using BankRUs.Api.Dtos.BankAccounts;
 using BankRUs.Application;
 using BankRUs.Application.Exceptions;
+using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.Identity;
 using BankRUs.Application.Services.PaginationService;
 using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
@@ -20,12 +21,14 @@ namespace BankRUs.Api.Controllers;
 [ApiController]
 public class AccountsController(
     ILogger<AccountsController> logger,
+    ICustomerService customerService,
     IIdentityService identityService,
     IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> listCustomerAccountsHandler,
     OpenCustomerAccountHandler openAccountHandler,
     GetBankAccountsForCustomerHandler getBankAccountsForCustomerHandler) : ControllerBase
 {
     private readonly ILogger<AccountsController> _logger = logger;
+    private readonly ICustomerService _customerService = customerService;
     private readonly IIdentityService _identityService = identityService;
     private readonly IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> _listCustomerAccountsHandler = listCustomerAccountsHandler;
     private readonly OpenCustomerAccountHandler _openAccountHandler = openAccountHandler;
@@ -77,7 +80,7 @@ public class AccountsController(
 
     // GET /api/accounts/customers
     [HttpGet("customers")]
-    public async Task<IActionResult> GetCustomers([FromQuery] BasePageQuery query)
+    public async Task<IActionResult> GetCustomerAccounts([FromQuery] BasePageQuery query)
     {
         var result = await _listCustomerAccountsHandler.HandleAsync(new ListCustomerAccountsQuery(
             Page: query.Page,
@@ -93,6 +96,38 @@ public class AccountsController(
         return Ok(new GetCustomerAccountsResponseDto(
             Paging: result.Meta,
             Items: customerItems));
+    }
+
+    // GET /api/accounts/customers/{customerId}
+    [HttpGet("customers/{customerId}")]
+    public async Task<IActionResult> GetCustomerAccount(Guid customerId)
+    {
+        try
+        {
+            var customer = await _customerService.GetCustomerAsync(customerId);
+            var bankAccountListItems = customer.BankAccounts.Select(b => new CustomerBankAccountListItemDto(
+                Id: b.Id,
+                Name: b.Name,
+                CurrentBalance: b.Balance,
+                Currency: b.Currency.ToString(),
+                OpenedAt: b.CreatedAt)).ToList();
+
+            return Ok(new GetCustomerAccountResponseDto(
+                Id: customer.Id,
+                FirstName: customer.FirstName,
+                LastName: customer.LastName,
+                Ssn: customer.SocialSecurityNumber,
+                Email: customer.Email,
+                BankAccounts: bankAccountListItems));
+        } 
+        catch (Exception ex)
+        {
+            if (ex is NotFoundException)
+            {
+                return NotFound();
+            }
+            return BadRequest();
+        }
     }
 
     // POST /api/accounts/customers/create (Endpoint /  API endpoint)
