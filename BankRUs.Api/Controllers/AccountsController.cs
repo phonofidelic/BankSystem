@@ -23,14 +23,14 @@ public class AccountsController(
     ILogger<AccountsController> logger,
     ICustomerService customerService,
     IIdentityService identityService,
-    IHandler<CustomerAccountsQuery, ListCustomerAccountsResult> listCustomerAccountsHandler,
+    IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> listCustomerAccountsHandler,
     OpenCustomerAccountHandler openAccountHandler,
     GetBankAccountsForCustomerHandler getBankAccountsForCustomerHandler) : ControllerBase
 {
     private readonly ILogger<AccountsController> _logger = logger;
     private readonly ICustomerService _customerService = customerService;
     private readonly IIdentityService _identityService = identityService;
-    private readonly IHandler<CustomerAccountsQuery, ListCustomerAccountsResult> _listCustomerAccountsHandler = listCustomerAccountsHandler;
+    private readonly IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> _listCustomerAccountsHandler = listCustomerAccountsHandler;
     private readonly OpenCustomerAccountHandler _openAccountHandler = openAccountHandler;
     private readonly GetBankAccountsForCustomerHandler _getBankAccountsForCustomerHandler = getBankAccountsForCustomerHandler;
 
@@ -80,15 +80,9 @@ public class AccountsController(
 
     // GET /api/accounts/customers
     [HttpGet("customers")]
-    public async Task<IActionResult> GetCustomerAccounts([FromQuery] GetCustomerAccountsQueryDto query)
+    public async Task<IActionResult> GetCustomerAccounts([FromQuery] ListCustomerAccountsQuery query)
     {
-        var listCustomersRequest = new CustomerAccountsQuery(
-            Search: new CustomersSearchQuery(query.Search),
-            Page: query.Page,
-            Size: query.Size,
-            Sort: query.SortOrder);
-
-        var result = await _listCustomerAccountsHandler.HandleAsync(listCustomersRequest);
+        var result = await _listCustomerAccountsHandler.HandleAsync(query);
 
         var customerItems = result.Items.Select(customer => new CustomerAccountsListItemDto(
             CustomerId: customer.Id,

@@ -86,7 +86,7 @@ builder.Services.AddScoped<IHandler<MakeDepositToBankAccountCommand, MakeDeposit
     MakeDepositToBankAccountHandler>();
 builder.Services.AddScoped<IHandler<MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult>, 
     MakeWithdrawalFromBankAccountHandler>();
-builder.Services.AddScoped<IHandler<CustomerAccountsQuery, ListCustomerAccountsResult>,
+builder.Services.AddScoped<IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult>,
     ListCustomerAccountsHandler>();
 
 // Jwt config

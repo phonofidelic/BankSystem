@@ -1,10 +1,10 @@
-﻿namespace BankRUs.Application.Services.CustomerService
-{
-    public class CustomersSearchQuery(string? search)
-    {
-        public string FirstName { get; set; } = search ?? string.Empty;
-        public string LastName { get; set; } = search ?? string.Empty;
-        public string Email { get; set; } = search ?? string.Empty;
-        public string SocialSecurityNumber { get; set; } = search ?? string.Empty;
-    }
-}
+﻿using BankRUs.Application.Services.PaginationService;
+
+namespace BankRUs.Application.Services.CustomerService;
+
+public record CustomersSearchQuery(
+    string? Search,
+    string? FirstName,
+    string? LastName,
+    string? Email,
+    string? Ssn) : BasePageQuery;
