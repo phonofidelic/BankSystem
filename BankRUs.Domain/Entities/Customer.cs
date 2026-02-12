@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using BankRUs.Domain.ValueObjects;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace BankRUs.Domain.Entities;
 
@@ -30,4 +28,31 @@ public class Customer : BaseUpdatableEntity<Guid>
     {
         BankAccounts.Add(bankAccount);
     }
+
+    public void Update(CustomerAccountDetails details)
+    {
+        if (details.AccountId != Id)
+        {
+            throw new CustomerIdentityException(string.Format("The provided Id does not belong to the customer. Provided Id: {0}", details.AccountId));
+        }
+
+        if (details.FirstName != null && details.FirstName != FirstName) { 
+            FirstName = details.FirstName;
+        }
+
+        if (details.LastName != null && details.LastName != LastName)
+        {
+            LastName = details.LastName;
+        }
+
+        if (details.Email != null && details.Email != Email) { 
+            Email = details.Email;
+        }
+
+        if (details.SocialSecurityNumber != null && details.SocialSecurityNumber != SocialSecurityNumber) { 
+            SocialSecurityNumber = details.SocialSecurityNumber;
+        }
+    }
 }
+
+public class CustomerIdentityException(string? message = "Could not perform operation on Customer") : Exception(message);

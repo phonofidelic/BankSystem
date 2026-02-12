@@ -8,11 +8,10 @@ using BankRUs.Application.Services.PaginationService;
 using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.OpenAccount;
+using BankRUs.Application.UseCases.UpdateCustomerAccount;
 using BankRUs.Infrastructure.Services.Identity;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BankRUs.Api.Controllers;
 
@@ -24,14 +23,16 @@ public class AccountsController(
     ICustomerService customerService,
     IIdentityService identityService,
     IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> listCustomerAccountsHandler,
-    OpenCustomerAccountHandler openAccountHandler,
+    IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto> openAccountHandler,
+    IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> updateCustomerAccountHandler,
     GetBankAccountsForCustomerHandler getBankAccountsForCustomerHandler) : ControllerBase
 {
     private readonly ILogger<AccountsController> _logger = logger;
     private readonly ICustomerService _customerService = customerService;
     private readonly IIdentityService _identityService = identityService;
     private readonly IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> _listCustomerAccountsHandler = listCustomerAccountsHandler;
-    private readonly OpenCustomerAccountHandler _openAccountHandler = openAccountHandler;
+    private readonly IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto> _openAccountHandler = openAccountHandler;
+    private readonly IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> _updateCustomerAccountHandler = updateCustomerAccountHandler;
     private readonly GetBankAccountsForCustomerHandler _getBankAccountsForCustomerHandler = getBankAccountsForCustomerHandler;
 
     // ToDo: Move to BankAccountsController
@@ -119,6 +120,37 @@ public class AccountsController(
         } 
         catch (Exception ex)
         {
+            if (ex is NotFoundException)
+            {
+                return NotFound();
+            }
+            return BadRequest();
+        }
+    }
+
+    // PATCH /api/accounts/customers/{customerAccountId}
+    [HttpPatch("customers/{customerAccountId}")]
+    public async Task<IActionResult> PatchCustomer(
+        [FromRoute] Guid customerAccountId,
+        [FromBody] PatchCustomerAccountRequestDto request)
+    {
+        try
+        {
+            var updateCustomerAccountResult = await _updateCustomerAccountHandler.HandleAsync(new UpdateCustomerAccountCommand(
+                CustomerAccountId: customerAccountId,
+                FirstName: request.FirstName,
+                LastName: request.LastName,
+                Email: request.Email,
+                SocialSecurityNumber: request.Ssn));
+
+            if (updateCustomerAccountResult.UpdatedFields.Count < 1)
+            {
+                return Ok();
+            }
+            _logger.LogInformation("Updated customer fields: {0}", updateCustomerAccountResult.UpdatedFields);
+            return NoContent();
+        }
+        catch (Exception ex) { 
             if (ex is NotFoundException)
             {
                 return NotFound();

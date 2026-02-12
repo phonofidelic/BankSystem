@@ -15,6 +15,7 @@ using BankRUs.Application.UseCases.ListTransactionsForBankAccount;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount;
 using BankRUs.Application.UseCases.MakeWithdrawalFromBankAccount;
 using BankRUs.Application.UseCases.OpenAccount;
+using BankRUs.Application.UseCases.UpdateCustomerAccount;
 using BankRUs.Infrastructure.Persistence;
 using BankRUs.Infrastructure.Repositories;
 using BankRUs.Infrastructure.Services.AuditLogService;
@@ -77,17 +78,14 @@ builder.Services.AddScoped<IEmailSender, FakeEmailSender>();
 builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();
 
 // Scoped Command/Query handlers
-builder.Services.AddScoped<OpenCustomerAccountHandler>();
 builder.Services.AddScoped<AuthenticateUserHandler>();
+builder.Services.AddScoped<IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto>, OpenCustomerAccountHandler>();
 builder.Services.AddScoped<GetBankAccountsForCustomerHandler>();
-builder.Services.AddScoped<IHandler<ListTransactionsForBankAccountQuery, ListTransactionsForBankAccountResult>, 
-    ListTransactionsForBankAccountHandler>();
-builder.Services.AddScoped<IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, 
-    MakeDepositToBankAccountHandler>();
-builder.Services.AddScoped<IHandler<MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult>, 
-    MakeWithdrawalFromBankAccountHandler>();
-builder.Services.AddScoped<IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult>,
-    ListCustomerAccountsHandler>();
+builder.Services.AddScoped<IHandler<ListTransactionsForBankAccountQuery, ListTransactionsForBankAccountResult>, ListTransactionsForBankAccountHandler>();
+builder.Services.AddScoped<IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, MakeDepositToBankAccountHandler>();
+builder.Services.AddScoped<IHandler<MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult>, MakeWithdrawalFromBankAccountHandler>();
+builder.Services.AddScoped<IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult>, ListCustomerAccountsHandler>();
+builder.Services.AddScoped<IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult>, UpdateCustomerAccountHandler>();
 
 // Jwt config
 builder.Services.AddOptions<JwtOptions>()
