@@ -1,5 +1,6 @@
 using BankRUs.Application;
 using BankRUs.Application.BankAccounts;
+using BankRUs.Application.Configuration;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.Authentication;
 using BankRUs.Application.Services.Authentication.AuthenticateUser;
@@ -144,15 +145,15 @@ if (app.Environment.IsDevelopment())
     await CurrencySeeder.SeedAsync(scope.ServiceProvider);
 
     //// Generate/remove seeded data
-    //const int SEED = 184765;
-    //var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+    // const int SEED = 184765;
+    // var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-    //await Seeder.GenerateSeededDataAsync(count: 10, seed: SEED, scope.ServiceProvider);
-    //await Seeder.RemoveSeededDataAsync(SEED, scope.ServiceProvider);
+    // await Seeder.GenerateSeededDataAsync(count: 10, seed: SEED, scope.ServiceProvider);
+    // // await Seeder.RemoveSeededDataAsync(SEED, scope.ServiceProvider);
 
-    //dbContext.SetTimestamps(false);
-    //await unitOfWork.SaveAsync();
-    //dbContext.SetTimestamps(true);
+    // dbContext.SetTimestamps(false);
+    // await unitOfWork.SaveAsync();
+    // dbContext.SetTimestamps(true);
 }
 
 app.UseHttpsRedirection();

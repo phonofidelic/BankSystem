@@ -1,4 +1,4 @@
-﻿using BankRUs.Application;
+﻿using BankRUs.Application.Configuration;
 using BankRUs.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
