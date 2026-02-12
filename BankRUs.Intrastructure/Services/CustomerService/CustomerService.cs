@@ -2,6 +2,7 @@
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.CustomerService.GetCustomer;
+using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
 using BankRUs.Domain.Entities;
 using BankRUs.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -16,11 +17,23 @@ namespace BankRUs.Infrastructure.Services.CustomerService
         private readonly AppSettings _appSettings = appSettings.Value;
         private readonly ApplicationDbContext _context = context;
 
-        public async Task<IQueryable<Customer>> GetCustomersAsync()
+        public async Task<IQueryable<Customer>> SearchCustomersAsync(ListCustomerAccountsQuery query)
         {
-            var customersQuery = _context.Customers.AsQueryable();
+            var search = query.Search ?? string.Empty;
+            var results = _context.Customers
+                .Where(c =>
+                      c.FirstName.Contains(search)
+                    | c.LastName.Contains(search)
+                    | c.Email.Contains(search)
+                    | c.SocialSecurityNumber.Contains(search))
+                .Where(c =>
+                      c.FirstName.Contains(query.FirstName ?? string.Empty)
+                    && c.LastName.Contains(query.LastName ?? string.Empty)
+                    && c.Email.Contains(query.Email ?? string.Empty)
+                    && c.SocialSecurityNumber.Contains(query.Ssn ?? string.Empty))
+                .AsQueryable();
 
-            return customersQuery;
+            return results;
         }
 
         public async Task<Customer> GetCustomerAsync(Guid customerId)

@@ -80,12 +80,9 @@ public class AccountsController(
 
     // GET /api/accounts/customers
     [HttpGet("customers")]
-    public async Task<IActionResult> GetCustomerAccounts([FromQuery] BasePageQuery query)
+    public async Task<IActionResult> GetCustomerAccounts([FromQuery] ListCustomerAccountsQuery query)
     {
-        var result = await _listCustomerAccountsHandler.HandleAsync(new ListCustomerAccountsQuery(
-            Page: query.Page,
-            PageSize: query.Size,
-            SortOrder: query.SortOrder));
+        var result = await _listCustomerAccountsHandler.HandleAsync(query);
 
         var customerItems = result.Items.Select(customer => new CustomerAccountsListItemDto(
             CustomerId: customer.Id,

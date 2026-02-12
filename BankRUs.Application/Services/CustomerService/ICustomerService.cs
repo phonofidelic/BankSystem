@@ -1,11 +1,12 @@
 ﻿using BankRUs.Application.Services.CustomerService.GetCustomer;
+using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
 using BankRUs.Domain.Entities;
 
 namespace BankRUs.Application.Services.CustomerService;
 
 public interface ICustomerService
 {
-    public Task<IQueryable<Customer>> GetCustomersAsync();
+    public Task<IQueryable<Customer>> SearchCustomersAsync(ListCustomerAccountsQuery query);
     
     public Task<Customer> GetCustomerAsync(Guid customerId);
     

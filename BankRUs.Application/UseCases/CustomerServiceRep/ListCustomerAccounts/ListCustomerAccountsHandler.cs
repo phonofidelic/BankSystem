@@ -1,21 +1,22 @@
 ﻿using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.PaginationService;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
 
 public class ListCustomerAccountsHandler(
+    ILogger<ListCustomerAccountsHandler> logger,
     ICustomerService customerService, 
     IPaginationService paginationService) : IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult>
 {
+    private readonly ILogger<ListCustomerAccountsHandler> _logger = logger;
     private readonly ICustomerService _customerService = customerService;
     private readonly IPaginationService _paginationService = paginationService;
     public async Task<ListCustomerAccountsResult> HandleAsync(ListCustomerAccountsQuery query)
     {
-        var customers = await _customerService.GetCustomersAsync();
-        var result = _paginationService.GetPagedResult(new CustomersPageQuery(
-            Page: query.Page,
-            PageSize: query.Size,
-            SortOrder: query.SortOrder), customers);
+        var customers = await _customerService.SearchCustomersAsync(query);
+        var result = _paginationService.GetPagedResult(query, customers);
 
         return new ListCustomerAccountsResult(
             Items: result.Items,
