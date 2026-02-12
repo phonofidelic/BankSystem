@@ -6,6 +6,8 @@ namespace BankRUs.Application.Services.CustomerService;
 public interface ICustomerService
 {
     public Task<IQueryable<Customer>> GetCustomersAsync();
+
+    public Task<IQueryable<Customer>> SearchCustomersAsync(CustomersSearchQuery query);
     
     public Task<Customer> GetCustomerAsync(Guid customerId);
     

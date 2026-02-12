@@ -94,5 +94,18 @@ namespace BankRUs.Infrastructure.Services.CustomerService
             var result = _context.Customers.Where(c => c.SocialSecurityNumber == ssn).FirstOrDefault();
             return result != null;
         }
+
+        public async Task<IQueryable<Customer>> SearchCustomersAsync(CustomersSearchQuery query)
+        {
+            var results = _context.Customers
+                .Where(c => 
+                      c.FirstName.Contains(query.FirstName)
+                    | c.LastName.Contains(query.LastName)
+                    | c.Email.Contains(query.Email)
+                    | c.SocialSecurityNumber.Contains(query.SocialSecurityNumber))
+                .AsQueryable();
+
+            return results;
+        }
     }
 }
