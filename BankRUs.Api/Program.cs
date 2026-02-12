@@ -52,7 +52,7 @@ builder.Services.AddOptions<AppSettings>()
 
 // Registrera ApplicationDbContext i DI-containern
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-      options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services
   .AddIdentity<ApplicationUser, IdentityRole>()
