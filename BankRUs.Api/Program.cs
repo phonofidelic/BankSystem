@@ -52,6 +52,11 @@ builder.Services.AddOptions<AppSettings>()
         CultureInfo.DefaultThreadCurrentUICulture = systemCulture;
     });
 
+builder.Services.AddOptions<DefaultAdmin>()
+    .BindConfiguration(nameof(DefaultAdmin))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
 // Registrera ApplicationDbContext i DI-containern
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
@@ -123,6 +128,16 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy(Roles.SystemAdmin, policy => policy.RequireRole([
+        Roles.SystemAdmin
+    ]))
+    .AddPolicy(Roles.CustomerServiceRepresentative, policy =>
+        policy.RequireRole([
+            Roles.CustomerServiceRepresentative,
+            Roles.SystemAdmin])
+);
+
 builder.Services.AddAuthorization();
 
 builder.Services.AddControllers()
@@ -157,6 +172,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.MapControllers();
 

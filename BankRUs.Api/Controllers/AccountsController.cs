@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BankRUs.Api.Controllers;
 
 [Route("api/[controller]")]
-[Authorize(Roles = Roles.CustomerServiceRepresentative)]
+[Authorize(Policy = Roles.CustomerServiceRepresentative)]
 [ApiController]
 public class AccountsController(
     ILogger<AccountsController> logger,
@@ -194,6 +194,7 @@ public class AccountsController(
 
     //POST /api/accounts/employees/create
     [HttpPost("employees/create")]
+    [Authorize(Policy = Roles.SystemAdmin)]
     public async Task<IActionResult> CreateEmployee(CreateEmployeeAccountRequestDto request)
     {
         var createApplicationUserResult = await _identityService.CreateApplicationUserAsync(new CreateApplicationUserRequest(
