@@ -1,15 +1,18 @@
 ﻿using BankRUs.Domain.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace BankRUs.Domain.Entities;
 
-public class Transaction(TransactionType type) : BaseCreatableEntity<Guid>
+public class Transaction : BaseCreatableEntity<Guid>
 {
-    private int _multiplyer { get; init; } = type == TransactionType.Deposit ? 1 : -1;
+    public Transaction()
+    {}
+
+    public Transaction(TransactionType type)
+    {
+        Type = type;
+        _multiplier = type == TransactionType.Deposit ? 1 : -1;
+    }
+    private int _multiplier { get; set; }
     public override Guid Id { get; set; } = Guid.NewGuid();
 
     public required Guid  CustomerId { get; set; }
@@ -26,9 +29,9 @@ public class Transaction(TransactionType type) : BaseCreatableEntity<Guid>
 
     public string? Reference { get; set; } = string.Empty;
 
-    public TransactionType Type { get; init; } = type;
+    public TransactionType Type { get; init; }
 
-    public decimal Value { get => Amount * _multiplyer; }
+    public decimal Value { get => Amount * _multiplier; }
 
     public void UpdateBalanceAfter(decimal balance)
     {

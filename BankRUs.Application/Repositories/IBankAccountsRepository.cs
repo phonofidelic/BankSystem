@@ -17,8 +17,6 @@ namespace BankRUs.Application.BankAccounts
 
         public Task<Guid> GetCustomerIdForBankAccountAsync(Guid bankAccountId);
 
-        public Task UpdateBankAccountBalanceWithTransactionAsync(Transaction transaction);
-
         public Task<decimal> GetBankAccountBalance(Guid bankAccountId);
 
         public Task<Currency> GetBankAccountCurrency(Guid bankAccountId);

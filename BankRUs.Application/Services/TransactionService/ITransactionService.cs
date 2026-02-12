@@ -8,7 +8,5 @@ namespace BankRUs.Application.Services.TransactionService
         public Task<CreateTransactionResult> CreateTransactionAsync(CreateTransactionRequest request);
 
         public Task<IQueryable<Transaction>> GetTransactionsAsync(TransactionsPageQuery query);
-
-        public Task<decimal> GetBalanceAfterAsync(Guid bankAccountId, Guid transactionId);
     }
 }

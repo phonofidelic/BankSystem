@@ -64,14 +64,10 @@ public class MakeWithdrawalFromBankAccountHandler(
         // Get the Transaction instance
         var createdTransaction = createTransactionResult.Transaction;
 
-        // Post the transaction to update the bank account balance
-        await _bankAccountRepository.UpdateBankAccountBalanceWithTransactionAsync(createdTransaction);
-
-        // Retrieve the new balance
-        var balanceAfter = await _bankAccountRepository.GetBankAccountBalance(createdTransaction.BankAccountId);
-
-        // Update the Transaction record with the new balance
-        createdTransaction.UpdateBalanceAfter(balanceAfter);
+        var bankAccount = await _bankAccountRepository.GetBankAccountAsync(command.BankAccountId);
+        
+        // Transaction functionality is implemented in BankAccount and Transaction entities
+        bankAccount.AddTransaction(createdTransaction);
 
         // Complete unit of work
         await _unitOfWork.SaveAsync();
@@ -83,7 +79,7 @@ public class MakeWithdrawalFromBankAccountHandler(
                 CustomerId: createTransactionResult.Transaction.CustomerId,
                 Type: createTransactionResult.Transaction.Type,
                 Amount: createTransactionResult.Transaction.Amount,
-                BalanceAfter: balanceAfter,
+                BalanceAfter: createdTransaction.BalanceAfter,
                 Currency: createTransactionResult.Transaction.Currency.ToString(),
                 Reference: createTransactionResult.Transaction.Reference,
                 CreatedAt: createTransactionResult.Transaction.CreatedAt);

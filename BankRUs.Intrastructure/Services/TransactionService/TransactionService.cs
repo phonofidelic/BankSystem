@@ -24,11 +24,6 @@ namespace BankRUs.Infrastructure.Services.TransactionService
             return new CreateTransactionResult(transaction);
         }
 
-        public Task<decimal> GetBalanceAfterAsync(Guid bankAccountId, Guid transactionId)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<IQueryable<Transaction>> GetTransactionsAsync(TransactionsPageQuery query)
         {
             var transactions = _context.Transactions.AsQueryable();

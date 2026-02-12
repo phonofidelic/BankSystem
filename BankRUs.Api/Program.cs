@@ -15,9 +15,7 @@ using BankRUs.Application.UseCases.ListTransactionsForBankAccount;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount;
 using BankRUs.Application.UseCases.MakeWithdrawalFromBankAccount;
 using BankRUs.Application.UseCases.OpenAccount;
-using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Persistence;
-using BankRUs.Infrastructure.Persistence.Configurations;
 using BankRUs.Infrastructure.Repositories;
 using BankRUs.Infrastructure.Services.AuditLogService;
 using BankRUs.Infrastructure.Services.Authentication;
@@ -54,7 +52,7 @@ builder.Services.AddOptions<AppSettings>()
 
 // Registrera ApplicationDbContext i DI-containern
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-  options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services
   .AddIdentity<ApplicationUser, IdentityRole>()
@@ -146,6 +144,17 @@ if (app.Environment.IsDevelopment())
 
     await IdentitySeeder.SeedAsync(scope.ServiceProvider);
     await CurrencySeeder.SeedAsync(scope.ServiceProvider);
+
+    //// Generate/remove seeded data
+    //const int SEED = 184765;
+    //var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+    //await Seeder.GenerateSeededDataAsync(count: 10, seed: SEED, scope.ServiceProvider);
+    //await Seeder.RemoveSeededDataAsync(SEED, scope.ServiceProvider);
+
+    //dbContext.SetTimestamps(false);
+    //await unitOfWork.SaveAsync();
+    //dbContext.SetTimestamps(true);
 }
 
 app.UseHttpsRedirection();
