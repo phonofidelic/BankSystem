@@ -6,8 +6,6 @@ using Bogus.Extensions.Sweden;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using System;
 
 namespace BankRUs.Infrastructure.Persistence;
 
@@ -18,27 +16,15 @@ public static class Seeder
     private const int MIN_TRANSACTIONS = 15;
     private const int MAX_TRANSACTIONS = 125;
 
-    public static async Task RemoveGeneratedCustomersAsync(int count, int seed, IServiceProvider serviceProvider)
+    public static async Task RemoveSeededDataAsync(int seed, IServiceProvider serviceProvider)
     {
         var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
-        //Randomizer.Seed = new Random(seed);
 
-        //var customer = new Faker<Customer>()
-        //    .RuleFor(c => c.Id, (f, c) => f.Random.Guid());
-
-        var customers = await GenerateCustomersAsync(count, seed, serviceProvider);
-        foreach (var customer in customers)
-        {
-            var storedCustomer = await context.Customers.FirstOrDefaultAsync(c => c.Email == customer.Email);
-            if (storedCustomer != null) {
-                Console.WriteLine("Removing customer: {0} {1}, ID: {2}", storedCustomer.FirstName, storedCustomer.LastName, storedCustomer.Id);
-
-                context.Customers.Remove(storedCustomer);
-            }
-        }
+        var toRemove = await context.Customers.Where(c => c.LastName.Contains(SeedStamp(seed))).ToListAsync();
+        context.Customers.RemoveRange(toRemove);
     }
 
-    public static async Task<List<Customer>>GenerateCustomersAsync(int count, int seed, IServiceProvider serviceProvider)
+    public static async Task GenerateSeededDataAsync(int count, int seed, IServiceProvider serviceProvider)
     {
         Randomizer.Seed = new Random(seed);
         var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
@@ -47,7 +33,7 @@ public static class Seeder
         var customer = new Faker<Customer>()
             .RuleFor(c => c.ApplicationUserId, (f, c) => f.Random.Guid())
             .RuleFor(c => c.FirstName, (f, c) => f.Person.FirstName)
-            .RuleFor(c => c.LastName, (f, c) => f.Person.LastName + " GENERATED")
+            .RuleFor(c => c.LastName, (f, c) => f.Person.LastName + SeedStamp(seed))
             .RuleFor(c => c.Email, (f, c) => f.Internet.Email(c.FirstName, c.LastName))
             .RuleFor(c => c.SocialSecurityNumber, (f, c) => f.Person.Personnummer())
             .RuleFor(c => c.CreatedAt, (f, c) => f.Date.Past(f.Random.Int(0, 5)))
@@ -57,19 +43,12 @@ public static class Seeder
 
         foreach (var generatedCustomer in customers)
         {
-            await GenerateBankAccountsForCustomer(generatedCustomer, serviceProvider);
+            await GenerateBankAccountsForCustomer(generatedCustomer, seed, serviceProvider);
             await context.Customers.AddAsync(generatedCustomer);
         }
-
-        //var serializerSettings = new JsonSerializerSettings();
-        //serializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-        
-        //await context.Customers.AddRangeAsync(customers);
-        
-        return customers;
     }
 
-    private static async Task GenerateBankAccountsForCustomer(Customer customer, IServiceProvider serviceProvider)
+    private static async Task GenerateBankAccountsForCustomer(Customer customer, int seed, IServiceProvider serviceProvider)
     {
         var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
         var appSettings = serviceProvider.GetRequiredService<IOptions<AppSettings>>().Value;
@@ -78,7 +57,7 @@ public static class Seeder
         var currency = appSettings.DefaultCurrency;
         var bankAccount = new Faker<BankAccount>()
             .RuleFor(b => b.Id, (f, b) => f.Random.Guid())
-            .RuleFor(b => b.Name, (f, b) => f.Finance.AccountName())
+            .RuleFor(b => b.Name, (f, b) => f.Finance.AccountName() + SeedStamp(seed))
             .RuleFor(b => b.CustomerId, () => customer.Id)
             .RuleFor(b => b.Customer, () => customer)
             .RuleFor(b => b.Balance, () => 1000)
@@ -94,18 +73,19 @@ public static class Seeder
                 var openDate = f.Date.Between(refDate, f.Date.Soon(f.Random.Int(1, 5), refDate));
                 refDate = openDate;
                 return openDate;
-            });
+            })
+            .RuleFor(b => b.UpdatedAt, (f, b) => f.Date.Between(b.CreatedAt, f.Date.Recent()));
 
         var bankAccounts = bankAccount.GenerateBetween(MIN_BANK_ACCOUNTS, MAX_BANK_ACCOUNTS);
 
         foreach (var generatedBankAccount in bankAccounts)
         {
-            await GenerateTransactionsForBankAccount(generatedBankAccount, serviceProvider);
+            await GenerateTransactionsForBankAccount(generatedBankAccount, seed, serviceProvider);
             customer.AddBankAccount(generatedBankAccount);
         }
     }
 
-    private static async Task GenerateTransactionsForBankAccount(BankAccount bankAccount, IServiceProvider serviceProvider)
+    private static async Task GenerateTransactionsForBankAccount(BankAccount bankAccount, int seed, IServiceProvider serviceProvider)
     {
         var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
         var appSettings = serviceProvider.GetRequiredService<IOptions<AppSettings>>().Value;
@@ -131,7 +111,7 @@ public static class Seeder
             .RuleFor(t => t.BankAccountId, () => bankAccount.Id)
             .RuleFor(t => t.BankAccount, () => bankAccount)
             .RuleFor(t => t.Amount, (f, t) => f.Finance.Amount())
-            .RuleFor(t => t.Reference, (f, t) => f.Lorem.Sentence() + " GENERATED")
+            .RuleFor(t => t.Reference, (f, t) => f.Lorem.Sentence() + SeedStamp(seed))
             .RuleFor(t => t.CreatedAt, (f, t) => {
                 var transactionDate = f.Date.Between(refDate, f.Date.Soon(f.Random.Int(1,5), refDate));
                 refDate = transactionDate;
@@ -156,4 +136,6 @@ public static class Seeder
             }
         }
     }
+
+    private static string SeedStamp(int seed) => $" [SEED:{seed}]";
 }

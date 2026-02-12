@@ -10,7 +10,7 @@ public sealed class ApplicationDbContext(
     DbContextOptions<ApplicationDbContext> options
     ) : IdentityDbContext<ApplicationUser>(options)
 {
-
+    private bool _setTimestamps { get; set; } = true;
     public DbSet<Customer> Customers { get; set; } = default!;
     public DbSet<BankAccount> BankAccounts { get; set; } = default!;
     public DbSet<Transaction> Transactions { get; set; } = default!;
@@ -22,15 +22,25 @@ public sealed class ApplicationDbContext(
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 
+    public void SetTimestamps(bool setTimestamps)
+    {
+        _setTimestamps = setTimestamps; 
+    }
     public override int SaveChanges()
     {
-        AddTimestamps();
+        if (_setTimestamps)
+        {
+            AddTimestamps();
+        }
         return base.SaveChanges();
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
     {
-        AddTimestamps();
+        if (_setTimestamps)
+        {
+            AddTimestamps();
+        }
         return await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
