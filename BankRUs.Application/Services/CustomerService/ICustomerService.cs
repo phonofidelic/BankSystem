@@ -1,5 +1,4 @@
-﻿using BankRUs.Application.Services.CustomerService.GetCustomer;
-using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
+﻿using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
 using BankRUs.Domain.Entities;
 
 namespace BankRUs.Application.Services.CustomerService;
@@ -10,7 +9,7 @@ public interface ICustomerService
     
     public Task<Customer> GetCustomerAsync(Guid customerId);
     
-    public Task<GetCustomerIdResult> GetCustomerIdAsync(GetCustomerIdRequest request);
+    public Task<Guid> GetCustomerIdAsync(Guid applicationUserId);
     
     public Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request);
     
