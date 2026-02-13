@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using BankRUs.Api.Dtos.Me;
 using BankRUs.Application;
 using BankRUs.Application.UseCases.GetCustomerAccountDetails;
@@ -61,11 +62,17 @@ namespace BankRUs.Api.Controllers
                 OpenedAt: b.CreatedAt
             )).ToList();
 
+            // Anonymize last four digits of social security number
+            // ToDo: If anonymization is a business rule, move it to CustomerAccount entity or service
+            var socialSecurityNumber = result.CustomerAccountDetails.SocialSecurityNumber ?? "";
+            var lastFour = new Regex(@"\d{4}$");
+            var anonomizedSocialSecurityNumber = lastFour.Replace(socialSecurityNumber, "####");
+
             var response = new GetMeCustomerAccountResponseDto(
                 Id: result.CustomerAccountId,
                 FirstName: result.CustomerAccountDetails.FirstName,
                 LastName: result.CustomerAccountDetails.LastName,
-                Ssn: result.CustomerAccountDetails.SocialSecurityNumber,
+                Ssn: anonomizedSocialSecurityNumber,
                 Email: result.CustomerAccountDetails.Email,
                 BankAccounts: bankAccountListItems
             );
