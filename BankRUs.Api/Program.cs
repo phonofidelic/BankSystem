@@ -26,6 +26,7 @@ using BankRUs.Infrastructure.Services.CurrencyService;
 using BankRUs.Infrastructure.Services.CustomerService;
 using BankRUs.Infrastructure.Services.Email;
 using BankRUs.Infrastructure.Services.Identity;
+using BankRUs.Infrastructure.Services.IdentityService;
 using BankRUs.Infrastructure.Services.PaginationService;
 using BankRUs.Infrastructure.Services.TransactionService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -129,14 +130,15 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorizationBuilder()
-    .AddPolicy(Roles.SystemAdmin, policy => policy.RequireRole([
+    .AddPolicy(Policies.REQUIRE_ROLE_SYSTEM_ADMIN, policy => policy.RequireRole([
         Roles.SystemAdmin
     ]))
-    .AddPolicy(Roles.CustomerServiceRepresentative, policy =>
+    .AddPolicy(Policies.REQUIRE_ROLE_CUSTOMER_SERVICE, policy =>
         policy.RequireRole([
             Roles.CustomerServiceRepresentative,
-            Roles.SystemAdmin])
-);
+            Roles.SystemAdmin]))
+    .AddDefaultPolicy(Policies.REQUIRE_AUTHENTICATION, policy =>
+        policy.RequireAuthenticatedUser());
 
 builder.Services.AddAuthorization();
 

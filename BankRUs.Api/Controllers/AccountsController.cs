@@ -10,13 +10,14 @@ using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.OpenAccount;
 using BankRUs.Application.UseCases.UpdateCustomerAccount;
 using BankRUs.Infrastructure.Services.Identity;
+using BankRUs.Infrastructure.Services.IdentityService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankRUs.Api.Controllers;
 
 [Route("api/[controller]")]
-[Authorize(Policy = Roles.CustomerServiceRepresentative)]
+[Authorize(Policy = Policies.REQUIRE_ROLE_CUSTOMER_SERVICE)]
 [ApiController]
 public class AccountsController(
     ILogger<AccountsController> logger,
@@ -145,6 +146,7 @@ public class AccountsController(
 
             if (updateCustomerAccountResult.UpdatedFields.Count < 1)
             {
+                _logger.LogInformation("No fields were updated");
                 return Ok();
             }
             _logger.LogInformation("Updated customer fields: {0}", updateCustomerAccountResult.UpdatedFields);
@@ -194,7 +196,7 @@ public class AccountsController(
 
     //POST /api/accounts/employees/create
     [HttpPost("employees/create")]
-    [Authorize(Policy = Roles.SystemAdmin)]
+    [Authorize(Policy = Policies.REQUIRE_ROLE_SYSTEM_ADMIN)]
     public async Task<IActionResult> CreateEmployee(CreateEmployeeAccountRequestDto request)
     {
         var createApplicationUserResult = await _identityService.CreateApplicationUserAsync(new CreateApplicationUserRequest(
