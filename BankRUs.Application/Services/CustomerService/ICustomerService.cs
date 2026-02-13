@@ -1,4 +1,4 @@
-﻿using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
+﻿using BankRUs.Application.UseCases.ListCustomerAccounts;
 using BankRUs.Domain.Entities;
 
 namespace BankRUs.Application.Services.CustomerService;
