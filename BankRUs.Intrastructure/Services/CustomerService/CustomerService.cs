@@ -1,7 +1,7 @@
 ﻿using BankRUs.Application.Configuration;
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.CustomerService;
-using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
+using BankRUs.Application.UseCases.ListCustomerAccounts;
 using BankRUs.Domain.Entities;
 using BankRUs.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;

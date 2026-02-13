@@ -3,7 +3,7 @@ using BankRUs.Application.Services.PaginationService;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
-namespace BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
+namespace BankRUs.Application.UseCases.ListCustomerAccounts;
 
 public class ListCustomerAccountsHandler(
     ILogger<ListCustomerAccountsHandler> logger,

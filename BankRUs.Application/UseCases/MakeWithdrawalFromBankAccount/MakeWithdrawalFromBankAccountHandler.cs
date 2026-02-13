@@ -73,7 +73,7 @@ public class MakeWithdrawalFromBankAccountHandler(
         await _unitOfWork.SaveAsync();
 
         return createTransactionResult == null
-            ? throw new Exception("Deposit transaction could not be made")
+            ? throw new Exception("Withdrawal transaction could not be made")
             : new MakeWithdrawalFromBankAccountResult(
                 TransactionId: createTransactionResult.Transaction.Id,
                 CustomerId: createTransactionResult.Transaction.CustomerId,
