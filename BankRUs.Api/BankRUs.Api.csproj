@@ -29,4 +29,8 @@
     <ProjectReference Include="..\BankRUs.Intrastructure\BankRUs.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Dtos/Me/" />
+  </ItemGroup>
+
 </Project>
