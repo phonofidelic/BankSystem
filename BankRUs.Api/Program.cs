@@ -12,6 +12,7 @@ using BankRUs.Application.Services.PaginationService;
 using BankRUs.Application.Services.TransactionService;
 using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
+using BankRUs.Application.UseCases.GetCustomerAccountDetails;
 using BankRUs.Application.UseCases.ListTransactionsForBankAccount;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount;
 using BankRUs.Application.UseCases.MakeWithdrawalFromBankAccount;
@@ -85,6 +86,7 @@ builder.Services.AddScoped<IEmailSender, FakeEmailSender>();
 builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();
 
 // Scoped Command/Query handlers
+builder.Services.AddScoped<IHandler<GetCustomerAccountDetailsQuery, GetCustomerAccountDetailsResult>, GetCustomerAccountDetailsHandler>();
 builder.Services.AddScoped<AuthenticateUserHandler>();
 builder.Services.AddScoped<IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto>, OpenCustomerAccountHandler>();
 builder.Services.AddScoped<GetBankAccountsForCustomerHandler>();

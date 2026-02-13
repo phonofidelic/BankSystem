@@ -29,6 +29,21 @@ public class Customer : BaseUpdatableEntity<Guid>
         BankAccounts.Add(bankAccount);
     }
 
+    public CustomerAccountDetails GetDetails()
+    {
+        return new CustomerAccountDetails(
+            FirstName,
+            LastName,
+            Email,
+            SocialSecurityNumber
+        );
+    }
+
+    public IReadOnlyList<BankAccount> GetBankAccounts()
+    {
+        return BankAccounts.ToList();
+    }
+
     public void Update(CustomerAccountDetails details)
     {
         if (details.FirstName != null && details.FirstName != FirstName) { 

@@ -14,4 +14,8 @@
     <ProjectReference Include="..\BankRUs.Domain\BankRUs.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UseCases/GetCustomerAccountDetails/" />
+  </ItemGroup>
+
 </Project>
