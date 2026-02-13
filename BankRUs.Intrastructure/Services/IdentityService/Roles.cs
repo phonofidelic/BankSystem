@@ -6,5 +6,5 @@ public static class Roles
     public const string CustomerServiceRepresentative = "CustomerServiceRepresentative";
     public const string SystemAdmin = "SystemAdministrator";
 
-    public static readonly string[] All = [Customer, CustomerServiceRepresentative, SystemAdmin];
+    public static readonly string[] All = [SystemAdmin, Customer, CustomerServiceRepresentative];
 }

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using BankRUs.Domain.ValueObjects;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace BankRUs.Domain.Entities;
 
@@ -29,5 +27,40 @@ public class Customer : BaseUpdatableEntity<Guid>
     public void AddBankAccount(BankAccount bankAccount)
     {
         BankAccounts.Add(bankAccount);
+    }
+
+    public CustomerAccountDetails GetDetails()
+    {
+        return new CustomerAccountDetails(
+            FirstName,
+            LastName,
+            Email,
+            SocialSecurityNumber
+        );
+    }
+
+    public IReadOnlyList<BankAccount> GetBankAccounts()
+    {
+        return BankAccounts.ToList();
+    }
+
+    public void Update(CustomerAccountDetails details)
+    {
+        if (details.FirstName != null && details.FirstName != FirstName) { 
+            FirstName = details.FirstName;
+        }
+
+        if (details.LastName != null && details.LastName != LastName)
+        {
+            LastName = details.LastName;
+        }
+
+        if (details.Email != null && details.Email != Email) { 
+            Email = details.Email;
+        }
+
+        if (details.SocialSecurityNumber != null && details.SocialSecurityNumber != SocialSecurityNumber) { 
+            SocialSecurityNumber = details.SocialSecurityNumber;
+        }
     }
 }

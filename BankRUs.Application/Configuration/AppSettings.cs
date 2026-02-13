@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace BankRUs.Application
+namespace BankRUs.Application.Configuration
 {
     public class AppSettings
     {

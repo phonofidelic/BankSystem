@@ -1,5 +1,6 @@
 using BankRUs.Application;
 using BankRUs.Application.BankAccounts;
+using BankRUs.Application.Configuration;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.Authentication;
 using BankRUs.Application.Services.Authentication.AuthenticateUser;
@@ -11,10 +12,12 @@ using BankRUs.Application.Services.PaginationService;
 using BankRUs.Application.Services.TransactionService;
 using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
+using BankRUs.Application.UseCases.GetCustomerAccountDetails;
 using BankRUs.Application.UseCases.ListTransactionsForBankAccount;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount;
 using BankRUs.Application.UseCases.MakeWithdrawalFromBankAccount;
 using BankRUs.Application.UseCases.OpenAccount;
+using BankRUs.Application.UseCases.UpdateCustomerAccount;
 using BankRUs.Infrastructure.Persistence;
 using BankRUs.Infrastructure.Repositories;
 using BankRUs.Infrastructure.Services.AuditLogService;
@@ -24,6 +27,7 @@ using BankRUs.Infrastructure.Services.CurrencyService;
 using BankRUs.Infrastructure.Services.CustomerService;
 using BankRUs.Infrastructure.Services.Email;
 using BankRUs.Infrastructure.Services.Identity;
+using BankRUs.Infrastructure.Services.IdentityService;
 using BankRUs.Infrastructure.Services.PaginationService;
 using BankRUs.Infrastructure.Services.TransactionService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -49,6 +53,11 @@ builder.Services.AddOptions<AppSettings>()
         CultureInfo.DefaultThreadCurrentCulture = systemCulture;
         CultureInfo.DefaultThreadCurrentUICulture = systemCulture;
     });
+
+builder.Services.AddOptions<DefaultAdmin>()
+    .BindConfiguration(nameof(DefaultAdmin))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 // Registrera ApplicationDbContext i DI-containern
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -77,17 +86,15 @@ builder.Services.AddScoped<IEmailSender, FakeEmailSender>();
 builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();
 
 // Scoped Command/Query handlers
-builder.Services.AddScoped<OpenCustomerAccountHandler>();
+builder.Services.AddScoped<IHandler<GetCustomerAccountDetailsQuery, GetCustomerAccountDetailsResult>, GetCustomerAccountDetailsHandler>();
 builder.Services.AddScoped<AuthenticateUserHandler>();
+builder.Services.AddScoped<IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto>, OpenCustomerAccountHandler>();
 builder.Services.AddScoped<GetBankAccountsForCustomerHandler>();
-builder.Services.AddScoped<IHandler<ListTransactionsForBankAccountQuery, ListTransactionsForBankAccountResult>, 
-    ListTransactionsForBankAccountHandler>();
-builder.Services.AddScoped<IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, 
-    MakeDepositToBankAccountHandler>();
-builder.Services.AddScoped<IHandler<MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult>, 
-    MakeWithdrawalFromBankAccountHandler>();
-builder.Services.AddScoped<IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult>,
-    ListCustomerAccountsHandler>();
+builder.Services.AddScoped<IHandler<ListTransactionsForBankAccountQuery, ListTransactionsForBankAccountResult>, ListTransactionsForBankAccountHandler>();
+builder.Services.AddScoped<IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, MakeDepositToBankAccountHandler>();
+builder.Services.AddScoped<IHandler<MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult>, MakeWithdrawalFromBankAccountHandler>();
+builder.Services.AddScoped<IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult>, ListCustomerAccountsHandler>();
+builder.Services.AddScoped<IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult>, UpdateCustomerAccountHandler>();
 
 // Jwt config
 builder.Services.AddOptions<JwtOptions>()
@@ -124,6 +131,17 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy(Policies.REQUIRE_ROLE_SYSTEM_ADMIN, policy => policy.RequireRole([
+        Roles.SystemAdmin
+    ]))
+    .AddPolicy(Policies.REQUIRE_ROLE_CUSTOMER_SERVICE, policy =>
+        policy.RequireRole([
+            Roles.CustomerServiceRepresentative,
+            Roles.SystemAdmin]))
+    .AddDefaultPolicy(Policies.REQUIRE_AUTHENTICATION, policy =>
+        policy.RequireAuthenticatedUser());
+
 builder.Services.AddAuthorization();
 
 builder.Services.AddControllers()
@@ -146,18 +164,22 @@ if (app.Environment.IsDevelopment())
     await CurrencySeeder.SeedAsync(scope.ServiceProvider);
 
     //// Generate/remove seeded data
-    //const int SEED = 184765;
-    //var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+    // const int SEED = 184765;
+    // var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-    //await Seeder.GenerateSeededDataAsync(count: 10, seed: SEED, scope.ServiceProvider);
-    //await Seeder.RemoveSeededDataAsync(SEED, scope.ServiceProvider);
+    // await Seeder.GenerateSeededDataAsync(count: 10, seed: SEED, scope.ServiceProvider);
+    // // await Seeder.RemoveSeededDataAsync(SEED, scope.ServiceProvider);
 
-    //dbContext.SetTimestamps(false);
-    //await unitOfWork.SaveAsync();
-    //dbContext.SetTimestamps(true);
+    // dbContext.SetTimestamps(false);
+    // await unitOfWork.SaveAsync();
+    // dbContext.SetTimestamps(true);
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.MapControllers();
 

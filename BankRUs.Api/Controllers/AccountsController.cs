@@ -8,30 +8,33 @@ using BankRUs.Application.Services.PaginationService;
 using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.OpenAccount;
+using BankRUs.Application.UseCases.UpdateCustomerAccount;
+using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Services.Identity;
+using BankRUs.Infrastructure.Services.IdentityService;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BankRUs.Api.Controllers;
 
 [Route("api/[controller]")]
-[Authorize(Roles = Roles.CustomerServiceRepresentative)]
+[Authorize(Policy = Policies.REQUIRE_ROLE_CUSTOMER_SERVICE)]
 [ApiController]
 public class AccountsController(
     ILogger<AccountsController> logger,
     ICustomerService customerService,
     IIdentityService identityService,
     IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> listCustomerAccountsHandler,
-    OpenCustomerAccountHandler openAccountHandler,
+    IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto> openAccountHandler,
+    IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> updateCustomerAccountHandler,
     GetBankAccountsForCustomerHandler getBankAccountsForCustomerHandler) : ControllerBase
 {
     private readonly ILogger<AccountsController> _logger = logger;
     private readonly ICustomerService _customerService = customerService;
     private readonly IIdentityService _identityService = identityService;
     private readonly IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> _listCustomerAccountsHandler = listCustomerAccountsHandler;
-    private readonly OpenCustomerAccountHandler _openAccountHandler = openAccountHandler;
+    private readonly IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto> _openAccountHandler = openAccountHandler;
+    private readonly IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> _updateCustomerAccountHandler = updateCustomerAccountHandler;
     private readonly GetBankAccountsForCustomerHandler _getBankAccountsForCustomerHandler = getBankAccountsForCustomerHandler;
 
     // ToDo: Move to BankAccountsController
@@ -127,19 +130,52 @@ public class AccountsController(
         }
     }
 
+    // PATCH /api/accounts/customers/{customerAccountId}
+    [HttpPatch("customers/{customerAccountId}")]
+    public async Task<IActionResult> PatchCustomer(
+        [FromRoute] Guid customerAccountId,
+        [FromBody] PatchCustomerAccountRequestDto requestBody)
+    {
+        try
+        {
+            var updateCustomerAccountResult = await _updateCustomerAccountHandler.HandleAsync(new UpdateCustomerAccountCommand(
+                CustomerAccountId: customerAccountId,
+                Details: new CustomerAccountDetails(
+                    firstName: requestBody.FirstName,
+                    lastName: requestBody.LastName,
+                    email: requestBody.Email,
+                    socialSecurityNumber: requestBody.Ssn)));
+
+            if (updateCustomerAccountResult.UpdatedFields.Count < 1)
+            {
+                _logger.LogInformation("No fields were updated");
+                return Ok();
+            }
+            _logger.LogInformation("Updated customer fields: {0}", updateCustomerAccountResult.UpdatedFields);
+            return NoContent();
+        }
+        catch (Exception ex) { 
+            if (ex is NotFoundException)
+            {
+                return NotFound();
+            }
+            return BadRequest();
+        }
+    }
+
     // POST /api/accounts/customers/create (Endpoint /  API endpoint)
     [HttpPost("customers/create")]
-    public async Task<IActionResult> CreateCustomer(CreateAccountRequestDto request)
+    public async Task<IActionResult> CreateCustomer(CreateAccountRequestDto requestBody)
     {
         try
         {
             var openAccountResult = await _openAccountHandler.HandleAsync(
                 new OpenCustomerAccountCommand(
-                    FirstName: request.FirstName,
-                    LastName: request.LastName,
-                    SocialSecurityNumber: request.SocialSecurityNumber,
-                    Email: request.Email,
-                    Password: request.Password));
+                    FirstName: requestBody.FirstName,
+                    LastName: requestBody.LastName,
+                    SocialSecurityNumber: requestBody.SocialSecurityNumber,
+                    Email: requestBody.Email,
+                    Password: requestBody.Password));
 
             // Return 201 Created
             return Created(string.Empty, new CreateAccountResponseDto(openAccountResult.UserId));
@@ -162,13 +198,14 @@ public class AccountsController(
 
     //POST /api/accounts/employees/create
     [HttpPost("employees/create")]
-    public async Task<IActionResult> CreateEmployee(CreateEmployeeAccountRequestDto request)
+    [Authorize(Policy = Policies.REQUIRE_ROLE_SYSTEM_ADMIN)]
+    public async Task<IActionResult> CreateEmployee(CreateEmployeeAccountRequestDto requestBody)
     {
         var createApplicationUserResult = await _identityService.CreateApplicationUserAsync(new CreateApplicationUserRequest(
-            FirstName: request.FirstName,
-            LastName: request.LastName,
-            Email: request.Email,
-            Password: request.Password));
+            FirstName: requestBody.FirstName,
+            LastName: requestBody.LastName,
+            Email: requestBody.Email,
+            Password: requestBody.Password));
 
         if (createApplicationUserResult == null)
         {

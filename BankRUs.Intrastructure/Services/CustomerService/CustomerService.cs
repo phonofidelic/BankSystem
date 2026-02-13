@@ -1,7 +1,6 @@
-﻿using BankRUs.Application;
+﻿using BankRUs.Application.Configuration;
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.CustomerService;
-using BankRUs.Application.Services.CustomerService.GetCustomer;
 using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
 using BankRUs.Domain.Entities;
 using BankRUs.Infrastructure.Persistence;
@@ -43,13 +42,13 @@ namespace BankRUs.Infrastructure.Services.CustomerService
                 .FirstOrDefaultAsync() ?? throw new CustomerNotFoundException();
         }
 
-        public async Task<GetCustomerIdResult> GetCustomerIdAsync(GetCustomerIdRequest request)
+        public async Task<Guid> GetCustomerIdAsync(Guid applicationUserId)
         {
             var customer = await _context
-                .Customers.Where(customer => customer.ApplicationUserId == request.ApplicationUserId)
-                .FirstAsync() ?? throw new CustomerNotFoundException(string.Format("Customer not found with user Id {0}", request.ApplicationUserId));
+                .Customers.Where(customer => customer.ApplicationUserId == applicationUserId)
+                .FirstAsync() ?? throw new CustomerNotFoundException(string.Format("Customer not found with user Id {0}", applicationUserId));
 
-            return new GetCustomerIdResult(CustomerId: customer.Id);
+            return customer.Id;
         }
 
         public async Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request)

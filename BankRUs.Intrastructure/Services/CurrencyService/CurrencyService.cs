@@ -1,4 +1,4 @@
-﻿using BankRUs.Application;
+﻿using BankRUs.Application.Configuration;
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.CurrencyService;
 using BankRUs.Domain.ValueObjects;

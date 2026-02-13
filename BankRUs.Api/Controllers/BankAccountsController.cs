@@ -3,7 +3,6 @@ using BankRUs.Application;
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.CustomerService;
-using BankRUs.Application.Services.CustomerService.GetCustomer;
 using BankRUs.Application.UseCases.ListTransactionsForBankAccount;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount;
 using BankRUs.Application.UseCases.MakeWithdrawalFromBankAccount;
@@ -67,10 +66,10 @@ public class BankAccountsController(
 
         try
         {
-            var getCustomerIdResult = await _customerService.GetCustomerIdAsync(new GetCustomerIdRequest(userGuid));
+            var customerId = await _customerService.GetCustomerIdAsync(userGuid);
 
             var result = await _listTransactionsForBankAccountHandler.HandleAsync(new ListTransactionsForBankAccountQuery(
-                CustomerId: getCustomerIdResult.CustomerId,
+                CustomerId: customerId,
                 BankAccountId: bankAccountId,
                 StartPeriodUtc: from,
                 EndPeriodUdc: to,
@@ -134,10 +133,10 @@ public class BankAccountsController(
 
         try
         {
-            var getCustomerIdResult = await _customerService.GetCustomerIdAsync(new GetCustomerIdRequest(userGuid));
+            var customerId = await _customerService.GetCustomerIdAsync(userGuid);
             
             var result = await _makeDepositToBankAccountHandler.HandleAsync(new MakeDepositToBankAccountCommand(
-                CustomerId: getCustomerIdResult.CustomerId,
+                CustomerId: customerId,
                 BankAccountId: bankAccountId,
                 Amount: request.Amount,
                 Currency: request.ISO_Currency_Symbol,
@@ -197,10 +196,10 @@ public class BankAccountsController(
 
         try
         {
-            var getCustomerIdResult = await _customerService.GetCustomerIdAsync(new GetCustomerIdRequest(userGuid));
+            var customerId = await _customerService.GetCustomerIdAsync(userGuid);
 
             var result = await _makeWithdrawalFromBankAccountHandler.HandleAsync(new MakeWithdrawalFromBankAccountCommand(
-                CustomerId: getCustomerIdResult.CustomerId,
+                CustomerId: customerId,
                 BankAccountId: bankAccountId,
                 Amount: request.Amount,
                 Currency: request.ISO_Currency_Symbol,

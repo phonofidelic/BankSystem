@@ -1,4 +1,4 @@
-﻿using BankRUs.Application;
+﻿using BankRUs.Application.Configuration;
 using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 using Bogus;
