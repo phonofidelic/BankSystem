@@ -9,6 +9,7 @@ using BankRUs.Application.UseCases.CustomerServiceRep.ListCustomerAccounts;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.OpenAccount;
 using BankRUs.Application.UseCases.UpdateCustomerAccount;
+using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Services.Identity;
 using BankRUs.Infrastructure.Services.IdentityService;
 using Microsoft.AspNetCore.Authorization;
@@ -133,16 +134,17 @@ public class AccountsController(
     [HttpPatch("customers/{customerAccountId}")]
     public async Task<IActionResult> PatchCustomer(
         [FromRoute] Guid customerAccountId,
-        [FromBody] PatchCustomerAccountRequestDto request)
+        [FromBody] PatchCustomerAccountRequestDto requestBody)
     {
         try
         {
             var updateCustomerAccountResult = await _updateCustomerAccountHandler.HandleAsync(new UpdateCustomerAccountCommand(
                 CustomerAccountId: customerAccountId,
-                FirstName: request.FirstName,
-                LastName: request.LastName,
-                Email: request.Email,
-                SocialSecurityNumber: request.Ssn));
+                Details: new CustomerAccountDetails(
+                    firstName: requestBody.FirstName,
+                    lastName: requestBody.LastName,
+                    email: requestBody.Email,
+                    socialSecurityNumber: requestBody.Ssn)));
 
             if (updateCustomerAccountResult.UpdatedFields.Count < 1)
             {
@@ -163,17 +165,17 @@ public class AccountsController(
 
     // POST /api/accounts/customers/create (Endpoint /  API endpoint)
     [HttpPost("customers/create")]
-    public async Task<IActionResult> CreateCustomer(CreateAccountRequestDto request)
+    public async Task<IActionResult> CreateCustomer(CreateAccountRequestDto requestBody)
     {
         try
         {
             var openAccountResult = await _openAccountHandler.HandleAsync(
                 new OpenCustomerAccountCommand(
-                    FirstName: request.FirstName,
-                    LastName: request.LastName,
-                    SocialSecurityNumber: request.SocialSecurityNumber,
-                    Email: request.Email,
-                    Password: request.Password));
+                    FirstName: requestBody.FirstName,
+                    LastName: requestBody.LastName,
+                    SocialSecurityNumber: requestBody.SocialSecurityNumber,
+                    Email: requestBody.Email,
+                    Password: requestBody.Password));
 
             // Return 201 Created
             return Created(string.Empty, new CreateAccountResponseDto(openAccountResult.UserId));
@@ -197,13 +199,13 @@ public class AccountsController(
     //POST /api/accounts/employees/create
     [HttpPost("employees/create")]
     [Authorize(Policy = Policies.REQUIRE_ROLE_SYSTEM_ADMIN)]
-    public async Task<IActionResult> CreateEmployee(CreateEmployeeAccountRequestDto request)
+    public async Task<IActionResult> CreateEmployee(CreateEmployeeAccountRequestDto requestBody)
     {
         var createApplicationUserResult = await _identityService.CreateApplicationUserAsync(new CreateApplicationUserRequest(
-            FirstName: request.FirstName,
-            LastName: request.LastName,
-            Email: request.Email,
-            Password: request.Password));
+            FirstName: requestBody.FirstName,
+            LastName: requestBody.LastName,
+            Email: requestBody.Email,
+            Password: requestBody.Password));
 
         if (createApplicationUserResult == null)
         {

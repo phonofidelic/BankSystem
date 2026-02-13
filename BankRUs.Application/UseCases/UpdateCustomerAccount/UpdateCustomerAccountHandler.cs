@@ -2,7 +2,6 @@
 using BankRUs.Application.GuardClause;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.UseCases.OpenCustomerAccount;
-using BankRUs.Domain.ValueObjects;
 
 namespace BankRUs.Application.UseCases.UpdateCustomerAccount;
 
@@ -22,26 +21,21 @@ public class UpdateCustomerAccountHandler(
             ?? throw new CustomerNotFoundException();
 
         // 2) If the Email is new, it must be unique in the system
-        var acceptedEmail = command.Email != null && command.Email != customerAccount.Email
-            ? Guard.Against.DuplicateCustomer(command.Email, _customerService.EmailExists)
-            : null;
+        if (command.Details.Email != null) 
+            Guard.Against.DuplicateCustomer(command.Details.Email, _customerService.EmailExists);
 
         // 3) If the SSN is new, it must be unique in the system
+        if (command.Details.SocialSecurityNumber != null)
+            Guard.Against.DuplicateCustomer(command.Details.SocialSecurityNumber, _customerService.SsnExists);
 
-        // 4) The Customer has confirmed the change
+        // 4) ToDo: The Customer has confirmed the change
         //    (implementation: by visiting a link sent in the confirmation email?)
 
-        var customerAccountDetails = new CustomerAccountDetails(
-            firstName: command.FirstName,
-            lastName: command.LastName,
-            email: acceptedEmail,
-            socialSecurityNumber: command.SocialSecurityNumber);
-
         // If validation is successful
-        customerAccount.Update(customerAccountDetails);
+        customerAccount.Update(command.Details);
 
         await _unitOfWork.SaveAsync();
 
-        return new UpdateCustomerAccountResult(customerAccountDetails.Fields);
+        return new UpdateCustomerAccountResult(command.Details.Fields);
     }
 }
