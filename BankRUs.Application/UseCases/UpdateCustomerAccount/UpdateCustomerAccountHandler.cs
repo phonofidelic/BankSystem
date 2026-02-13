@@ -31,19 +31,17 @@ public class UpdateCustomerAccountHandler(
         // 4) The Customer has confirmed the change
         //    (implementation: by visiting a link sent in the confirmation email?)
 
-        var customerAccountDetailsUpdate = new CustomerAccountDetails(
-            accountId: command.CustomerAccountId,
+        var customerAccountDetails = new CustomerAccountDetails(
             firstName: command.FirstName,
             lastName: command.LastName,
             email: acceptedEmail,
-            socialSecurityNumber: command.SocialSecurityNumber
-        );
+            socialSecurityNumber: command.SocialSecurityNumber);
 
         // If validation is successful
-        customerAccount.Update(customerAccountDetailsUpdate);
+        customerAccount.Update(customerAccountDetails);
 
         await _unitOfWork.SaveAsync();
 
-        return new UpdateCustomerAccountResult(customerAccountDetailsUpdate.Fields);
+        return new UpdateCustomerAccountResult(customerAccountDetails.Fields);
     }
 }

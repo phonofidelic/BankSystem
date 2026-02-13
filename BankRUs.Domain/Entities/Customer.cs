@@ -31,11 +31,6 @@ public class Customer : BaseUpdatableEntity<Guid>
 
     public void Update(CustomerAccountDetails details)
     {
-        if (details.AccountId != Id)
-        {
-            throw new CustomerIdentityException(string.Format("The provided Id does not belong to the customer. Provided Id: {0}", details.AccountId));
-        }
-
         if (details.FirstName != null && details.FirstName != FirstName) { 
             FirstName = details.FirstName;
         }
@@ -54,5 +49,3 @@ public class Customer : BaseUpdatableEntity<Guid>
         }
     }
 }
-
-public class CustomerIdentityException(string? message = "Could not perform operation on Customer") : Exception(message);

@@ -5,7 +5,6 @@ namespace BankRUs.Domain.ValueObjects;
 
 public class CustomerAccountDetails : ValueObject
 {
-    public Guid AccountId { get; init; }
     public string? FirstName { get; init; }
     public string? LastName { get; init; }
     public string? Email { get; init; }
@@ -14,14 +13,12 @@ public class CustomerAccountDetails : ValueObject
     public IReadOnlySet<string> Fields { get => _attributes.ToFrozenSet(); }
 
     public CustomerAccountDetails(
-    Guid accountId,
     string? firstName,
     string? lastName,
     string? email,
     string? socialSecurityNumber)
     {
         // ToDo: Add validation here?
-        AccountId = accountId;
         FirstName = firstName;
         LastName = lastName;
         Email = email;
@@ -35,7 +32,6 @@ public class CustomerAccountDetails : ValueObject
 
     protected override IEnumerable<object> GetEqualityComponents()
     {
-        yield return AccountId;
         if (FirstName != null) yield return FirstName;
         if (LastName != null) yield return LastName;
         if (Email != null) yield return Email;
