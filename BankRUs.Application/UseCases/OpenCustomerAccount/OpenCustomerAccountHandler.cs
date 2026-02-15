@@ -1,8 +1,9 @@
 ﻿using BankRUs.Application.GuardClause;
 using BankRUs.Application.Services.CustomerService;
-using BankRUs.Application.Services.Email;
+using BankRUs.Application.Services.EmailService;
 using BankRUs.Application.Services.Identity;
 using BankRUs.Application.UseCases.OpenCustomerAccount;
+using BankRUs.Domain.ValueObjects;
 
 namespace BankRUs.Application.UseCases.OpenAccount;
 
@@ -55,11 +56,10 @@ public class OpenCustomerAccountHandler(
         try
         {
             // Send confirmation email to customer
-            var sendEmailRequest = new SendEmailRequest(
-                To: command.Email,
-                From: "your.bank@example.com",
-                Subject: "Välkommen till BankAB!",
-                Body: "Ditt bankkonto är nu redo!");
+            var sendEmailRequest = new OpenCustomerAccountConfirmationEmail(
+                to: command.Email,
+                from: "your.bank@example.com",
+                body: "ToDo: add welcome message with confirmation link");
 
              await _emailSender.SendEmailAsync(sendEmailRequest);
         } catch
