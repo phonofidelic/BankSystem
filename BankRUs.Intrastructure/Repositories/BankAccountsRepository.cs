@@ -60,4 +60,9 @@ public class BankAccountsRepository(ApplicationDbContext context) : IBankAccount
         var bankAccount = await GetBankAccountAsync(bankAccountId);
         return bankAccount.Currency;
     }
+
+    public async Task RemoveBankAccount(BankAccount bankAccount)
+    {
+        _context.BankAccounts.Remove(bankAccount);
+    }
 }

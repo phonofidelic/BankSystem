@@ -24,6 +24,18 @@ public class BankAccount : BaseUpdatableEntity<Guid>
         Balance = pendingBalance;
         Transactions.Add(transaction);
     }
+
+    public void Close(Transaction closingTransaction)
+    {
+        if (Balance < 0)
+        {
+            throw new NegativeBalanceException();
+        }
+        
+        AddTransaction(closingTransaction);
+    }
 }
 
 public class InsufficientFundsException() : Exception("Insufficient Funds");
+
+public class NegativeBalanceException() : Exception("Bank account has negative balance");
