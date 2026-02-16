@@ -1,7 +1,6 @@
-﻿namespace BankRUs.Application.Services.Authentication
+﻿namespace BankRUs.Application.Services.Authentication;
+
+public interface IAuthenticationService
 {
-    public interface IAuthenticationService
-    {
-        Task <AuthenticatedUser?> AuthenticateUser(string username, string password);
-    }
+    Task <AuthenticatedUser?> AuthenticateUserAsync(string username, string password);
 }

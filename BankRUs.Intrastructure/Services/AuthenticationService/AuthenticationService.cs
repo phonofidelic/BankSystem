@@ -7,7 +7,7 @@ namespace BankRUs.Infrastructure.Services.Authentication
     public class AuthenticationService(UserManager<ApplicationUser> userManager) : IAuthenticationService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
-        public async Task<AuthenticatedUser?> AuthenticateUser(string username, string password)
+        public async Task<AuthenticatedUser?> AuthenticateUserAsync(string username, string password)
         {
             var user = await _userManager.FindByEmailAsync(username);
 

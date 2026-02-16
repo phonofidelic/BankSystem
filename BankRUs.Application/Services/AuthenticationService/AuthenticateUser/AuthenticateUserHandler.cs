@@ -14,7 +14,7 @@ namespace BankRUs.Application.Services.Authentication.AuthenticateUser
         public async Task<AuthenticateUserResult> HandleAsync(AuthenticateUserCommand command)
         {
             // 1. Check for a user with given credentials
-            var authenticatedUser = await _authenticationService.AuthenticateUser(
+            var authenticatedUser = await _authenticationService.AuthenticateUserAsync(
                 username: command.UserName,
                 password: command.Password);
 
