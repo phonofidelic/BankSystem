@@ -41,11 +41,14 @@ public class BankAccount : BaseUpdatableEntity<Guid>
         }
         
         AddTransaction(closingTransaction);
+        Status = BankAccountStatus.Closed;
     }
 }
 
 public enum BankAccountStatus
 {
+    // ToDo: add Default status and only set to Opened if conditions are met
+    // Default,
     Opened,
     Closed
 }

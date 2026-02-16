@@ -21,8 +21,6 @@ namespace BankRUs.Application.BankAccounts
 
         public Task<Currency> GetBankAccountCurrency(Guid bankAccountId);
 
-        public Task RemoveBankAccount(BankAccount bankAccount);
-
         public bool BankAccountExists(Guid bankAccountId);
     }
 }

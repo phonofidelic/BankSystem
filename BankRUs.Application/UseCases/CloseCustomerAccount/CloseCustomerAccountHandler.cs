@@ -50,8 +50,6 @@ public class CloseCustomerAccountHandler(
             bankAccount.Close(closingTransaction);
 
             closingTransactions.Add(closingTransaction);
-
-            await _bankAccountRepository.RemoveBankAccount(bankAccount);
         }
         
         customerAccount.Close();

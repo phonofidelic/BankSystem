@@ -113,7 +113,8 @@ public class AccountsController(
                 Name: b.Name,
                 CurrentBalance: b.Balance,
                 Currency: b.Currency.ToString(),
-                OpenedAt: b.CreatedAt)).ToList();
+                OpenedAt: b.CreatedAt,
+                AccountStatus: b.Status.ToString())).ToList();
 
             return Ok(new GetCustomerAccountResponseDto(
                 Id: customer.Id,
@@ -121,6 +122,7 @@ public class AccountsController(
                 LastName: customer.LastName,
                 Ssn: customer.SocialSecurityNumber,
                 Email: customer.Email,
+                AccountStatus: customer.Status.ToString(),
                 BankAccounts: bankAccountListItems));
         } 
         catch (Exception ex)
