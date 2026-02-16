@@ -5,6 +5,7 @@ using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.Identity;
 using BankRUs.Application.Services.PaginationService;
+using BankRUs.Application.UseCases.CloseCustomerAccount;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.ListCustomerAccounts;
 using BankRUs.Application.UseCases.OpenAccount;
@@ -27,6 +28,7 @@ public class AccountsController(
     IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> listCustomerAccountsHandler,
     IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto> openAccountHandler,
     IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> updateCustomerAccountHandler,
+    IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> closeCustomerAccountHandler,
     GetBankAccountsForCustomerHandler getBankAccountsForCustomerHandler) : ControllerBase
 {
     private readonly ILogger<AccountsController> _logger = logger;
@@ -35,6 +37,7 @@ public class AccountsController(
     private readonly IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> _listCustomerAccountsHandler = listCustomerAccountsHandler;
     private readonly IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto> _openAccountHandler = openAccountHandler;
     private readonly IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> _updateCustomerAccountHandler = updateCustomerAccountHandler;
+    private readonly IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> _closeCustomerAccountHandler = closeCustomerAccountHandler;
     private readonly GetBankAccountsForCustomerHandler _getBankAccountsForCustomerHandler = getBankAccountsForCustomerHandler;
 
     // ToDo: Move to BankAccountsController
@@ -159,6 +162,29 @@ public class AccountsController(
             {
                 return NotFound();
             }
+            return BadRequest();
+        }
+    }
+
+    // DELETE /api/accounts/customers/{customerAccountId}
+    [HttpDelete("customers/{customerAccountId}")]
+    public async Task<IActionResult> CloseCustomerAccount([FromRoute] Guid customerAccountId)
+    {
+        try
+        {
+            await _closeCustomerAccountHandler.HandleAsync(new CloseCustomerAccountCommand(customerAccountId));
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            if (ex is NotFoundException)
+            {
+                return NotFound();
+            }
+
+            EventId eventId = new();
+            _logger.LogError(eventId, ex, message: ex.Message);
+
             return BadRequest();
         }
     }

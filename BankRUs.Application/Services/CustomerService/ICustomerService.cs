@@ -12,6 +12,8 @@ public interface ICustomerService
     public Task<Guid> GetCustomerIdAsync(Guid applicationUserId);
     
     public Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request);
+
+    public void RemoveCustomerAccount(Customer customer);
     
     // ToDo: Move to BankAccountsRepository?
     public Task<CreateBankAccountResult> CreateBankAccountAsync(CreateBankAccountRequest request);

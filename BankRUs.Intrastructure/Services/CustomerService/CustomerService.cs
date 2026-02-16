@@ -53,23 +53,16 @@ namespace BankRUs.Infrastructure.Services.CustomerService
 
         public async Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request)
         {
-            try
+            var newCustomer = new Customer
             {
-                var newCustomer = new Customer
-                {
-                    Id = Guid.NewGuid(),
-                    Email = request.Email,
-                    SocialSecurityNumber = request.SocialSecurityNumber
-                };
+                Id = Guid.NewGuid(),
+                Email = request.Email,
+                SocialSecurityNumber = request.SocialSecurityNumber
+            };
 
-                await _context.Customers.AddAsync(newCustomer);
+            await _context.Customers.AddAsync(newCustomer);
 
-                return new CreateCustomerResult(newCustomer);
-
-            } catch (Exception ex)
-            {
-                throw;
-            }
+            return new CreateCustomerResult(newCustomer);
         }
 
         public async Task<CreateBankAccountResult> CreateBankAccountAsync(CreateBankAccountRequest request)
@@ -105,6 +98,11 @@ namespace BankRUs.Infrastructure.Services.CustomerService
         {
             var result = _context.Customers.Where(c => c.SocialSecurityNumber == ssn).FirstOrDefault();
             return result != null;
+        }
+
+        public void RemoveCustomerAccount(Customer customer)
+        {
+            _context.Customers.Remove(customer);
         }
     }
 }

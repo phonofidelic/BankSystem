@@ -51,7 +51,10 @@ public class CloseCustomerAccountHandler(
             closingTransactions.Add(closingTransaction);
 
             await _bankAccountRepository.RemoveBankAccount(bankAccount);
+
         }
+        
+        customerAccount.Remove(_customerService.RemoveCustomerAccount);
 
         await _unitOfWork.SaveAsync();
 

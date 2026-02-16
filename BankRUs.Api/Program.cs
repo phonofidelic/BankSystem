@@ -10,6 +10,7 @@ using BankRUs.Application.Services.EmailService;
 using BankRUs.Application.Services.Identity;
 using BankRUs.Application.Services.PaginationService;
 using BankRUs.Application.Services.TransactionService;
+using BankRUs.Application.UseCases.CloseCustomerAccount;
 using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.GetCustomerAccountDetails;
 using BankRUs.Application.UseCases.ListCustomerAccounts;
@@ -95,6 +96,7 @@ builder.Services.AddScoped<IHandler<MakeDepositToBankAccountCommand, MakeDeposit
 builder.Services.AddScoped<IHandler<MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult>, MakeWithdrawalFromBankAccountHandler>();
 builder.Services.AddScoped<IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult>, ListCustomerAccountsHandler>();
 builder.Services.AddScoped<IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult>, UpdateCustomerAccountHandler>();
+builder.Services.AddScoped<IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult>, CloseCustomerAccountHandler>();
 
 // Jwt config
 builder.Services.AddOptions<JwtOptions>()

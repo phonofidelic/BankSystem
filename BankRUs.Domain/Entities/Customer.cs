@@ -7,6 +7,8 @@ public class Customer : BaseUpdatableEntity<Guid>
 {
     public override Guid Id { get; set; } = Guid.NewGuid();
 
+    public CustomerAccountStatus Status { get; private set; }
+
     public Guid ApplicationUserId { get; private set; }
 
     public string FirstName { get; set; } = string.Empty;
@@ -14,9 +16,9 @@ public class Customer : BaseUpdatableEntity<Guid>
     public string LastName { get; set; } = string.Empty;
 
     [EmailAddress]
-    public required string Email { get; set; }
+    public string Email { get; set; } = string.Empty;
     
-    public required string SocialSecurityNumber { get; set; }
+    public string SocialSecurityNumber { get; set; } = string.Empty;
 
     public ICollection<BankAccount> BankAccounts { get; set; } = [];
 
@@ -24,6 +26,15 @@ public class Customer : BaseUpdatableEntity<Guid>
 
     public void SetApplicationUserId(Guid applicationUserId) => ApplicationUserId = applicationUserId; 
 
+    public void Open(CustomerAccountDetails details)
+    {
+        FirstName = details.FirstName ?? throw new OpenCustomerAccountException(FirstName);
+        LastName = details.LastName ?? throw new OpenCustomerAccountException(LastName);
+        Email = details.Email ?? throw new OpenCustomerAccountException(FirstName);
+        SocialSecurityNumber = details.SocialSecurityNumber ?? throw new OpenCustomerAccountException(SocialSecurityNumber);
+
+        Status = CustomerAccountStatus.Opened;
+    }
     public void AddBankAccount(BankAccount bankAccount)
     {
         BankAccounts.Add(bankAccount);
@@ -63,4 +74,28 @@ public class Customer : BaseUpdatableEntity<Guid>
             SocialSecurityNumber = details.SocialSecurityNumber;
         }
     }
+
+    public void Remove(Action<Customer> removeAction)
+    {
+        // Validate that Customer account removal is allowed
+        var canRemove = BankAccounts.All(bankAccount => bankAccount.Balance == 0);
+
+        if (!canRemove)
+        {
+            var bankAccountsWithRemainingBalance = BankAccounts.Where(bankAccount => bankAccount.Balance != 0);
+            throw new CloseCustomerAccountException(string.Format("Could not close Customer account. {0} bank accounts have a remaining balance", bankAccountsWithRemainingBalance.Count()));
+        }
+
+        removeAction(this);
+    }
 }
+
+public enum CustomerAccountStatus
+{
+    Default,
+    Opened,
+    Closed
+}
+
+class OpenCustomerAccountException(object param) : ArgumentException("Could not open Customer account. Missing required parameter.", paramName: nameof(param));
+class CloseCustomerAccountException(string message = "Could not close Customer account") : Exception(message);
