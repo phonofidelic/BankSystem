@@ -8,6 +8,8 @@ public class BankAccount : BaseUpdatableEntity<Guid>
 
     public BankAccountStatus Status { get; private set; }
 
+    public DateTime? ClosedOn { get; set; } = null;
+
     public string Name { get; set; } = "Checking account";
 
     public Guid CustomerId { get; set; }
@@ -39,8 +41,10 @@ public class BankAccount : BaseUpdatableEntity<Guid>
         {
             throw new NegativeBalanceException();
         }
-        
+
+        Name = "";
         Status = BankAccountStatus.Closed;
+        ClosedOn = DateTime.UtcNow;
     }
 }
 

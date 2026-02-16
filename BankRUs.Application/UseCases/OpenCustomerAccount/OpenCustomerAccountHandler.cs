@@ -55,27 +55,14 @@ public class OpenCustomerAccountHandler(
             CustomerAccountDetails: customerDetails,
             ApplicationUserId: createApplicationUserResult.UserId));
 
-        //// Add ApplicationUserId to the Customer
-        //customerAccount.SetApplicationUserId(createApplicationUserResult.UserId);
+        // Send confirmation email to customer
+        var sendEmailRequest = new OpenCustomerAccountConfirmationEmail(
+            to: command.Email,
+            from: "your.bank@example.com",
+            body: "ToDo: add welcome message with confirmation link");
 
-        //// Create default bank account for new Customer
-        //var createdDefaultBankAccountResult = await _customerService.CreateBankAccountAsync(new CreateBankAccountRequest(
-        //    CustomerId: createCustomerResult.Customer.Id,
-        //    BankAccountName: "Default Checking Account"));
+        await _emailSender.SendEmailAsync(sendEmailRequest);
 
-        try
-        {
-            // Send confirmation email to customer
-            var sendEmailRequest = new OpenCustomerAccountConfirmationEmail(
-                to: command.Email,
-                from: "your.bank@example.com",
-                body: "ToDo: add welcome message with confirmation link");
-
-             await _emailSender.SendEmailAsync(sendEmailRequest);
-        } catch
-        {
-            // ToDo: Log email sender error
-        }
 
         // Complete unit of work
         await _unitOfWork.SaveAsync();

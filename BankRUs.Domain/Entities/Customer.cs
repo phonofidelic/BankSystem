@@ -9,16 +9,18 @@ public class Customer : BaseUpdatableEntity<Guid>
 
     public CustomerAccountStatus Status { get; private set; }
 
+    public DateTime? ClosedOn { get; private set; } = null;
+
     public Guid ApplicationUserId { get; private set; }
 
-    public string FirstName { get; set; } = string.Empty;
+    public string FirstName { get; private set; } = string.Empty;
 
-    public string LastName { get; set; } = string.Empty;
+    public string LastName { get; private set; } = string.Empty;
 
     [EmailAddress]
-    public string Email { get; set; } = string.Empty;
+    public string Email { get; private set; } = string.Empty;
     
-    public string SocialSecurityNumber { get; set; } = string.Empty;
+    public string SocialSecurityNumber { get; private set; } = string.Empty;
 
     public ICollection<BankAccount> BankAccounts { get; set; } = [];
 
@@ -86,7 +88,12 @@ public class Customer : BaseUpdatableEntity<Guid>
             throw new CloseCustomerAccountException(string.Format("Could not close Customer account. {0} bank accounts have a remaining balance", bankAccountsWithRemainingBalance.Count()));
         }
 
+        FirstName = "";
+        LastName = "";
+        Email = "";
+        SocialSecurityNumber = "";
         Status = CustomerAccountStatus.Closed;
+        ClosedOn = DateTime.UtcNow;
     }
 }
 

@@ -13,6 +13,8 @@ public interface ICustomerService
     
     public Task<Guid> GetCustomerIdAsync(Guid applicationUserId);
 
+    public Task<Customer?> GetClosedCustomerAccountBySocialSecurityNumber(string socialSecurityNumber);
+
     CompleteCustomerAccountDetails ValidateCustomerAccountDetails(CustomerAccountDetails customerAccountDetails);
     public Task<CreateCustomerResult> CreateCustomerAsync();
 

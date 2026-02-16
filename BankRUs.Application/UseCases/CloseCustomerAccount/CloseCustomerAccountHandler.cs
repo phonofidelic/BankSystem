@@ -1,6 +1,7 @@
 using BankRUs.Application.BankAccounts;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.EmailService;
+using BankRUs.Application.Services.Identity;
 using BankRUs.Application.Services.TransactionService;
 using BankRUs.Domain.Entities;
 
@@ -8,6 +9,7 @@ namespace BankRUs.Application.UseCases.CloseCustomerAccount;
 
 public class CloseCustomerAccountHandler(
     IUnitOfWork unitOfWork,
+    IIdentityService identityService,
     ICustomerService customerService,
     ITransactionService transactionService,
     IBankAccountsRepository bankAccountsRepository,
@@ -15,6 +17,7 @@ public class CloseCustomerAccountHandler(
 ) : IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult>
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly IIdentityService _identityService = identityService;
     private readonly ICustomerService _customerService = customerService;
     private readonly ITransactionService _transactionService = transactionService;
     private readonly IBankAccountsRepository _bankAccountRepository = bankAccountsRepository;
@@ -52,12 +55,11 @@ public class CloseCustomerAccountHandler(
 
             closingTransactions.Add(closingTransaction);
         }
-        
-        customerAccount.Close();
 
-        await _unitOfWork.SaveAsync();
+        // Remove the ApplicationUser
+        await _identityService.DeleteApplicationUserAsync(customerAccount.ApplicationUserId);
 
-        // Send confirmation email
+        // Create confirmation email with relevant data
         var confirmationEmail = new CloseCustomerAccountConfirmationEmail(
             to: customerAccount.Email,
             from: "customerservice@bank.example.com",
@@ -65,8 +67,13 @@ public class CloseCustomerAccountHandler(
             closingTransactions: closingTransactions
         );
 
+        // Close the Customer account
+        customerAccount.Close();
+
+        // Send confirmation email
         await _emailSender.SendEmailAsync(confirmationEmail);
 
+        await _unitOfWork.SaveAsync();
         return new CloseCustomerAccountResult();
     }
 }

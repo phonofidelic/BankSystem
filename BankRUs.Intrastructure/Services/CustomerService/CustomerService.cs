@@ -53,6 +53,13 @@ namespace BankRUs.Infrastructure.Services.CustomerService
             return customer.Id;
         }
 
+        public async Task<Customer?> GetClosedCustomerAccountBySocialSecurityNumber(string socialSecurityNumber)
+        {
+            return await _context.Customers.FirstOrDefaultAsync(c => 
+            c.SocialSecurityNumber == socialSecurityNumber
+            && c.Status == CustomerAccountStatus.Closed);
+        }
+
         public async Task<CreateCustomerResult> CreateCustomerAsync()
         {
             var newCustomer = new Customer();

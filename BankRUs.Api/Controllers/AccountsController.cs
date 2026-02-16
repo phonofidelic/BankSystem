@@ -179,13 +179,13 @@ public class AccountsController(
         }
         catch (Exception ex)
         {
+            EventId eventId = new();
+            _logger.LogError(eventId, ex, message: ex.Message);
+
             if (ex is NotFoundException)
             {
                 return NotFound();
             }
-
-            EventId eventId = new();
-            _logger.LogError(eventId, ex, message: ex.Message);
 
             return BadRequest();
         }

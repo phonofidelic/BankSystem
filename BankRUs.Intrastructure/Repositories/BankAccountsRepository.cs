@@ -60,4 +60,9 @@ public class BankAccountsRepository(ApplicationDbContext context) : IBankAccount
         var bankAccount = await GetBankAccountAsync(bankAccountId);
         return bankAccount.Currency;
     }
+
+    public async Task<BankAccount?> GetClosedBankAccountBySocialSecurityNumber(string socialSecurityNumber)
+    {
+        return await _context.BankAccounts.FirstOrDefaultAsync(b => b.Customer.SocialSecurityNumber == socialSecurityNumber);
+    }
 }
