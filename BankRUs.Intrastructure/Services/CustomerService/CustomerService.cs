@@ -116,11 +116,6 @@ namespace BankRUs.Infrastructure.Services.CustomerService
             return result != null;
         }
 
-        public void RemoveCustomerAccount(Customer customer)
-        {
-            _context.Customers.Remove(customer);
-        }
-
         public CompleteCustomerAccountDetails ValidateCustomerAccountDetails(CustomerAccountDetails details)
         {
             var firstName = details.FirstName ?? throw new CustomerAccountDetailsValidationException();

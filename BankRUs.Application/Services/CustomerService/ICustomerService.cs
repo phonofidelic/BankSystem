@@ -18,8 +18,6 @@ public interface ICustomerService
 
     public Task OpenCustomerAccountAsync(OpenCustomerAccountRequest request);
 
-    public void RemoveCustomerAccount(Customer customer);
-    
     // ToDo: Move to BankAccountsRepository?
     public Task<CreateBankAccountResult> CreateBankAccountAsync(CreateBankAccountRequest request);
     
