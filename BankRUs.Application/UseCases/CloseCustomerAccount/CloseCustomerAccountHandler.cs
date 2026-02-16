@@ -47,7 +47,8 @@ public class CloseCustomerAccountHandler(
             
             var closingTransaction = createTransactionResult.Transaction;
 
-            bankAccount.Close(closingTransaction);
+            bankAccount.AddTransaction(closingTransaction);
+            bankAccount.Close();
 
             closingTransactions.Add(closingTransaction);
         }

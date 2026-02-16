@@ -33,14 +33,13 @@ public class BankAccount : BaseUpdatableEntity<Guid>
         Transactions.Add(transaction);
     }
 
-    public void Close(Transaction closingTransaction)
+    public void Close()
     {
         if (Balance < 0)
         {
             throw new NegativeBalanceException();
         }
         
-        AddTransaction(closingTransaction);
         Status = BankAccountStatus.Closed;
     }
 }
