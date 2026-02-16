@@ -30,10 +30,15 @@ public class OpenCustomerAccountHandler(
         // 2) There is no Customer with the same SSN
         var sanitizedSocialSecurityNumber = Guard.Against.DuplicateCustomer(command.SocialSecurityNumber, _customerService.SsnExists);
 
+        // Create the Customer details object
+        var customerDetails = _customerService.ValidateCustomerAccountDetails(new CustomerAccountDetails(
+            firstName: command.FirstName,
+            lastName: command.LastName,
+            email: command.Email,
+            socialSecurityNumber: command.SocialSecurityNumber));
+
         // Create new Customer
-        var createCustomerResult = await _customerService.CreateCustomerAsync(new CreateCustomerRequest(
-            Email: sanitizedEmail,
-            SocialSecurityNumber: sanitizedSocialSecurityNumber));
+        var createCustomerResult = await _customerService.CreateCustomerAsync();
 
         // Create new ApplicationUser
         var createApplicationUserResult = await _identityService.CreateApplicationUserAsync(new CreateApplicationUserRequest(
@@ -43,15 +48,20 @@ public class OpenCustomerAccountHandler(
             Password: command.Password
          ));
 
-        var createdCustomer = createCustomerResult.Customer;
+        var customerAccount = createCustomerResult.Customer;
 
-        // Add ApplicationUserId to the Customer
-        createdCustomer.SetApplicationUserId(createApplicationUserResult.UserId);
+        await _customerService.OpenCustomerAccountAsync(new OpenCustomerAccountRequest(
+            CustomerAccount: createCustomerResult.Customer,
+            CustomerAccountDetails: customerDetails,
+            ApplicationUserId: createApplicationUserResult.UserId));
 
-        // Create default bank account for new Customer
-        var createdDefaultBankAccountResult = await _customerService.CreateBankAccountAsync(new CreateBankAccountRequest(
-            CustomerId: createCustomerResult.Customer.Id,
-            BankAccountName: "Default Checking Account"));
+        //// Add ApplicationUserId to the Customer
+        //customerAccount.SetApplicationUserId(createApplicationUserResult.UserId);
+
+        //// Create default bank account for new Customer
+        //var createdDefaultBankAccountResult = await _customerService.CreateBankAccountAsync(new CreateBankAccountRequest(
+        //    CustomerId: createCustomerResult.Customer.Id,
+        //    BankAccountName: "Default Checking Account"));
 
         try
         {

@@ -21,15 +21,16 @@ public class CloseCustomerAccountHandler(
     private readonly IEmailSender _emailSender = emailSender;
     public async Task<CloseCustomerAccountResult> HandleAsync(CloseCustomerAccountCommand command)
     {
-        // A Customer account cana be closed if...
+        // A Customer account can be closed if...
 
         // 1) all bank accounts have a zero balance
         var customerAccount = await _customerService.GetCustomerAsync(command.CustomerAccountId);
         
         var bankAccounts = customerAccount.GetBankAccounts();
         
-       List<Transaction> closingTransactions = [];
+        List<Transaction> closingTransactions = [];
         
+        // ToDo: Move to service?
         foreach(var bankAccount in bankAccounts)
         {
             var createTransactionRequest = new CreateTransactionRequest
@@ -51,10 +52,9 @@ public class CloseCustomerAccountHandler(
             closingTransactions.Add(closingTransaction);
 
             await _bankAccountRepository.RemoveBankAccount(bankAccount);
-
         }
         
-        customerAccount.Remove(_customerService.RemoveCustomerAccount);
+        customerAccount.Close();
 
         await _unitOfWork.SaveAsync();
 

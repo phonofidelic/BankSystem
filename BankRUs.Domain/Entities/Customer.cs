@@ -26,12 +26,12 @@ public class Customer : BaseUpdatableEntity<Guid>
 
     public void SetApplicationUserId(Guid applicationUserId) => ApplicationUserId = applicationUserId; 
 
-    public void Open(CustomerAccountDetails details)
+    public void Open()
     {
-        FirstName = details.FirstName ?? throw new OpenCustomerAccountException(FirstName);
-        LastName = details.LastName ?? throw new OpenCustomerAccountException(LastName);
-        Email = details.Email ?? throw new OpenCustomerAccountException(FirstName);
-        SocialSecurityNumber = details.SocialSecurityNumber ?? throw new OpenCustomerAccountException(SocialSecurityNumber);
+        if (string.IsNullOrEmpty(FirstName)) throw new OpenCustomerAccountException(FirstName);
+        if (string.IsNullOrEmpty(LastName)) throw new OpenCustomerAccountException(LastName);
+        if (string.IsNullOrEmpty(Email)) throw new OpenCustomerAccountException(FirstName);
+        if (string.IsNullOrEmpty(SocialSecurityNumber)) throw new OpenCustomerAccountException(SocialSecurityNumber);
 
         Status = CustomerAccountStatus.Opened;
     }
@@ -55,7 +55,7 @@ public class Customer : BaseUpdatableEntity<Guid>
         return BankAccounts.ToList();
     }
 
-    public void Update(CustomerAccountDetails details)
+    public void UpdateAccountDetails(CustomerAccountDetails details)
     {
         if (details.FirstName != null && details.FirstName != FirstName) { 
             FirstName = details.FirstName;
@@ -75,18 +75,18 @@ public class Customer : BaseUpdatableEntity<Guid>
         }
     }
 
-    public void Remove(Action<Customer> removeAction)
+    public void Close()
     {
-        // Validate that Customer account removal is allowed
-        var canRemove = BankAccounts.All(bankAccount => bankAccount.Balance == 0);
+        // Validate that Customer account closure is allowed
+        var canClose = BankAccounts.All(bankAccount => bankAccount.Balance == 0);
 
-        if (!canRemove)
+        if (!canClose)
         {
             var bankAccountsWithRemainingBalance = BankAccounts.Where(bankAccount => bankAccount.Balance != 0);
             throw new CloseCustomerAccountException(string.Format("Could not close Customer account. {0} bank accounts have a remaining balance", bankAccountsWithRemainingBalance.Count()));
         }
 
-        removeAction(this);
+        Status = CustomerAccountStatus.Closed;
     }
 }
 

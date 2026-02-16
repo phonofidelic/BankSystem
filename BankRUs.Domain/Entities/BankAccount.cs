@@ -6,12 +6,18 @@ public class BankAccount : BaseUpdatableEntity<Guid>
 {
     public override Guid Id { get; set; } = Guid.NewGuid();
 
-    public BankAccountStatus Status { get; private set;}
+    public BankAccountStatus Status { get; private set; }
+
     public string Name { get; set; } = "Checking account";
+
     public Guid CustomerId { get; set; }
+    
     public Customer Customer { get; set; } = default!;
+    
     public required Currency Currency { get; set; }
+    
     public decimal Balance { get; private set; }
+    
     public ICollection<Transaction> Transactions { get; set; } = [];
 
     public void AddTransaction(Transaction transaction)

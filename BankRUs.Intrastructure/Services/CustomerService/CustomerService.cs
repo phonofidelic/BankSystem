@@ -1,8 +1,10 @@
 ﻿using BankRUs.Application.Configuration;
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.CustomerService;
+using BankRUs.Application.Services.CustomerService.GetBankAccount;
 using BankRUs.Application.UseCases.ListCustomerAccounts;
 using BankRUs.Domain.Entities;
+using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -51,18 +53,32 @@ namespace BankRUs.Infrastructure.Services.CustomerService
             return customer.Id;
         }
 
-        public async Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request)
+        public async Task<CreateCustomerResult> CreateCustomerAsync()
         {
-            var newCustomer = new Customer
-            {
-                Id = Guid.NewGuid(),
-                Email = request.Email,
-                SocialSecurityNumber = request.SocialSecurityNumber
-            };
+            var newCustomer = new Customer();
 
             await _context.Customers.AddAsync(newCustomer);
 
             return new CreateCustomerResult(newCustomer);
+        }
+
+        public async Task OpenCustomerAccountAsync(OpenCustomerAccountRequest request)
+        {
+            var defaultBankAccount = new BankAccount
+            {
+                Name = "Default Checking Account",
+                CustomerId = request.CustomerAccount.Id,
+                Currency = _appSettings.DefaultCurrency
+            };
+
+            await _context.BankAccounts.AddAsync(defaultBankAccount);
+
+            request.CustomerAccount.UpdateAccountDetails(request.CustomerAccountDetails);
+            request.CustomerAccount.SetApplicationUserId(request.ApplicationUserId);
+            request.CustomerAccount.AddBankAccount(defaultBankAccount);
+
+            // ToDo: Simulate customer visiting confirmation url?
+            request.CustomerAccount.Open();
         }
 
         public async Task<CreateBankAccountResult> CreateBankAccountAsync(CreateBankAccountRequest request)
@@ -104,5 +120,17 @@ namespace BankRUs.Infrastructure.Services.CustomerService
         {
             _context.Customers.Remove(customer);
         }
+
+        public CompleteCustomerAccountDetails ValidateCustomerAccountDetails(CustomerAccountDetails details)
+        {
+            var firstName = details.FirstName ?? throw new CustomerAccountDetailsValidationException();
+            var lastName = details.LastName ?? throw new CustomerAccountDetailsValidationException();
+            var email = details.Email ?? throw new CustomerAccountDetailsValidationException();
+            var socialSecurityNumber = details.SocialSecurityNumber ?? throw new CustomerAccountDetailsValidationException();
+
+            return new CompleteCustomerAccountDetails(firstName, lastName, email, socialSecurityNumber);
+        }
+
+        
     }
 }
