@@ -1,5 +1,5 @@
 ﻿using BankRUs.Application.Services.CustomerService;
-using BankRUs.Application.Services.Email;
+using BankRUs.Application.Services.EmailService;
 
 
 namespace BankRUs.Application.UseCases.OpenBankAccount;
@@ -26,11 +26,13 @@ public class OpenBankAccountHandler : IHandler<OpenBankAccountCommand, OpenBankA
        
 
         // Send confirmation email to customer
-        var sendEmailRequest = new SendEmailRequest(
-            To: command.CustomerEmail,
-            From: "your.bank@example.com",
-            Subject: "Ditt bankkonto är nu redo!",
-            Body: "Ditt bankkonto är nu redo!");
+        var sendEmailRequest = new OpenCustomerAccountConfirmationEmail(
+            to: command.CustomerEmail,
+            from: "customerservice@bank.example.com",
+            body: "Welcome to Bank Example! \nYour Customer account is ready."
+        );
+
+        await _emailSender.SendEmailAsync(sendEmailRequest);
 
         return new OpenBankAccountResult(
            BankAccountId: createdNewBankAccountResult.BankAccount.Id);

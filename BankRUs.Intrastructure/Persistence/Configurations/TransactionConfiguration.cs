@@ -41,10 +41,20 @@ namespace BankRUs.Infrastructure.Persistence.Configurations
 
             builder
                 .HasOne(t => t.Customer)
-                .WithMany(c => c.Transactions);
+                .WithMany(c => c.Transactions)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder
+                .HasOne(t => t.BankAccount)
+                .WithMany(b => b.Transactions)
+                .OnDelete(DeleteBehavior.NoAction);
 
             builder
                 .Property(t => t.Amount)
+                .HasPrecision(19, 2);
+
+            builder
+                .Property(t => t.BalanceAfter)
                 .HasPrecision(19, 2);
 
             builder

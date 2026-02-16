@@ -32,7 +32,7 @@ public class UpdateCustomerAccountHandler(
         //    (implementation: by visiting a link sent in the confirmation email?)
 
         // If validation is successful
-        customerAccount.Update(command.Details);
+        customerAccount.UpdateAccountDetails(command.Details);
 
         await _unitOfWork.SaveAsync();
 

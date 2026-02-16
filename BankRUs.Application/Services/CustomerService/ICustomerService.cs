@@ -1,5 +1,7 @@
-﻿using BankRUs.Application.UseCases.ListCustomerAccounts;
+﻿using BankRUs.Application.Services.CustomerService.GetBankAccount;
+using BankRUs.Application.UseCases.ListCustomerAccounts;
 using BankRUs.Domain.Entities;
+using BankRUs.Domain.ValueObjects;
 
 namespace BankRUs.Application.Services.CustomerService;
 
@@ -10,9 +12,14 @@ public interface ICustomerService
     public Task<Customer> GetCustomerAsync(Guid customerId);
     
     public Task<Guid> GetCustomerIdAsync(Guid applicationUserId);
-    
-    public Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request);
-    
+
+    public Task<Customer?> GetClosedCustomerAccountBySocialSecurityNumber(string socialSecurityNumber);
+
+    CompleteCustomerAccountDetails ValidateCustomerAccountDetails(CustomerAccountDetails customerAccountDetails);
+    public Task<CreateCustomerResult> CreateCustomerAsync();
+
+    public Task OpenCustomerAccountAsync(OpenCustomerAccountRequest request);
+
     // ToDo: Move to BankAccountsRepository?
     public Task<CreateBankAccountResult> CreateBankAccountAsync(CreateBankAccountRequest request);
     

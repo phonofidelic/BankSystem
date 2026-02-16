@@ -6,6 +6,7 @@ public record GetCustomerAccountResponseDto(
     string LastName,
     string Ssn,
     string Email,
+    string AccountStatus,
     IReadOnlyList<CustomerBankAccountListItemDto> BankAccounts);
 
 public record CustomerBankAccountListItemDto(
@@ -13,4 +14,5 @@ public record CustomerBankAccountListItemDto(
     string Name,
     decimal CurrentBalance,
     string Currency,
-    DateTime OpenedAt);
+    DateTime OpenedAt,
+    string AccountStatus);

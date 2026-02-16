@@ -1,8 +1,10 @@
 ﻿using BankRUs.Application.Configuration;
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.CustomerService;
+using BankRUs.Application.Services.CustomerService.GetBankAccount;
 using BankRUs.Application.UseCases.ListCustomerAccounts;
 using BankRUs.Domain.Entities;
+using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -51,25 +53,39 @@ namespace BankRUs.Infrastructure.Services.CustomerService
             return customer.Id;
         }
 
-        public async Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request)
+        public async Task<Customer?> GetClosedCustomerAccountBySocialSecurityNumber(string socialSecurityNumber)
         {
-            try
+            return await _context.Customers.FirstOrDefaultAsync(c => 
+            c.SocialSecurityNumber == socialSecurityNumber
+            && c.Status == CustomerAccountStatus.Closed);
+        }
+
+        public async Task<CreateCustomerResult> CreateCustomerAsync()
+        {
+            var newCustomer = new Customer();
+
+            await _context.Customers.AddAsync(newCustomer);
+
+            return new CreateCustomerResult(newCustomer);
+        }
+
+        public async Task OpenCustomerAccountAsync(OpenCustomerAccountRequest request)
+        {
+            var defaultBankAccount = new BankAccount
             {
-                var newCustomer = new Customer
-                {
-                    Id = Guid.NewGuid(),
-                    Email = request.Email,
-                    SocialSecurityNumber = request.SocialSecurityNumber
-                };
+                Name = "Default Checking Account",
+                CustomerId = request.CustomerAccount.Id,
+                Currency = _appSettings.DefaultCurrency
+            };
 
-                await _context.Customers.AddAsync(newCustomer);
+            await _context.BankAccounts.AddAsync(defaultBankAccount);
 
-                return new CreateCustomerResult(newCustomer);
+            request.CustomerAccount.UpdateAccountDetails(request.CustomerAccountDetails);
+            request.CustomerAccount.SetApplicationUserId(request.ApplicationUserId);
+            request.CustomerAccount.AddBankAccount(defaultBankAccount);
 
-            } catch (Exception ex)
-            {
-                throw;
-            }
+            // ToDo: Simulate customer visiting confirmation url?
+            request.CustomerAccount.Open();
         }
 
         public async Task<CreateBankAccountResult> CreateBankAccountAsync(CreateBankAccountRequest request)
@@ -106,5 +122,17 @@ namespace BankRUs.Infrastructure.Services.CustomerService
             var result = _context.Customers.Where(c => c.SocialSecurityNumber == ssn).FirstOrDefault();
             return result != null;
         }
+
+        public CompleteCustomerAccountDetails ValidateCustomerAccountDetails(CustomerAccountDetails details)
+        {
+            var firstName = details.FirstName ?? throw new CustomerAccountDetailsValidationException();
+            var lastName = details.LastName ?? throw new CustomerAccountDetailsValidationException();
+            var email = details.Email ?? throw new CustomerAccountDetailsValidationException();
+            var socialSecurityNumber = details.SocialSecurityNumber ?? throw new CustomerAccountDetailsValidationException();
+
+            return new CompleteCustomerAccountDetails(firstName, lastName, email, socialSecurityNumber);
+        }
+
+        
     }
 }

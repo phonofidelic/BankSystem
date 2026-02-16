@@ -4,6 +4,7 @@ using BankRUs.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BankRUs.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260216095554_AddStatusToCustomerAndBankAccount")]
+    partial class AddStatusToCustomerAndBankAccount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,9 +34,6 @@ namespace BankRUs.Infrastructure.Migrations
                     b.Property<decimal>("Balance")
                         .HasPrecision(19, 2)
                         .HasColumnType("decimal(19,2)");
-
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -67,9 +67,6 @@ namespace BankRUs.Infrastructure.Migrations
                     b.Property<Guid>("ApplicationUserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("ClosedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -97,7 +94,7 @@ namespace BankRUs.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId", "SocialSecurityNumber")
+                    b.HasIndex("SocialSecurityNumber")
                         .IsUnique();
 
                     b.ToTable("Customers");

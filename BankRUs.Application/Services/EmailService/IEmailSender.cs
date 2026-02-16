@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using BankRUs.Domain.ValueObjects;
 
-namespace BankRUs.Application.Services.Email;
+namespace BankRUs.Application.Services.EmailService;
 
 public interface IEmailSender
 {
-    Task SendEmailAsync(SendEmailRequest request);
+    Task SendEmailAsync(Email request);
 }

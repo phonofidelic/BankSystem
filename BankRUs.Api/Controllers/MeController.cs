@@ -3,6 +3,7 @@ using BankRUs.Api.Dtos.Me;
 using BankRUs.Application;
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.CustomerService;
+using BankRUs.Application.UseCases.CloseCustomerAccount;
 using BankRUs.Application.UseCases.GetCustomerAccountDetails;
 using BankRUs.Application.UseCases.UpdateCustomerAccount;
 using BankRUs.Domain.ValueObjects;
@@ -24,12 +25,14 @@ namespace BankRUs.Api.Controllers
         ILogger<MeController> logger,
         ICustomerService customerService,
         IHandler<GetCustomerAccountDetailsQuery, GetCustomerAccountDetailsResult> getCustomerDetailsResponseHandler,
-        IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> updateCustomerAccountHandler) : ControllerBase
+        IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> updateCustomerAccountHandler,
+        IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> closeCustomerAccountHandler) : ControllerBase
     {
         private readonly ILogger<MeController> _logger = logger;
         private readonly ICustomerService _customerService = customerService;
         private readonly IHandler<GetCustomerAccountDetailsQuery, GetCustomerAccountDetailsResult> _getBankAccountsForCustomerHandler = getCustomerDetailsResponseHandler;
         private readonly IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> _updateCustomerAccountHandler = updateCustomerAccountHandler;
+        private readonly IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> _closeCustomerAccountHandler = closeCustomerAccountHandler;
 
         // GET /api/me
         [HttpGet]
@@ -100,8 +103,6 @@ namespace BankRUs.Api.Controllers
                 return Unauthorized();
             }
 
-            var email = User.FindFirstValue(ClaimTypes.Email);
-
             if (!Guid.TryParse(userId, out Guid applicationUserId))
             {
                 return Unauthorized();
@@ -137,6 +138,47 @@ namespace BankRUs.Api.Controllers
                 {
                     return NotFound();
                 }
+                return BadRequest();
+            }
+        }
+
+        // DELETE /api/me
+        [HttpDelete]
+        public async Task<IActionResult> DeleteMe()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            if (!Guid.TryParse(userId, out Guid applicationUserId))
+            {
+                return Unauthorized();
+            }
+
+            if (!User.IsInRole(Roles.Customer))
+            {
+                return StatusCode(501);
+            }
+
+            try
+            {
+                var customerAccountId = await _customerService.GetCustomerIdAsync(applicationUserId);
+                await _closeCustomerAccountHandler.HandleAsync(new CloseCustomerAccountCommand(customerAccountId));
+
+                return NoContent();
+            }
+            catch (Exception ex) {
+                EventId eventId = new();
+                _logger.LogError(eventId, ex, message: ex.Message);
+
+                if (ex is NotFoundException)
+                {
+                    return NotFound();
+                }
+
                 return BadRequest();
             }
         }

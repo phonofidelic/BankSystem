@@ -21,7 +21,7 @@ namespace BankRUs.Infrastructure.Persistence.Configurations
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder
-                .HasIndex(c => c.SocialSecurityNumber)
+                .HasIndex(c => new { c.ApplicationUserId, c.SocialSecurityNumber })
                 .IsUnique();
         }
     }
