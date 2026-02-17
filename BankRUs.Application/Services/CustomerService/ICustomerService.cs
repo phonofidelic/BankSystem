@@ -16,7 +16,7 @@ public interface ICustomerService
     public Task<Customer?> GetClosedCustomerAccountBySocialSecurityNumber(string socialSecurityNumber);
 
     CompleteCustomerAccountDetails ValidateCustomerAccountDetails(CustomerAccountDetails customerAccountDetails);
-    public Task<CreateCustomerResult> CreateCustomerAsync();
+    public Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request);
 
     public Task OpenCustomerAccountAsync(OpenCustomerAccountRequest request);
 

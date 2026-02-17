@@ -6,6 +6,6 @@ namespace BankRUs.Application.Services.CustomerService;
 
 public sealed record CreateCustomerRequest
 (
-    string SocialSecurityNumber,
-    string Email
+    Guid ApplicationUserId,
+    string SocialSecurityNumber
 );

@@ -37,16 +37,18 @@ public class OpenCustomerAccountHandler(
             email: command.Email,
             socialSecurityNumber: command.SocialSecurityNumber));
 
-        // Create new Customer
-        var createCustomerResult = await _customerService.CreateCustomerAsync();
-
         // Create new ApplicationUser
         var createApplicationUserResult = await _identityService.CreateApplicationUserAsync(new CreateApplicationUserRequest(
             FirstName: command.FirstName,
             LastName: command.LastName,
             Email: command.Email,
             Password: command.Password
-         ));
+         )) ?? throw new Exception("Could not create application user"); ;
+
+        // Create new Customer
+        var createCustomerResult = await _customerService.CreateCustomerAsync(new CreateCustomerRequest(
+            ApplicationUserId: createApplicationUserResult.UserId, 
+            SocialSecurityNumber: command.SocialSecurityNumber));
 
         var customerAccount = createCustomerResult.Customer;
 

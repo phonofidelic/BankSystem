@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BankRUs.Domain.Entities;
 
-public class Customer : BaseUpdatableEntity<Guid>
+public class Customer(Guid applicationUserId, string socialSecurityNumber) : BaseUpdatableEntity<Guid>
 {
     public override Guid Id { get; set; } = Guid.NewGuid();
 
@@ -11,7 +11,7 @@ public class Customer : BaseUpdatableEntity<Guid>
 
     public DateTime? ClosedOn { get; private set; } = null;
 
-    public Guid ApplicationUserId { get; private set; }
+    public Guid ApplicationUserId { get; private set; } = applicationUserId;
 
     public string FirstName { get; private set; } = string.Empty;
 
@@ -20,7 +20,7 @@ public class Customer : BaseUpdatableEntity<Guid>
     [EmailAddress]
     public string Email { get; private set; } = string.Empty;
     
-    public string SocialSecurityNumber { get; private set; } = string.Empty;
+    public string SocialSecurityNumber { get; private set; } = socialSecurityNumber;
 
     public ICollection<BankAccount> BankAccounts { get; set; } = [];
 
