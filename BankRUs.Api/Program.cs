@@ -16,7 +16,7 @@ using BankRUs.Application.UseCases.ListCustomerAccounts;
 using BankRUs.Application.UseCases.ListTransactionsForBankAccount;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount;
 using BankRUs.Application.UseCases.MakeWithdrawalFromBankAccount;
-using BankRUs.Application.UseCases.OpenAccount;
+using BankRUs.Application.UseCases.OpenCustomerAccount;
 using BankRUs.Application.UseCases.UpdateCustomerAccount;
 using BankRUs.Infrastructure.Persistence;
 using BankRUs.Infrastructure.Repositories;
@@ -85,7 +85,7 @@ builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();
 // Scoped Command/Query handlers
 builder.Services.AddScoped<IHandler<GetCustomerAccountDetailsQuery, GetCustomerAccountDetailsResult>, GetCustomerAccountDetailsHandler>();
 builder.Services.AddScoped<AuthenticateUserHandler>();
-builder.Services.AddScoped<IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto>, OpenCustomerAccountHandler>();
+builder.Services.AddScoped<IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResult>, OpenCustomerAccountHandler>();
 builder.Services.AddScoped<IHandler<ListTransactionsForBankAccountQuery, ListTransactionsForBankAccountResult>, ListTransactionsForBankAccountHandler>();
 builder.Services.AddScoped<IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, MakeDepositToBankAccountHandler>();
 builder.Services.AddScoped<IHandler<MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult>, MakeWithdrawalFromBankAccountHandler>();

@@ -2,16 +2,15 @@
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.EmailService;
 using BankRUs.Application.Services.Identity;
-using BankRUs.Application.UseCases.OpenCustomerAccount;
 using BankRUs.Domain.ValueObjects;
 
-namespace BankRUs.Application.UseCases.OpenAccount;
+namespace BankRUs.Application.UseCases.OpenCustomerAccount;
 
 public class OpenCustomerAccountHandler(
     IUnitOfWork unitOfWork,
     IIdentityService identityService,
     ICustomerService customerService,
-    IEmailSender emailSender) : IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto>
+    IEmailSender emailSender) : IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResult>
 {
     // ToDo: Add ILoggerService?
     //private readonly ILoggerService<OpenCustomerAccountHandler> _logger;
@@ -20,7 +19,7 @@ public class OpenCustomerAccountHandler(
     private readonly ICustomerService _customerService = customerService;
     private readonly IEmailSender _emailSender = emailSender;
 
-    public async Task<OpenCustomerAccountResponseDto> HandleAsync(OpenCustomerAccountCommand command)
+    public async Task<OpenCustomerAccountResult> HandleAsync(OpenCustomerAccountCommand command)
     {
         // A Customer Account can be opened if...
 
@@ -68,6 +67,6 @@ public class OpenCustomerAccountHandler(
 
         // Complete unit of work
         await _unitOfWork.SaveAsync();
-        return new OpenCustomerAccountResponseDto(UserId: createApplicationUserResult.UserId);
+        return new OpenCustomerAccountResult(CustomerAccountId: customerAccount.Id);
     }
 }

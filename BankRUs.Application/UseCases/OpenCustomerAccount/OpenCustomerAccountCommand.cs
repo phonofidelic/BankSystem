@@ -1,4 +1,4 @@
-﻿namespace BankRUs.Application.UseCases.OpenAccount;
+﻿namespace BankRUs.Application.UseCases.OpenCustomerAccount;
 
 public record OpenCustomerAccountCommand(
     string FirstName,
