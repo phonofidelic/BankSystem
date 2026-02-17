@@ -1,8 +1,7 @@
-﻿using BankRUs.Api.Attributes;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace BankRUs.Api.Dtos.Accounts;
+namespace BankRUs.Api.Dtos.Employees;
 
 public record CreateEmployeeAccountRequestDto(
     [Required]

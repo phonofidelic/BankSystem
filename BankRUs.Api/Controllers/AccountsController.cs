@@ -2,10 +2,9 @@
 using BankRUs.Application;
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.CustomerService;
-using BankRUs.Application.Services.Identity;
 using BankRUs.Application.UseCases.CloseCustomerAccount;
 using BankRUs.Application.UseCases.ListCustomerAccounts;
-using BankRUs.Application.UseCases.OpenAccount;
+using BankRUs.Application.UseCases.OpenCustomerAccount;
 using BankRUs.Application.UseCases.UpdateCustomerAccount;
 using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Services.IdentityService;
@@ -21,17 +20,15 @@ namespace BankRUs.Api.Controllers;
 public class AccountsController(
     ILogger<AccountsController> logger,
     ICustomerService customerService,
-    IIdentityService identityService,
     IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> listCustomerAccountsHandler,
-    IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto> openAccountHandler,
+    IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResult> openAccountHandler,
     IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> updateCustomerAccountHandler,
     IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> closeCustomerAccountHandler) : ControllerBase
 {
     private readonly ILogger<AccountsController> _logger = logger;
     private readonly ICustomerService _customerService = customerService;
-    private readonly IIdentityService _identityService = identityService;
     private readonly IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> _listCustomerAccountsHandler = listCustomerAccountsHandler;
-    private readonly IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto> _openAccountHandler = openAccountHandler;
+    private readonly IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResult> _openAccountHandler = openAccountHandler;
     private readonly IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> _updateCustomerAccountHandler = updateCustomerAccountHandler;
     private readonly IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> _closeCustomerAccountHandler = closeCustomerAccountHandler;
 
@@ -163,10 +160,10 @@ public class AccountsController(
     // POST /api/accounts/customers/create (Endpoint /  API endpoint)
     [HttpPost("customers/create")]
     [Produces("application/json")]
-    [ProducesResponseType<CreateAccountResponseDto>(StatusCodes.Status201Created)]
+    [ProducesResponseType<CreateCustomerAccountResponseDto>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateCustomer(CreateAccountRequestDto requestBody)
+    public async Task<IActionResult> CreateCustomer(CreateCustomerAccountRequestDto requestBody)
     {
         try
         {
@@ -179,7 +176,7 @@ public class AccountsController(
                     Password: requestBody.Password));
 
             // Return 201 Created
-            return Created(string.Empty, new CreateAccountResponseDto(openAccountResult.UserId));
+            return Created(string.Empty, new CreateCustomerAccountResponseDto(openAccountResult.CustomerAccountId));
         } catch (Exception ex)
         {
             // Log error
@@ -197,39 +194,5 @@ public class AccountsController(
         }
     }
 
-    //POST /api/accounts/employees/create
-    [HttpPost("employees/create")]
-    [Authorize(Policy = Policies.REQUIRE_ROLE_SYSTEM_ADMIN)]
-    [HttpPost("customers/create")]
-    [Produces("application/json")]
-    [ProducesResponseType<CreateEmployeeAccountResponseDto>(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateEmployee(CreateEmployeeAccountRequestDto requestBody)
-    {
-        var createApplicationUserResult = await _identityService.CreateApplicationUserAsync(new CreateApplicationUserRequest(
-            FirstName: requestBody.FirstName,
-            LastName: requestBody.LastName,
-            Email: requestBody.Email,
-            Password: requestBody.Password));
-
-        if (createApplicationUserResult == null)
-        {
-            return BadRequest(ModelState);
-        }
-
-        try
-        {
-            await _identityService.AssignCustomerServiceRepresentativeRoleToUser(createApplicationUserResult.UserId);
-
-            return Created(string.Empty, createApplicationUserResult);
-        } catch (Exception ex)
-        {
-            // Log error
-            EventId eventId = new();
-            _logger.LogError(eventId, ex, message: ex.Message);
-
-            return BadRequest();
-        }
-    }
+    
 }

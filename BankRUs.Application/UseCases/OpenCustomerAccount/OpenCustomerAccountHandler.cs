@@ -2,16 +2,15 @@
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.EmailService;
 using BankRUs.Application.Services.Identity;
-using BankRUs.Application.UseCases.OpenCustomerAccount;
 using BankRUs.Domain.ValueObjects;
 
-namespace BankRUs.Application.UseCases.OpenAccount;
+namespace BankRUs.Application.UseCases.OpenCustomerAccount;
 
 public class OpenCustomerAccountHandler(
     IUnitOfWork unitOfWork,
     IIdentityService identityService,
     ICustomerService customerService,
-    IEmailSender emailSender) : IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto>
+    IEmailSender emailSender) : IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResult>
 {
     // ToDo: Add ILoggerService?
     //private readonly ILoggerService<OpenCustomerAccountHandler> _logger;
@@ -20,7 +19,7 @@ public class OpenCustomerAccountHandler(
     private readonly ICustomerService _customerService = customerService;
     private readonly IEmailSender _emailSender = emailSender;
 
-    public async Task<OpenCustomerAccountResponseDto> HandleAsync(OpenCustomerAccountCommand command)
+    public async Task<OpenCustomerAccountResult> HandleAsync(OpenCustomerAccountCommand command)
     {
         // A Customer Account can be opened if...
 
@@ -37,16 +36,18 @@ public class OpenCustomerAccountHandler(
             email: command.Email,
             socialSecurityNumber: command.SocialSecurityNumber));
 
-        // Create new Customer
-        var createCustomerResult = await _customerService.CreateCustomerAsync();
-
         // Create new ApplicationUser
         var createApplicationUserResult = await _identityService.CreateApplicationUserAsync(new CreateApplicationUserRequest(
             FirstName: command.FirstName,
             LastName: command.LastName,
             Email: command.Email,
             Password: command.Password
-         ));
+         )) ?? throw new Exception("Could not create application user"); ;
+
+        // Create new Customer
+        var createCustomerResult = await _customerService.CreateCustomerAsync(new CreateCustomerRequest(
+            ApplicationUserId: createApplicationUserResult.UserId, 
+            SocialSecurityNumber: command.SocialSecurityNumber));
 
         var customerAccount = createCustomerResult.Customer;
 
@@ -66,6 +67,6 @@ public class OpenCustomerAccountHandler(
 
         // Complete unit of work
         await _unitOfWork.SaveAsync();
-        return new OpenCustomerAccountResponseDto(UserId: createApplicationUserResult.UserId);
+        return new OpenCustomerAccountResult(CustomerAccountId: customerAccount.Id);
     }
 }

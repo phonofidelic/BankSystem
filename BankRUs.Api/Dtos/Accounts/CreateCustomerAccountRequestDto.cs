@@ -6,7 +6,7 @@ namespace BankRUs.Api.Dtos.Accounts;
 
 // Använd record när: DTO, Command, Query
 // Använd class när: entitet
-public record CreateAccountRequestDto(
+public record CreateCustomerAccountRequestDto(
     
     [Required]
     [MaxLength(25)]

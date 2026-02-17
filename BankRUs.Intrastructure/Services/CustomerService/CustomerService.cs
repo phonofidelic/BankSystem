@@ -60,9 +60,9 @@ namespace BankRUs.Infrastructure.Services.CustomerService
             && c.Status == CustomerAccountStatus.Closed);
         }
 
-        public async Task<CreateCustomerResult> CreateCustomerAsync()
+        public async Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request)
         {
-            var newCustomer = new Customer();
+            var newCustomer = new Customer(request.ApplicationUserId, request.SocialSecurityNumber);
 
             await _context.Customers.AddAsync(newCustomer);
 
