@@ -1,22 +1,19 @@
 ﻿using BankRUs.Api.Dtos.Accounts;
-using BankRUs.Api.Dtos.BankAccounts;
 using BankRUs.Application;
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.Identity;
-using BankRUs.Application.Services.PaginationService;
 using BankRUs.Application.UseCases.CloseCustomerAccount;
-using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.ListCustomerAccounts;
 using BankRUs.Application.UseCases.OpenAccount;
 using BankRUs.Application.UseCases.UpdateCustomerAccount;
 using BankRUs.Domain.ValueObjects;
-using BankRUs.Infrastructure.Services.Identity;
 using BankRUs.Infrastructure.Services.IdentityService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankRUs.Api.Controllers;
+
 
 [Route("api/[controller]")]
 [Authorize(Policy = Policies.REQUIRE_ROLE_CUSTOMER_SERVICE)]
@@ -28,8 +25,7 @@ public class AccountsController(
     IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> listCustomerAccountsHandler,
     IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto> openAccountHandler,
     IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> updateCustomerAccountHandler,
-    IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> closeCustomerAccountHandler,
-    GetBankAccountsForCustomerHandler getBankAccountsForCustomerHandler) : ControllerBase
+    IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> closeCustomerAccountHandler) : ControllerBase
 {
     private readonly ILogger<AccountsController> _logger = logger;
     private readonly ICustomerService _customerService = customerService;
@@ -38,54 +34,12 @@ public class AccountsController(
     private readonly IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto> _openAccountHandler = openAccountHandler;
     private readonly IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> _updateCustomerAccountHandler = updateCustomerAccountHandler;
     private readonly IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> _closeCustomerAccountHandler = closeCustomerAccountHandler;
-    private readonly GetBankAccountsForCustomerHandler _getBankAccountsForCustomerHandler = getBankAccountsForCustomerHandler;
-
-    // ToDo: Move to BankAccountsController
-    // GET /api/accounts/{customerId}
-    // ToDo: add guard
-    [HttpGet("{CustomerId}")]
-    public async Task<IActionResult> Get([FromRoute] GetBankAccountsRequestDto request)
-    {
-
-        if (!Guid.TryParse(request.CustomerId, out Guid customerId))
-        {
-            return NotFound();
-        }
-        var query = new GetBankAccountsForCustomerQuery(customerId);
-
-        try
-        {
-            var result = await _getBankAccountsForCustomerHandler.HandleAsync(query);
-        
-
-            var response = new GetBankAccountsResponseDto(
-                    result.bankAccounts.Select(ba =>
-                        new CustomerBankAccountDto(
-                            Id: ba.Id,
-                            CustomerId: ba.CustomerId,
-                            AccountName: ba.Name,
-                            Balance: ba.Balance,
-                            OpenedAt: ba.CreatedAt,
-                            UpdatedAt: ba.UpdatedAt)));
-
-            if (response == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(response);
-        } catch (Exception ex)
-        {
-            // Log error
-            EventId eventId = new();
-            _logger.LogError(eventId, ex, message: ex.Message);
-
-            return NotFound();
-        }
-    }
 
     // GET /api/accounts/customers
     [HttpGet("customers")]
+    [Produces("application/json")]
+    [ProducesResponseType<GetCustomerAccountsResponseDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetCustomerAccounts([FromQuery] ListCustomerAccountsQuery query)
     {
         var result = await _listCustomerAccountsHandler.HandleAsync(query);
@@ -103,6 +57,11 @@ public class AccountsController(
 
     // GET /api/accounts/customers/{customerId}
     [HttpGet("customers/{customerId}")]
+    [Produces("application/json")]
+    [ProducesResponseType<GetCustomerAccountResponseDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetCustomerAccount(Guid customerId)
     {
         try
@@ -137,6 +96,11 @@ public class AccountsController(
 
     // PATCH /api/accounts/customers/{customerAccountId}
     [HttpPatch("customers/{customerAccountId}")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PatchCustomer(
         [FromRoute] Guid customerAccountId,
         [FromBody] PatchCustomerAccountRequestDto requestBody)
@@ -170,6 +134,11 @@ public class AccountsController(
 
     // DELETE /api/accounts/customers/{customerAccountId}
     [HttpDelete("customers/{customerAccountId}")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CloseCustomerAccount([FromRoute] Guid customerAccountId)
     {
         try
@@ -193,6 +162,10 @@ public class AccountsController(
 
     // POST /api/accounts/customers/create (Endpoint /  API endpoint)
     [HttpPost("customers/create")]
+    [Produces("application/json")]
+    [ProducesResponseType<CreateAccountResponseDto>(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateCustomer(CreateAccountRequestDto requestBody)
     {
         try
@@ -227,6 +200,11 @@ public class AccountsController(
     //POST /api/accounts/employees/create
     [HttpPost("employees/create")]
     [Authorize(Policy = Policies.REQUIRE_ROLE_SYSTEM_ADMIN)]
+    [HttpPost("customers/create")]
+    [Produces("application/json")]
+    [ProducesResponseType<CreateEmployeeAccountResponseDto>(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateEmployee(CreateEmployeeAccountRequestDto requestBody)
     {
         var createApplicationUserResult = await _identityService.CreateApplicationUserAsync(new CreateApplicationUserRequest(
@@ -244,7 +222,7 @@ public class AccountsController(
         {
             await _identityService.AssignCustomerServiceRepresentativeRoleToUser(createApplicationUserResult.UserId);
 
-            return Created(string.Empty, createApplicationUserResult.UserId);
+            return Created(string.Empty, createApplicationUserResult);
         } catch (Exception ex)
         {
             // Log error

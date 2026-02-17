@@ -38,6 +38,11 @@ public class BankAccountsController(
 
     // GET /api/bank-accounts/{bankAccountId}/transactions?page=1&pageSize=20&from=2026-01-04%2016:35:40&to=2026-02-04%2016:35:40
     [HttpGet("{id}/transactions")]
+    [Produces("application/json")]
+    [ProducesResponseType<ListTransactionsResponseDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(
         [FromRoute] string id,
         [FromQuery(Name = "page")] int page = 1,
@@ -111,6 +116,11 @@ public class BankAccountsController(
 
     // POST /api/bank-accounts/{bankAccountId}/deposits
     [HttpPost("{id}/deposits")]
+    [Produces("application/json")]
+    [ProducesResponseType<PostDepositResponseDto>(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PostDeposit(
         [FromRoute] string id,
         [FromBody] PostDepositRequestDto request)
@@ -139,7 +149,7 @@ public class BankAccountsController(
                 CustomerId: customerId,
                 BankAccountId: bankAccountId,
                 Amount: request.Amount,
-                Currency: request.ISO_Currency_Symbol,
+                Currency: request.IsoCurrencySymbol,
                 Reference: request.Reference));
 
             return Created(string.Empty, new PostDepositResponseDto(
@@ -173,6 +183,12 @@ public class BankAccountsController(
 
     // POST /api/bank-accounts/{bankAccountId}/withdrawals
     [HttpPost("{id}/withdrawals")]
+    [HttpPost("{id}/deposits")]
+    [Produces("application/json")]
+    [ProducesResponseType<PostWithdrawalRequestDto>(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PostWithdrawal(
         [FromRoute] string id,
         [FromBody] PostWithdrawalRequestDto request)
@@ -202,7 +218,7 @@ public class BankAccountsController(
                 CustomerId: customerId,
                 BankAccountId: bankAccountId,
                 Amount: request.Amount,
-                Currency: request.ISO_Currency_Symbol,
+                Currency: request.IsoCurrencySymbol,
                 Reference: request.Reference));
 
             return Created(string.Empty, new PostWithdrawalResponseDto(

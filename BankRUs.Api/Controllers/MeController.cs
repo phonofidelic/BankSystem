@@ -36,6 +36,11 @@ namespace BankRUs.Api.Controllers
 
         // GET /api/me
         [HttpGet]
+        [Produces("application/json")]
+        [ProducesResponseType<GetMeResponseDto>(StatusCodes.Status200OK)]
+        [ProducesResponseType<GetMeCustomerAccountResponseDto>(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetMe()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -94,6 +99,13 @@ namespace BankRUs.Api.Controllers
 
         // PATCH /api/me
         [HttpPatch]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status501NotImplemented)]
         public async Task<IActionResult> PatchMe(PatchCustomerAccountRequestDto requestBody)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -110,7 +122,7 @@ namespace BankRUs.Api.Controllers
 
             if (!User.IsInRole(Roles.Customer))
             {
-                return StatusCode(501);
+                return StatusCode(StatusCodes.Status501NotImplemented);
             }
 
             try
@@ -144,6 +156,12 @@ namespace BankRUs.Api.Controllers
 
         // DELETE /api/me
         [HttpDelete]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status501NotImplemented)]
         public async Task<IActionResult> DeleteMe()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -160,7 +178,7 @@ namespace BankRUs.Api.Controllers
 
             if (!User.IsInRole(Roles.Customer))
             {
-                return StatusCode(501);
+                return StatusCode(StatusCodes.Status501NotImplemented);
             }
 
             try

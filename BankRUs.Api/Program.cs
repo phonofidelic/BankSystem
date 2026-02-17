@@ -11,7 +11,6 @@ using BankRUs.Application.Services.Identity;
 using BankRUs.Application.Services.PaginationService;
 using BankRUs.Application.Services.TransactionService;
 using BankRUs.Application.UseCases.CloseCustomerAccount;
-using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.GetCustomerAccountDetails;
 using BankRUs.Application.UseCases.ListCustomerAccounts;
 using BankRUs.Application.UseCases.ListTransactionsForBankAccount;
@@ -35,6 +34,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -69,10 +69,6 @@ builder.Services
   .AddEntityFrameworkStores<ApplicationDbContext>()
   .AddDefaultTokenProviders();
 
-//builder.Services.AddSingleton<CurrencyValueGenerator>();
-//await CurrencySeeder
-
-
 // Scoped services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IPaginationService, PaginationService>();
@@ -90,7 +86,6 @@ builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();
 builder.Services.AddScoped<IHandler<GetCustomerAccountDetailsQuery, GetCustomerAccountDetailsResult>, GetCustomerAccountDetailsHandler>();
 builder.Services.AddScoped<AuthenticateUserHandler>();
 builder.Services.AddScoped<IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto>, OpenCustomerAccountHandler>();
-builder.Services.AddScoped<GetBankAccountsForCustomerHandler>();
 builder.Services.AddScoped<IHandler<ListTransactionsForBankAccountQuery, ListTransactionsForBankAccountResult>, ListTransactionsForBankAccountHandler>();
 builder.Services.AddScoped<IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, MakeDepositToBankAccountHandler>();
 builder.Services.AddScoped<IHandler<MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult>, MakeWithdrawalFromBankAccountHandler>();
@@ -152,10 +147,17 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
+// Add documentation pages
+builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+
     using var scope = app.Services.CreateScope();
 
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
