@@ -6,7 +6,6 @@ using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.Identity;
 using BankRUs.Application.Services.PaginationService;
 using BankRUs.Application.UseCases.CloseCustomerAccount;
-using BankRUs.Application.UseCases.GetBankAccountsForCustomer;
 using BankRUs.Application.UseCases.ListCustomerAccounts;
 using BankRUs.Application.UseCases.OpenAccount;
 using BankRUs.Application.UseCases.UpdateCustomerAccount;
@@ -29,7 +28,6 @@ public class AccountsController(
     IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto> openAccountHandler,
     IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> updateCustomerAccountHandler,
     IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> closeCustomerAccountHandler,
-    GetBankAccountsForCustomerHandler getBankAccountsForCustomerHandler) : ControllerBase
 {
     private readonly ILogger<AccountsController> _logger = logger;
     private readonly ICustomerService _customerService = customerService;
@@ -38,51 +36,6 @@ public class AccountsController(
     private readonly IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResponseDto> _openAccountHandler = openAccountHandler;
     private readonly IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> _updateCustomerAccountHandler = updateCustomerAccountHandler;
     private readonly IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> _closeCustomerAccountHandler = closeCustomerAccountHandler;
-    private readonly GetBankAccountsForCustomerHandler _getBankAccountsForCustomerHandler = getBankAccountsForCustomerHandler;
-
-    // ToDo: Move to BankAccountsController
-    // GET /api/accounts/{customerId}
-    // ToDo: add guard
-    [HttpGet("{CustomerId}")]
-    public async Task<IActionResult> Get([FromRoute] GetBankAccountsRequestDto request)
-    {
-
-        if (!Guid.TryParse(request.CustomerId, out Guid customerId))
-        {
-            return NotFound();
-        }
-        var query = new GetBankAccountsForCustomerQuery(customerId);
-
-        try
-        {
-            var result = await _getBankAccountsForCustomerHandler.HandleAsync(query);
-        
-
-            var response = new GetBankAccountsResponseDto(
-                    result.bankAccounts.Select(ba =>
-                        new CustomerBankAccountDto(
-                            Id: ba.Id,
-                            CustomerId: ba.CustomerId,
-                            AccountName: ba.Name,
-                            Balance: ba.Balance,
-                            OpenedAt: ba.CreatedAt,
-                            UpdatedAt: ba.UpdatedAt)));
-
-            if (response == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(response);
-        } catch (Exception ex)
-        {
-            // Log error
-            EventId eventId = new();
-            _logger.LogError(eventId, ex, message: ex.Message);
-
-            return NotFound();
-        }
-    }
 
     // GET /api/accounts/customers
     [HttpGet("customers")]
