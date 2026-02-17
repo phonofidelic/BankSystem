@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BankRUs.Api.Controllers;
 
-[Microsoft.AspNetCore.Mvc.Route("api/[controller]")]
+[Route("api/[controller]")]
 [ApiController]
 public class AuthController(
     AuthenticateUserHandler authenticateUserHandler) : ControllerBase
@@ -13,6 +13,9 @@ public class AuthController(
 
     // POST /api/auth/login
     [HttpPost("login")]
+    [Produces("application/json")]
+    [ProducesResponseType<LoginResponseDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<LoginResponseDto>> Login(LoginRequestDto request)
     {
         var authenticateUserResult = await _authenticateUserHandler.HandleAsync(new AuthenticateUserCommand(
