@@ -53,7 +53,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             foreach (var sd in toRemove)
                 services.Remove(sd);
 
-            // 3) Configure test options
+            // 3) Configure test services
             services.Configure<DefaultAdmin>(opts =>
             {
                 opts.Username = "testadmin";
@@ -82,7 +82,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             // 4) Add services for seeding mock data
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            // 4) Add test database
+            // 5) Add test database
             _connection = new SqliteConnection("DataSource=:memory:");
             _connection.Open();
 
@@ -97,8 +97,6 @@ public class ApiFactory : WebApplicationFactory<Program>
             var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
             db.Database.EnsureCreated();
-            // db.Database.Migrate();
-
 
             await IdentitySeeder.SeedAsync(scope.ServiceProvider);
             await CurrencySeeder.SeedAsync(scope.ServiceProvider);
