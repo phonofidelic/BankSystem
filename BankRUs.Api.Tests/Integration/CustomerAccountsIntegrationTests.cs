@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Azure;
+using BankRUs.Api.Dtos.Accounts;
 using BankRUs.Api.Dtos.Auth;
 using BankRUs.Api.Tests.Infrastructure;
 using BankRUs.Application.Configuration;
@@ -29,6 +30,17 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
 
         // Assert:
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var getCustomerAccountsResponse = await response.Content.ReadFromJsonAsync<GetCustomerAccountsResponseDto>();
+        
+        Assert.NotNull(getCustomerAccountsResponse);
+        Assert.NotEmpty(getCustomerAccountsResponse.Items);
+        Assert.IsType<CustomerAccountsListItemDto>(getCustomerAccountsResponse.Items[0]);
+        
+        Assert.NotNull(getCustomerAccountsResponse.Paging);
+        Assert.Equal(1, getCustomerAccountsResponse.Paging.Page);
+        Assert.Equal(50, getCustomerAccountsResponse.Paging.PageSize);
+        Assert.Equal("descending", getCustomerAccountsResponse.Paging.Sort);
     }
 
     /// <summary>

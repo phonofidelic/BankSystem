@@ -13,7 +13,6 @@ public class TransactionTemporalConfiguration : IEntityTypeConfiguration<Transac
 
     public void Configure(EntityTypeBuilder<Transaction> builder)
     {
-        Console.WriteLine("### CONFIGURING TEMPORAL TABLE FOR Transaction ENTITY ###");
         builder.ToTable(TABLE_NAME, t => t.IsTemporal(t => {
                 t.HasPeriodStart(TABLE_HISTORY_PERIOD_START_NAME).HasColumnName(TABLE_HISTORY_PERIOD_START_NAME);
                 t.HasPeriodEnd(TABLE_HISTORY_PERIOD_END_NAME).HasColumnName(TABLE_HISTORY_PERIOD_END_NAME);
