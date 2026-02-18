@@ -21,9 +21,8 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
     public async Task Get_WhenCustomerAccountsExist_ShouldReturn200AndCustomerAccounts()
     {
         // Arrange:
-        // Log in using seeded admin credentials
-        var loginResponse = await GetToken(_defaultAdmin.Email, _defaultAdmin.Password);
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse?.Token);
+        // Log in as Admin
+        await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
 
         // Act:
         var response = await _client.GetAsync("/api/accounts/customers");
@@ -43,20 +42,36 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
         Assert.Equal("descending", getCustomerAccountsResponse.Paging.Sort);
     }
 
+    [Fact]
+    public async Task Get_WhenPagingIsSpecified_ShouldReflectPagingQuery()
+    {
+        // Arrange:
+        // Log in as Admin
+        await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
+
+        // Act:
+        var response = await _client.GetAsync("/api/accounts/customers?size=5&page=2&sortOrder=ascending");
+
+        var getCustomerAccountsResponse = await response.Content.ReadFromJsonAsync<GetCustomerAccountsResponseDto>();
+
+        // Assert:
+        Assert.NotNull(getCustomerAccountsResponse);
+        Assert.NotNull(getCustomerAccountsResponse.Paging);
+        Assert.Equal(2, getCustomerAccountsResponse.Paging.Page);
+        Assert.Equal(5, getCustomerAccountsResponse.Paging.PageSize);
+        Assert.Equal("ascending", getCustomerAccountsResponse.Paging.Sort);
+    }
+
     /// <summary>
     /// See https://stackoverflow.com/a/68424710
     /// </summary>
-    private async Task<LoginResponseDto?> GetToken(string username, string password)
+    private async Task LoginClient(string username, string password)
     {
         var loginRequest = new LoginRequestDto(username, password);
 
         var response = await _client.PostAsJsonAsync("/api/auth/login", loginRequest);
 
-        if (!response.IsSuccessStatusCode) 
-            return null;
-
-        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
-
-        return loginResponse;
+        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponseDto>() ?? throw new Exception("Login failed");
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse?.Token);
     }
 }
