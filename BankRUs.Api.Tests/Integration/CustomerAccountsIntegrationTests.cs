@@ -1,21 +1,29 @@
-using System;
-using System.Net;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using Azure;
 using BankRUs.Api.Dtos.Accounts;
 using BankRUs.Api.Dtos.Auth;
 using BankRUs.Api.Tests.Infrastructure;
 using BankRUs.Application.Configuration;
+using BankRUs.Domain.ValueObjects;
+using BankRUs.Infrastructure.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using System;
+using System.Net;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Runtime.Intrinsics.X86;
 
 namespace BankRUs.Api.Tests.Integration;
 
 public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixture<ApiFactory>
 {
+    //private readonly int _seed = factory.Seed;
     private readonly HttpClient _client = factory.CreateClient();
     private readonly DefaultAdmin _defaultAdmin = factory.Services.GetRequiredService<IOptions<DefaultAdmin>>().Value;
+    private readonly CustomerAccountDetails _testCustomerAccountDetails = new CustomerAccountDetails(
+            firstName: "Test",
+            lastName: "Testerson",
+            email: "test.testerson@example.com",
+            socialSecurityNumber: Seeder.GenerateSocialSecurityNumber(factory.Seed));
 
     [Fact]
     public async Task Get_WhenCustomerAccountsExist_ShouldReturn200AndCustomerAccounts()
@@ -52,14 +60,34 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
         // Act:
         var response = await _client.GetAsync("/api/accounts/customers?size=5&page=2&sortOrder=ascending");
 
+        // Assert:
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
         var getCustomerAccountsResponse = await response.Content.ReadFromJsonAsync<GetCustomerAccountsResponseDto>();
 
-        // Assert:
         Assert.NotNull(getCustomerAccountsResponse);
         Assert.NotNull(getCustomerAccountsResponse.Paging);
         Assert.Equal(2, getCustomerAccountsResponse.Paging.Page);
         Assert.Equal(5, getCustomerAccountsResponse.Paging.PageSize);
         Assert.Equal("ascending", getCustomerAccountsResponse.Paging.Sort);
+    }
+
+    [Fact]
+    public async Task Post_WhenValidDataIsProvided_ShouldCreateNewCustomerAccount()
+    {
+        // Arrange:
+        await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
+
+        var createCustoemrRequest = new CreateCustomerAccountRequestDto(
+            FirstName: _testCustomerAccountDetails.FirstName!,
+            LastName: _testCustomerAccountDetails.LastName!,
+            Email: _testCustomerAccountDetails.Email!,
+            SocialSecurityNumber: _testCustomerAccountDetails.SocialSecurityNumber!,
+            Password: "Test@123");
+
+        var response = await _client.PostAsJsonAsync("/api/accounts/customers/create", createCustoemrRequest);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
     /// <summary>

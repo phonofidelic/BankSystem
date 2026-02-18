@@ -16,6 +16,13 @@ public static class Seeder
     private const int MIN_TRANSACTIONS = 15;
     private const int MAX_TRANSACTIONS = 125;
 
+    public static string GenerateSocialSecurityNumber(int seed)
+    {
+        Randomizer.Seed = new Random(seed);
+        var faker = new Faker();
+        return faker.Person.Personnummer();
+    }
+
     public static async Task RemoveSeededDataAsync(int seed, IServiceProvider serviceProvider)
     {
         var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
