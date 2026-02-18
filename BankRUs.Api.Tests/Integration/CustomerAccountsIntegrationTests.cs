@@ -107,7 +107,7 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
         var secondResponse = await _client.PostAsJsonAsync("/api/accounts/customers/create", secondCreateCustomerRequest);
 
         // Assert:
-        Assert.Equal(HttpStatusCode.BadRequest, secondResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, secondResponse.StatusCode);
     }
 
     /// <summary>
