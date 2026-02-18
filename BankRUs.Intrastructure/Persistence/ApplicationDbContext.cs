@@ -1,4 +1,5 @@
 ﻿using BankRUs.Domain.Entities;
+using BankRUs.Infrastructure.Persistence.Configurations;
 using BankRUs.Infrastructure.Services.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +20,17 @@ public sealed class ApplicationDbContext(
     {
         base.OnModelCreating(builder);
 
-        builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        if (Database.IsSqlServer())
+        {
+            builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        }
+        else
+        {
+            // Exclude temporal configuration when running integration tests using SQLite
+            builder.ApplyConfigurationsFromAssembly(
+                Assembly.GetExecutingAssembly(),
+                type => type != typeof(TransactionTemporalConfiguration));
+        }
     }
 
     public void SetTimestamps(bool setTimestamps)
@@ -46,10 +57,7 @@ public sealed class ApplicationDbContext(
 
     private void AddTimestamps()
     {
-        var now = DateTime.UtcNow; // current datetime
-
-        //var entities = ChangeTracker.Entries()
-        //    .Where(x => x.Entity is BaseCreatableEntity<Guid> && (x.State == EntityState.Added || x.State == EntityState.Modified));
+        var now = DateTime.UtcNow;
 
         var creatableEntries = ChangeTracker.Entries()
             .Where(e => (e.Entity is BaseCreatableEntity<int> || e.Entity is BaseCreatableEntity<Guid>)

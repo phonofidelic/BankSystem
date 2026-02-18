@@ -1,4 +1,4 @@
-﻿using BankRUs.Application.Configuration;
+using BankRUs.Application.Configuration;
 using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 using Bogus;
@@ -31,11 +31,12 @@ public static class Seeder
         var appSettings = serviceProvider.GetRequiredService<IOptions<AppSettings>>().Value;
 
         var customer = new Faker<Customer>()
+            .CustomInstantiator((f) => new Customer(f.Random.Guid(), f.Person.Personnummer()))
             .RuleFor(c => c.ApplicationUserId, (f, c) => f.Random.Guid())
             .RuleFor(c => c.FirstName, (f, c) => f.Person.FirstName)
             .RuleFor(c => c.LastName, (f, c) => f.Person.LastName + SeedStamp(seed))
             .RuleFor(c => c.Email, (f, c) => f.Internet.Email(c.FirstName, c.LastName))
-            .RuleFor(c => c.SocialSecurityNumber, (f, c) => f.Person.Personnummer())
+            // .RuleFor(c => c.SocialSecurityNumber, (f, c) => f.Person.Personnummer())
             .RuleFor(c => c.CreatedAt, (f, c) => f.Date.Past(f.Random.Int(0, 5)))
             .RuleFor(c => c.UpdatedAt, (f, c) => f.Date.Recent());
 
@@ -138,4 +139,36 @@ public static class Seeder
     }
 
     private static string SeedStamp(int seed) => $" [SEED:{seed}]";
+
+    private static string GeneratePersonnummer()
+    {
+        var random = new Random();
+
+        // Generate random birth date (between 18 and 80 years ago)
+        var today = DateTime.Today;
+        var minDate = today.AddYears(-80);
+        var maxDate = today.AddYears(-18);
+        var daysRange = (maxDate - minDate).Days;
+        var birthDate = minDate.AddDays(random.Next(daysRange));
+
+        // Format: YYMMDD
+        var datePart = birthDate.ToString("yyMMdd");
+
+        // Generate 3-digit serial number (001-999)
+        var serialNumber = random.Next(1, 1000).ToString("D3");
+
+        // Calculate Luhn checksum
+        var digits = datePart + serialNumber;
+        var sum = 0;
+        for (var i = 0; i < digits.Length; i++)
+        {
+            var digit = digits[i] - '0';
+            var multiplier = (i % 2 == 0) ? 2 : 1;
+            var product = digit * multiplier;
+            sum += product > 9 ? product - 9 : product;
+        }
+        var checksum = (10 - (sum % 10)) % 10;
+
+        return $"{datePart}-{serialNumber}{checksum}";
+    }
 }

@@ -100,7 +100,7 @@ namespace BankRUs.Infrastructure.Migrations
                     b.HasIndex("ApplicationUserId", "SocialSecurityNumber")
                         .IsUnique();
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("BankRUs.Domain.Entities.Transaction", b =>
@@ -412,7 +412,7 @@ namespace BankRUs.Infrastructure.Migrations
 
                             b1.HasKey("BankAccountId");
 
-                            b1.ToTable("BankAccounts");
+                            b1.ToTable("BankAccounts", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("BankAccountId");
