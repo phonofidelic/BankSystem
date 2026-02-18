@@ -2,6 +2,7 @@ using BankRUs.Api.Dtos.Accounts;
 using BankRUs.Api.Dtos.Auth;
 using BankRUs.Api.Tests.Infrastructure;
 using BankRUs.Application.Configuration;
+using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Persistence;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +22,9 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
             firstName: "Test",
             lastName: "Testerson",
             email: "test.testerson@example.com",
-            socialSecurityNumber: Seeder.GenerateSocialSecurityNumber(factory.Seed));
+            socialSecurityNumber: Seeder.GenerateSocialSecurityNumber(factory.NextSeed));
+
+    private Guid TestCustomerAccountId { get; set; }
 
     [Fact]
     public async Task Get_WhenCustomerAccountsExist_ShouldReturn200AndCustomerAccounts()
@@ -88,6 +91,12 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
 
         // Assert;
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var responseContent = await response.Content.ReadFromJsonAsync<CreateCustomerAccountResponseDto>();
+
+        Assert.NotNull(responseContent);
+        Assert.IsType<Guid>(responseContent.CustomerAccountId);
+
+        TestCustomerAccountId = responseContent.CustomerAccountId;
     }
 
     [Fact]
@@ -109,6 +118,41 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
         // Assert:
         Assert.Equal(HttpStatusCode.BadRequest, secondResponse.StatusCode);
     }
+
+    [Fact]
+    public async Task GetDetails_WhenCustomerAccountExists_ShouldReturnDetails()
+    {
+        // Arrange:
+        await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
+        var ssn = Seeder.GenerateSocialSecurityNumber(factory.NextSeed);
+        var createCustomerAccountRequest = new CreateCustomerAccountRequestDto(
+            FirstName: "Test",
+            LastName: "Details",
+            Email: "test.details@example.com",
+            SocialSecurityNumber: ssn,
+            Password: "Test@123");
+
+        var createCustomerAccountResponse = await _client.PostAsJsonAsync("/api/accounts/customers/create", createCustomerAccountRequest);
+        var createCustomerAccountResponseContent = await createCustomerAccountResponse.Content.ReadFromJsonAsync<CreateCustomerAccountResponseDto>();
+        var customerAccountId = createCustomerAccountResponseContent?.CustomerAccountId ?? throw new Exception("Customer account not found");
+
+        // Act:
+        var response = await _client.GetAsync($"/api/accounts/customers/{customerAccountId}");
+        var content = await response.Content.ReadFromJsonAsync<GetCustomerAccountResponseDto>();
+
+        // Assert:
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(content);
+        Assert.Equal("Test", content.FirstName);
+        Assert.Equal("Details", content.LastName);
+        Assert.Equal("test.details@example.com", content.Email);
+        Assert.Equal(ssn, content.Ssn);
+        Assert.Equal(CustomerAccountStatus.Opened.ToString(), content.AccountStatus);
+
+        Assert.NotEmpty(content.BankAccounts);
+        Assert.Single(content.BankAccounts);
+        Assert.Equal("Default Checking Account", content.BankAccounts[0].Name);
+    }   
 
     /// <summary>
     /// See https://stackoverflow.com/a/68424710
