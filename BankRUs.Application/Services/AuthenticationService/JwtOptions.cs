@@ -2,6 +2,7 @@
 
 namespace BankRUs.Application.Services.Authentication;
 
+// ToDo: Move to a Configuration class
 public sealed record JwtOptions
 {
     [Required]

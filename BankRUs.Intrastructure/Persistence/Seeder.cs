@@ -1,4 +1,4 @@
-﻿using BankRUs.Application.Configuration;
+using BankRUs.Application.Configuration;
 using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 using Bogus;
@@ -16,6 +16,13 @@ public static class Seeder
     private const int MIN_TRANSACTIONS = 15;
     private const int MAX_TRANSACTIONS = 125;
 
+    public static string GenerateSocialSecurityNumber(int seed)
+    {
+        Randomizer.Seed = new Random(seed);
+        var faker = new Faker();
+        return faker.Person.Personnummer();
+    }
+
     public static async Task RemoveSeededDataAsync(int seed, IServiceProvider serviceProvider)
     {
         var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
@@ -31,11 +38,12 @@ public static class Seeder
         var appSettings = serviceProvider.GetRequiredService<IOptions<AppSettings>>().Value;
 
         var customer = new Faker<Customer>()
+            .CustomInstantiator((f) => new Customer(f.Random.Guid(), f.Person.Personnummer()))
             .RuleFor(c => c.ApplicationUserId, (f, c) => f.Random.Guid())
             .RuleFor(c => c.FirstName, (f, c) => f.Person.FirstName)
             .RuleFor(c => c.LastName, (f, c) => f.Person.LastName + SeedStamp(seed))
             .RuleFor(c => c.Email, (f, c) => f.Internet.Email(c.FirstName, c.LastName))
-            .RuleFor(c => c.SocialSecurityNumber, (f, c) => f.Person.Personnummer())
+            // .RuleFor(c => c.SocialSecurityNumber, (f, c) => f.Person.Personnummer())
             .RuleFor(c => c.CreatedAt, (f, c) => f.Date.Past(f.Random.Int(0, 5)))
             .RuleFor(c => c.UpdatedAt, (f, c) => f.Date.Recent());
 

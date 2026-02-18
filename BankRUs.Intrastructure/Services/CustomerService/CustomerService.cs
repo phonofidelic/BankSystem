@@ -21,14 +21,14 @@ namespace BankRUs.Infrastructure.Services.CustomerService
         public async Task<IQueryable<Customer>> SearchCustomersAsync(ListCustomerAccountsQuery query)
         {
             var search = query.Search ?? string.Empty;
-            var results = _context.Customers
+            var results = _context.Customers.AsNoTracking()
                 .Where(c =>
                       c.FirstName.Contains(search)
                     | c.LastName.Contains(search)
                     | c.Email.Contains(search)
                     | c.SocialSecurityNumber.Contains(search))
                 .Where(c =>
-                      c.FirstName.Contains(query.FirstName ?? string.Empty)
+                       c.FirstName.Contains(query.FirstName ?? string.Empty)
                     && c.LastName.Contains(query.LastName ?? string.Empty)
                     && c.Email.Contains(query.Email ?? string.Empty)
                     && c.SocialSecurityNumber.Contains(query.Ssn ?? string.Empty))

@@ -37,7 +37,10 @@ public static class CurrencySeeder
             bankAccount.Currency = defaultCurrency;
         }
 
-        var transactions = await context.Transactions.TemporalAll().Where(t => t.Currency.ISOSymbol == Currency.Placeholder.ISOSymbol).ToListAsync();
+        var transactionsQuery = context.Database.IsSqlServer()
+            ? context.Transactions.TemporalAll()
+            : context.Transactions.AsQueryable();
+        var transactions = await transactionsQuery.Where(t => t.Currency.ISOSymbol == Currency.Placeholder.ISOSymbol).ToListAsync();
         foreach (var transaction in transactions)
         {
             transaction.Currency = defaultCurrency;
