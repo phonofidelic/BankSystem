@@ -13,8 +13,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BankRUs.Api.Controllers;
 
-// test edit
-
 [Route("api/[controller]")]
 [Authorize(Policy = Policies.REQUIRE_ROLE_CUSTOMER_SERVICE)]
 [ApiController]
