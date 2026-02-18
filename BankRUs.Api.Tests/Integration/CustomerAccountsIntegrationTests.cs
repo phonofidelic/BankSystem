@@ -76,16 +76,38 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
         // Arrange:
         await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
 
-        var createCustoemrRequest = new CreateCustomerAccountRequestDto(
+        var createCustomerRequest = new CreateCustomerAccountRequestDto(
             FirstName: _testCustomerAccountDetails.FirstName!,
             LastName: _testCustomerAccountDetails.LastName!,
             Email: _testCustomerAccountDetails.Email!,
             SocialSecurityNumber: _testCustomerAccountDetails.SocialSecurityNumber!,
             Password: "Test@123");
 
-        var response = await _client.PostAsJsonAsync("/api/accounts/customers/create", createCustoemrRequest);
+        // Act:
+        var response = await _client.PostAsJsonAsync("/api/accounts/customers/create", createCustomerRequest);
 
+        // Assert;
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_WhenExistingSsnIsProvided_ShouldRespondBadRequest()
+    {
+        // Arrange:
+        await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
+
+        var secondCreateCustomerRequest = new CreateCustomerAccountRequestDto(
+            FirstName: _testCustomerAccountDetails.FirstName!,
+            LastName: _testCustomerAccountDetails.LastName!,
+            Email: _testCustomerAccountDetails.Email!,
+            SocialSecurityNumber: _testCustomerAccountDetails.SocialSecurityNumber!,
+            Password: "Test@123");
+        
+        // Act:
+        var secondResponse = await _client.PostAsJsonAsync("/api/accounts/customers/create", secondCreateCustomerRequest);
+
+        // Assert:
+        Assert.Equal(HttpStatusCode.BadRequest, secondResponse.StatusCode);
     }
 
     /// <summary>
