@@ -3,7 +3,6 @@ using BankRUs.Api.Dtos.Auth;
 using BankRUs.Api.Tests.Exceptions;
 using BankRUs.Api.Tests.Infrastructure;
 using BankRUs.Application.Configuration;
-using BankRUs.Application.UseCases.GetCustomerAccountDetails;
 using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Persistence;
