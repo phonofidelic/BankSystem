@@ -46,8 +46,8 @@ public class MakeDepositToBankAccountHandler(
 
         // 5) The Bank Account supports the provided Currency
         var parsedCurrency = _currencyService.ParseIsoSymbol(command.Currency);
-        var bankAccounCurrency = await _bankAccountRepository.GetBankAccountCurrency(command.BankAccountId);
-        var sanitizedTransactionCurrency = Guard.Against.BankAccountUnsupportedCurrency(parsedCurrency, bankAccounCurrency);
+        var bankAccountCurrency = await _bankAccountRepository.GetBankAccountCurrency(command.BankAccountId);
+        var sanitizedTransactionCurrency = Guard.Against.BankAccountUnsupportedCurrency(parsedCurrency, bankAccountCurrency);
 
         // Get the result from the Transaction service
         var createTransactionResult = await _transactionService.CreateTransactionAsync(new CreateTransactionRequest(
