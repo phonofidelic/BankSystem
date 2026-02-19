@@ -96,7 +96,7 @@ public class AccountsController(
     [ProducesResponseType<CreateCustomerAccountResponseDto>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateCustomer(CreateCustomerAccountRequestDto requestBody)
+    public async Task<IActionResult> CreateCustomerAccount(CreateCustomerAccountRequestDto requestBody)
     {
         try
         {

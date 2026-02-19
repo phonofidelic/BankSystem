@@ -108,7 +108,7 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
     }
 
     [Fact]
-    public async Task CreateCustomer_WhenValidDataIsProvided_ShouldCreateNewCustomerAccount()
+    public async Task CreateCustomerAccount_WhenValidDataIsProvided_ShouldCreateNewCustomerAccount()
     {
         // Arrange:
         await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
