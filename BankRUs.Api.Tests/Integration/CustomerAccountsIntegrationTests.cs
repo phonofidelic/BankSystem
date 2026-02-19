@@ -32,7 +32,7 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
         await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
 
         // Act:
-        var response = await _client.GetAsync("/api/accounts/customers");
+        var response = await _client.GetAsync("/api/customer-accounts");
 
         // Assert:
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -57,7 +57,7 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
         await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
 
         // Act:
-        var response = await _client.GetAsync("/api/accounts/customers?size=5&page=2&sortOrder=ascending");
+        var response = await _client.GetAsync("/api/customer-accounts?size=5&page=2&sortOrder=ascending");
 
         // Assert:
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -84,12 +84,12 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
             SocialSecurityNumber: ssn,
             Password: "Test@123");
 
-        var createCustomerAccountResponse = await _client.PostAsJsonAsync("/api/accounts/customers/create", createCustomerAccountRequest);
+        var createCustomerAccountResponse = await _client.PostAsJsonAsync("/api/customer-accounts/create", createCustomerAccountRequest);
         var createCustomerAccountResponseContent = await createCustomerAccountResponse.Content.ReadFromJsonAsync<CreateCustomerAccountResponseDto>();
         var customerAccountId = createCustomerAccountResponseContent?.CustomerAccountId ?? throw new Exception("Customer account not found");
 
         // Act:
-        var response = await _client.GetAsync($"/api/accounts/customers/{customerAccountId}");
+        var response = await _client.GetAsync($"/api/customer-accounts/{customerAccountId}");
         var content = await response.Content.ReadFromJsonAsync<GetCustomerAccountResponseDto>();
 
         // Assert:
@@ -120,7 +120,7 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
             Password: "Test@123");
 
         // Act:
-        var response = await _client.PostAsJsonAsync("/api/accounts/customers/create", createCustomerRequest);
+        var response = await _client.PostAsJsonAsync("/api/customer-accounts/create", createCustomerRequest);
 
         // Assert;
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -144,7 +144,7 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
             Password: "Test@123");
         
         // Act:
-        var secondResponse = await _client.PostAsJsonAsync("/api/accounts/customers/create", secondCreateCustomerRequest);
+        var secondResponse = await _client.PostAsJsonAsync("/api/customer-accounts/create", secondCreateCustomerRequest);
 
         // Assert:
         Assert.Equal(HttpStatusCode.BadRequest, secondResponse.StatusCode);

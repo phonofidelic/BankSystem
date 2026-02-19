@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BankRUs.Api.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/customer-accounts")]
 [Authorize(Policy = Policies.REQUIRE_ROLE_CUSTOMER_SERVICE)]
 [ApiController]
 public class AccountsController(
@@ -31,8 +31,8 @@ public class AccountsController(
     private readonly IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> _updateCustomerAccountHandler = updateCustomerAccountHandler;
     private readonly IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> _closeCustomerAccountHandler = closeCustomerAccountHandler;
 
-    // GET /api/accounts/customers
-    [HttpGet("customers")]
+    // GET /api/customer-accounts
+    [HttpGet()]
     [Produces("application/json")]
     [ProducesResponseType<GetCustomerAccountsResponseDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -51,8 +51,8 @@ public class AccountsController(
             Items: customerItems));
     }
 
-    // GET /api/accounts/customers/{customerId}
-    [HttpGet("customers/{customerId}")]
+    // GET /api/customer-accounts/{customerId}
+    [HttpGet("{customerId}")]
     [Produces("application/json")]
     [ProducesResponseType<GetCustomerAccountResponseDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -90,8 +90,8 @@ public class AccountsController(
         }
     }
 
-    // POST /api/accounts/customers/create (Endpoint /  API endpoint)
-    [HttpPost("customers/create")]
+    // POST /api/customer-accounts/create (Endpoint /  API endpoint)
+    [HttpPost("create")]
     [Produces("application/json")]
     [ProducesResponseType<CreateCustomerAccountResponseDto>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -127,8 +127,8 @@ public class AccountsController(
         }
     }
 
-    // PATCH /api/accounts/customers/{customerAccountId}
-    [HttpPatch("customers/{customerAccountId}")]
+    // PATCH /api/customer-accounts/{customerAccountId}
+    [HttpPatch("{customerAccountId}")]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -165,8 +165,8 @@ public class AccountsController(
         }
     }
 
-    // DELETE /api/accounts/customers/{customerAccountId}
-    [HttpDelete("customers/{customerAccountId}")]
+    // DELETE /api/customer-accounts/{customerAccountId}
+    [HttpDelete("{customerAccountId}")]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
