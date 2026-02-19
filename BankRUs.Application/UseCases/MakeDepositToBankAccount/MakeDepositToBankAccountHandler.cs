@@ -27,8 +27,8 @@ public class MakeDepositToBankAccountHandler(
         // A Bank Deposit can be made if...
 
         // 1) The Bank Account exists
-        bool bankAccountexists = _bankAccountRepository.BankAccountExists(command.BankAccountId);
-        if (!bankAccountexists) throw new BankAccountNotFoundException();
+        bool bankAccountExists = _bankAccountRepository.BankAccountExists(command.BankAccountId);
+        if (!bankAccountExists) throw new BankAccountNotFoundException();
 
         // 2) The Customer owns the Bank Account
         var bankAccountOwnerId = await _bankAccountRepository.GetCustomerIdForBankAccountAsync(command.BankAccountId);
@@ -46,8 +46,8 @@ public class MakeDepositToBankAccountHandler(
 
         // 5) The Bank Account supports the provided Currency
         var parsedCurrency = _currencyService.ParseIsoSymbol(command.Currency);
-        var bankAccounCurrency = await _bankAccountRepository.GetBankAccountCurrency(command.BankAccountId);
-        var sanitizedTransactionCurrency = Guard.Against.BankAccountUnsupportedCurrency(parsedCurrency, bankAccounCurrency);
+        var bankAccountCurrency = await _bankAccountRepository.GetBankAccountCurrency(command.BankAccountId);
+        var sanitizedTransactionCurrency = Guard.Against.BankAccountUnsupportedCurrency(parsedCurrency, bankAccountCurrency);
 
         // Get the result from the Transaction service
         var createTransactionResult = await _transactionService.CreateTransactionAsync(new CreateTransactionRequest(
