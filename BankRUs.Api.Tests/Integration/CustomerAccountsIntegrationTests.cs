@@ -132,7 +132,7 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
     }
 
     [Fact]
-    public async Task CreateCustomer_WhenExistingSsnIsProvided_ShouldRespondBadRequest()
+    public async Task CreateCustomerAccount_WhenExistingSsnIsProvided_ShouldRespondBadRequest()
     {
         // Arrange:
         await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
@@ -152,7 +152,7 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
     }
 
     [Fact]
-    public async Task PatchCustomer_WhenChangedDetailsProvided_UpdatesCustomerAccountDetails()
+    public async Task PatchCustomerAccount_WhenChangedDetailsProvided_UpdatesCustomerAccountDetails()
     {
         // Arrange:
         await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);

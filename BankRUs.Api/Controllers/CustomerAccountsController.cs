@@ -134,7 +134,7 @@ public class AccountsController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> PatchCustomer(
+    public async Task<IActionResult> PatchCustomerAccount(
         [FromRoute] Guid customerAccountId,
         [FromBody] PatchCustomerAccountRequestDto requestBody)
     {
