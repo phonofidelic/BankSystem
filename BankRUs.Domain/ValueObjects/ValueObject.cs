@@ -48,7 +48,9 @@ namespace BankRUs.Domain.ValueObjects
         public int CompareTo(object? obj)
         {
             Type thisType = GetType();
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
             Type otherType = obj.GetType();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
             if (thisType != otherType)
             {
