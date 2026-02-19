@@ -133,9 +133,10 @@ public class MakeDepositToBankAccountUnitTest
     }
 
     [Theory]
-    [InlineData(-10)]
-    [InlineData(0)]
-    public async Task MakeDepositToBankAccountHandler_WhenTransactionAmountIsNotPositive_ShouldThrowBankAccountTransactionException(decimal amount)
+    [InlineData([-10, "Test deposit transaction, negative amount"])]
+    [InlineData([0, "Test deposit transaction, zero amount"])]
+    [InlineData([10, "Test deposit transaction, reference exceeds max length. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et ma"])]
+    public async Task MakeDepositToBankAccountHandler_WhenTransactionBreaksRules_ShouldThrowBankAccountTransactionException(decimal amount, string referenceMessage)
     {
         // Arrange:
         var customerId = Guid.NewGuid();
@@ -150,9 +151,9 @@ public class MakeDepositToBankAccountUnitTest
         var makeDepositCommand = new MakeDepositToBankAccountCommand(
             CustomerId: customerId,
             BankAccountId: Guid.NewGuid(),
-            Amount: (decimal)amount,
+            Amount: amount,
             Currency: "SEK",
-            Reference: "Test deposit transaction, negative amount");
+            Reference: referenceMessage);
 
         try
         {
