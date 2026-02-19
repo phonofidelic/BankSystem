@@ -90,6 +90,43 @@ public class AccountsController(
         }
     }
 
+    // POST /api/accounts/customers/create (Endpoint /  API endpoint)
+    [HttpPost("customers/create")]
+    [Produces("application/json")]
+    [ProducesResponseType<CreateCustomerAccountResponseDto>(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateCustomer(CreateCustomerAccountRequestDto requestBody)
+    {
+        try
+        {
+            var openAccountResult = await _openAccountHandler.HandleAsync(
+                new OpenCustomerAccountCommand(
+                    FirstName: requestBody.FirstName,
+                    LastName: requestBody.LastName,
+                    SocialSecurityNumber: requestBody.SocialSecurityNumber,
+                    Email: requestBody.Email,
+                    Password: requestBody.Password));
+
+            // Return 201 Created
+            return Created(string.Empty, new CreateCustomerAccountResponseDto(openAccountResult.CustomerAccountId));
+        } catch (Exception ex)
+        {
+            // Log error
+            EventId eventId = new();
+            _logger.LogError(eventId, ex, message: ex.Message);
+
+            if (ex.GetType() == typeof(DuplicateCustomerException))
+            {
+                ModelState.AddModelError("Account", "Customer account already exists");
+                // Return 400 Bad Request
+                return BadRequest(ModelState);
+            }
+
+            return BadRequest();
+        }
+    }
+
     // PATCH /api/accounts/customers/{customerAccountId}
     [HttpPatch("customers/{customerAccountId}")]
     [Produces("application/json")]
@@ -155,43 +192,4 @@ public class AccountsController(
             return BadRequest();
         }
     }
-
-    // POST /api/accounts/customers/create (Endpoint /  API endpoint)
-    [HttpPost("customers/create")]
-    [Produces("application/json")]
-    [ProducesResponseType<CreateCustomerAccountResponseDto>(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateCustomer(CreateCustomerAccountRequestDto requestBody)
-    {
-        try
-        {
-            var openAccountResult = await _openAccountHandler.HandleAsync(
-                new OpenCustomerAccountCommand(
-                    FirstName: requestBody.FirstName,
-                    LastName: requestBody.LastName,
-                    SocialSecurityNumber: requestBody.SocialSecurityNumber,
-                    Email: requestBody.Email,
-                    Password: requestBody.Password));
-
-            // Return 201 Created
-            return Created(string.Empty, new CreateCustomerAccountResponseDto(openAccountResult.CustomerAccountId));
-        } catch (Exception ex)
-        {
-            // Log error
-            EventId eventId = new();
-            _logger.LogError(eventId, ex, message: ex.Message);
-
-            if (ex.GetType() == typeof(DuplicateCustomerException))
-            {
-                ModelState.AddModelError("Account", "Customer account already exists");
-                // Return 400 Bad Request
-                return BadRequest(ModelState);
-            }
-
-            return BadRequest();
-        }
-    }
-
-    
 }
