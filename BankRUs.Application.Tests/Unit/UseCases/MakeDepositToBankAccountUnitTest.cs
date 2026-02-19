@@ -19,16 +19,14 @@ public class MakeDepositToBankAccountUnitTest
             bankAccountsRepository: new BankAccountRepositoryStub(customerId),
             currencyService: new CurrencyServiceStub(),
             transactionService: new TransactionServiceStub(),
-            auditLogger: new AuditLoggerStub()
-        );
+            auditLogger: new AuditLoggerStub());
 
         var makeDepositCommand = new MakeDepositToBankAccountCommand(
             CustomerId: customerId,
             BankAccountId: bankAccountId,
             Amount: (decimal)100.25111,
             Currency: "SEK",
-            Reference: "Test make deposit transaction"
-        );
+            Reference: "Test make deposit transaction");
 
         // Act:
         var makeDepositResult = await makeDepositHandler.HandleAsync(makeDepositCommand);
@@ -53,8 +51,7 @@ public class MakeDepositToBankAccountUnitTest
             bankAccountsRepository: new BankAccountRepositoryStub(customerId),
             currencyService: new CurrencyServiceStub(),
             transactionService: new TransactionServiceStub(),
-            auditLogger: new AuditLoggerStub()
-        );
+            auditLogger: new AuditLoggerStub());
 
         var makeDepositCommand = new MakeDepositToBankAccountCommand(
             CustomerId: customerId,
@@ -70,7 +67,41 @@ public class MakeDepositToBankAccountUnitTest
         }
         catch (Exception ex) {
             // Assert:
-            Assert.Equal(new BankAccountNotFoundException(), ex);
+            Assert.IsType<BankAccountNotFoundException>(ex);
+        }
+    }
+
+    [Fact]
+    public async Task MakeDepositToBankAccountHandler_WhenBankAccountNotOwned_ShouldThrowNotOwned()
+    {
+        var customerId = Guid.NewGuid();
+
+        // Arrange:
+        var makeDepositHandler = new MakeDepositToBankAccountHandler(
+            unitOfWork: new UnitOfWorkStub(),
+            bankAccountsRepository: new BankAccountRepositoryStub(Guid.NewGuid()),
+            currencyService: new CurrencyServiceStub(),
+            transactionService: new TransactionServiceStub(),
+            auditLogger: new AuditLoggerStub());
+
+        var makeDepositCommand = new MakeDepositToBankAccountCommand(
+            CustomerId: customerId,
+            BankAccountId: Guid.NewGuid(),
+            Amount: (decimal)100.25111,
+            Currency: "SEK",
+            Reference: "Test bank account not found deposit transaction");
+
+        //var exception = new BankAccountNotOwnedException();
+
+        // Act:
+        try
+        {
+            await makeDepositHandler.HandleAsync(makeDepositCommand);
+        }
+        catch (Exception ex)
+        {
+            // Assert:
+            Assert.IsType<BankAccountNotOwnedException>(ex);
         }
     }
 }
