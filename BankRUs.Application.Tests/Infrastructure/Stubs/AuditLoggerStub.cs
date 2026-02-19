@@ -7,11 +7,11 @@ public class AuditLoggerStub : IAuditLogger
 {
     public IEnumerable<AuditLog> GetAuditLogs()
     {
-        throw new NotImplementedException();
+        return [];
     }
 
     public void Log(string message)
     {
-        throw new NotImplementedException();
+        
     }
 }

@@ -5,8 +5,10 @@ using Bogus;
 
 namespace BankRUs.Application.Tests.Infrastructure.Stubs;
 
-public class BankAccountRepositoryStub : IBankAccountsRepository
+public class BankAccountRepositoryStub(Guid customerId) : IBankAccountsRepository
 {
+    private readonly Guid _customerId = customerId;
+    
     public async Task Add(BankAccount bankAccount)
     {
         await Task.Delay(100);
@@ -14,7 +16,7 @@ public class BankAccountRepositoryStub : IBankAccountsRepository
 
     public bool BankAccountExists(Guid bankAccountId)
     {
-        return false;
+        return true;
     }
 
     public async Task<BankAccount> GetBankAccountAsync(Guid bankAccountId)
@@ -33,7 +35,7 @@ public class BankAccountRepositoryStub : IBankAccountsRepository
             })
             .RuleFor(b => b.Balance, (f) => f.Finance.Amount());
 
-            return bankAccount.Generate();
+        return bankAccount.Generate();
     }
 
     public async Task<decimal> GetBankAccountBalance(Guid bankAccountId)
@@ -52,18 +54,46 @@ public class BankAccountRepositoryStub : IBankAccountsRepository
             };
     }
 
-    public Task<IQueryable<BankAccount>> GetBankAccountsForCustomerAsync(Guid customerId)
+    public async Task<IQueryable<BankAccount>> GetBankAccountsForCustomerAsync(Guid customerId)
     {
-        throw new NotImplementedException();
+        var bankAccount = new Faker<BankAccount>()
+            .RuleFor(b => b.Id, () => Guid.NewGuid())
+            .RuleFor(b => b.Status, () => BankAccountStatus.Opened)
+            .RuleFor(b => b.Name, (f) => f.Finance.AccountName())
+            .RuleFor(b => b.CustomerId, () => customerId)
+            .RuleFor(b => b.Currency, () => new Currency
+            {
+                EnglishName = "Swedish Krona",
+                NativeName = "Svensk krona",
+                ISOSymbol = "SEK",
+                Symbol = "kr"
+            })
+            .RuleFor(b => b.Balance, (f) => f.Finance.Amount());
+
+        return bankAccount.Generate(2).AsQueryable();
     }
 
-    public Task<BankAccount?> GetClosedBankAccountBySocialSecurityNumber(string socialSecurityNumber)
+    public async Task<BankAccount?> GetClosedBankAccountBySocialSecurityNumber(string socialSecurityNumber)
     {
-        throw new NotImplementedException();
+        var bankAccount = new Faker<BankAccount>()
+            .RuleFor(b => b.Id, Guid.NewGuid)
+            .RuleFor(b => b.Status, () => BankAccountStatus.Closed)
+            .RuleFor(b => b.Name, () => "")
+            .RuleFor(b => b.CustomerId, Guid.NewGuid)
+            .RuleFor(b => b.Currency, () => new Currency
+            {
+                EnglishName = "Swedish Krona",
+                NativeName = "Svensk krona",
+                ISOSymbol = "SEK",
+                Symbol = "kr"
+            })
+            .RuleFor(b => b.Balance, () => 0);
+
+        return bankAccount.Generate();
     }
 
-    public Task<Guid> GetCustomerIdForBankAccountAsync(Guid bankAccountId)
+    public async Task<Guid> GetCustomerIdForBankAccountAsync(Guid bankAccountId)
     {
-        throw new NotImplementedException();
+        return _customerId;
     }
 }
