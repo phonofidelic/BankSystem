@@ -24,10 +24,8 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
             email: "test.testerson@example.com",
             socialSecurityNumber: Seeder.GenerateSocialSecurityNumber(factory.NextSeed));
 
-    private Guid TestCustomerAccountId { get; set; }
-
     [Fact]
-    public async Task Get_WhenCustomerAccountsExist_ShouldReturn200AndCustomerAccounts()
+    public async Task GetCustomerAccounts_WhenCustomerAccountsExist_ShouldReturn200AndCustomerAccounts()
     {
         // Arrange:
         // Log in as Admin
@@ -52,7 +50,7 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
     }
 
     [Fact]
-    public async Task Get_WhenPagingIsSpecified_ShouldReflectPagingQuery()
+    public async Task GetCustomerAccounts_WhenPagingIsSpecified_ShouldReflectPagingQuery()
     {
         // Arrange:
         // Log in as Admin
@@ -74,53 +72,7 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
     }
 
     [Fact]
-    public async Task Post_WhenValidDataIsProvided_ShouldCreateNewCustomerAccount()
-    {
-        // Arrange:
-        await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
-
-        var createCustomerRequest = new CreateCustomerAccountRequestDto(
-            FirstName: _testCustomerAccountDetails.FirstName!,
-            LastName: _testCustomerAccountDetails.LastName!,
-            Email: _testCustomerAccountDetails.Email!,
-            SocialSecurityNumber: _testCustomerAccountDetails.SocialSecurityNumber!,
-            Password: "Test@123");
-
-        // Act:
-        var response = await _client.PostAsJsonAsync("/api/accounts/customers/create", createCustomerRequest);
-
-        // Assert;
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        var responseContent = await response.Content.ReadFromJsonAsync<CreateCustomerAccountResponseDto>();
-
-        Assert.NotNull(responseContent);
-        Assert.IsType<Guid>(responseContent.CustomerAccountId);
-
-        TestCustomerAccountId = responseContent.CustomerAccountId;
-    }
-
-    [Fact]
-    public async Task Post_WhenExistingSsnIsProvided_ShouldRespondBadRequest()
-    {
-        // Arrange:
-        await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
-
-        var secondCreateCustomerRequest = new CreateCustomerAccountRequestDto(
-            FirstName: _testCustomerAccountDetails.FirstName!,
-            LastName: _testCustomerAccountDetails.LastName!,
-            Email: _testCustomerAccountDetails.Email!,
-            SocialSecurityNumber: _testCustomerAccountDetails.SocialSecurityNumber!,
-            Password: "Test@123");
-        
-        // Act:
-        var secondResponse = await _client.PostAsJsonAsync("/api/accounts/customers/create", secondCreateCustomerRequest);
-
-        // Assert:
-        Assert.Equal(HttpStatusCode.BadRequest, secondResponse.StatusCode);
-    }
-
-    [Fact]
-    public async Task GetDetails_WhenCustomerAccountExists_ShouldReturnDetails()
+    public async Task GetCustomerAccount_WhenCustomerAccountExists_ShouldReturnDetails()
     {
         // Arrange:
         await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
@@ -152,7 +104,51 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
         Assert.NotEmpty(content.BankAccounts);
         Assert.Single(content.BankAccounts);
         Assert.Equal("Default Checking Account", content.BankAccounts[0].Name);
-    }   
+    }
+
+    [Fact]
+    public async Task CreateCustomer_WhenValidDataIsProvided_ShouldCreateNewCustomerAccount()
+    {
+        // Arrange:
+        await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
+
+        var createCustomerRequest = new CreateCustomerAccountRequestDto(
+            FirstName: _testCustomerAccountDetails.FirstName!,
+            LastName: _testCustomerAccountDetails.LastName!,
+            Email: _testCustomerAccountDetails.Email!,
+            SocialSecurityNumber: _testCustomerAccountDetails.SocialSecurityNumber!,
+            Password: "Test@123");
+
+        // Act:
+        var response = await _client.PostAsJsonAsync("/api/accounts/customers/create", createCustomerRequest);
+
+        // Assert;
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var responseContent = await response.Content.ReadFromJsonAsync<CreateCustomerAccountResponseDto>();
+
+        Assert.NotNull(responseContent);
+        Assert.IsType<Guid>(responseContent.CustomerAccountId);
+    }
+
+    [Fact]
+    public async Task CreateCustomer_WhenExistingSsnIsProvided_ShouldRespondBadRequest()
+    {
+        // Arrange:
+        await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
+
+        var secondCreateCustomerRequest = new CreateCustomerAccountRequestDto(
+            FirstName: _testCustomerAccountDetails.FirstName!,
+            LastName: _testCustomerAccountDetails.LastName!,
+            Email: _testCustomerAccountDetails.Email!,
+            SocialSecurityNumber: _testCustomerAccountDetails.SocialSecurityNumber!,
+            Password: "Test@123");
+        
+        // Act:
+        var secondResponse = await _client.PostAsJsonAsync("/api/accounts/customers/create", secondCreateCustomerRequest);
+
+        // Assert:
+        Assert.Equal(HttpStatusCode.BadRequest, secondResponse.StatusCode);
+    }
 
     /// <summary>
     /// See https://stackoverflow.com/a/68424710
