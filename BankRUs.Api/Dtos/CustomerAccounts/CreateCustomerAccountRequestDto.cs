@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace BankRUs.Api.Dtos.Accounts;
+namespace BankRUs.Api.Dtos.CustomerAccounts;
 
 // Använd record när: DTO, Command, Query
 // Använd class när: entitet

@@ -1,4 +1,4 @@
-using BankRUs.Api.Dtos.Accounts;
+using BankRUs.Api.Dtos.CustomerAccounts;
 using BankRUs.Api.Dtos.Me;
 using BankRUs.Application;
 using BankRUs.Application.Exceptions;

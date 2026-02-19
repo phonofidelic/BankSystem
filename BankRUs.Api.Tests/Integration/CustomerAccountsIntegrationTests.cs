@@ -1,4 +1,4 @@
-using BankRUs.Api.Dtos.Accounts;
+using BankRUs.Api.Dtos.CustomerAccounts;
 using BankRUs.Api.Dtos.Auth;
 using BankRUs.Api.Tests.Exceptions;
 using BankRUs.Api.Tests.Infrastructure;
@@ -19,12 +19,7 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
     //private readonly int _seed = factory.Seed;
     private readonly HttpClient _client = factory.CreateClient();
     private readonly DefaultAdmin _defaultAdmin = factory.Services.GetRequiredService<IOptions<DefaultAdmin>>().Value;
-    private readonly CustomerAccountDetails _testCustomerAccountDetails = new CustomerAccountDetails(
-            firstName: "Test",
-            lastName: "Testerson",
-            email: "test.testerson@example.com",
-            socialSecurityNumber: Seeder.GenerateSocialSecurityNumber(factory.NextSeed));
-
+    
     [Fact]
     public async Task GetCustomerAccounts_WhenCustomerAccountsExist_ShouldReturn200AndCustomerAccounts()
     {
@@ -114,10 +109,10 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
         await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
 
         var createCustomerRequest = new CreateCustomerAccountRequestDto(
-            FirstName: _testCustomerAccountDetails.FirstName!,
-            LastName: _testCustomerAccountDetails.LastName!,
-            Email: _testCustomerAccountDetails.Email!,
-            SocialSecurityNumber: _testCustomerAccountDetails.SocialSecurityNumber!,
+            FirstName: "Test",
+            LastName: "Create",
+            Email: "test.create@example.com",
+            SocialSecurityNumber: Seeder.GenerateSocialSecurityNumber(factory.NextSeed),
             Password: "Test@123");
 
         // Act:
@@ -137,12 +132,22 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
         // Arrange:
         await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
 
+        var ssn = Seeder.GenerateSocialSecurityNumber(factory.NextSeed);
+        var createFirstCustomerRequest = new CreateCustomerAccountRequestDto(
+            FirstName: "Test",
+            LastName: "First",
+            Email: "test.first@example.com",
+            SocialSecurityNumber: ssn,
+            Password: "TestP@ssw0rd!"
+        );
+        await _client.PostAsJsonAsync("/api/customer-accounts/create", createFirstCustomerRequest);
+
         var secondCreateCustomerRequest = new CreateCustomerAccountRequestDto(
-            FirstName: _testCustomerAccountDetails.FirstName!,
-            LastName: _testCustomerAccountDetails.LastName!,
-            Email: _testCustomerAccountDetails.Email!,
-            SocialSecurityNumber: _testCustomerAccountDetails.SocialSecurityNumber!,
-            Password: "Test@123");
+            FirstName: "Test",
+            LastName: "Second",
+            Email: "test.second@example.com",
+            SocialSecurityNumber: ssn,
+            Password: "TestP@ssw0rd!");
         
         // Act:
         var secondResponse = await _client.PostAsJsonAsync("/api/customer-accounts/create", secondCreateCustomerRequest);
