@@ -27,8 +27,8 @@ public class MakeDepositToBankAccountHandler(
         // A Bank Deposit can be made if...
 
         // 1) The Bank Account exists
-        bool bankAccountexists = _bankAccountRepository.BankAccountExists(command.BankAccountId);
-        if (!bankAccountexists) throw new BankAccountNotFoundException();
+        bool bankAccountExists = _bankAccountRepository.BankAccountExists(command.BankAccountId);
+        if (!bankAccountExists) throw new BankAccountNotFoundException();
 
         // 2) The Customer owns the Bank Account
         var bankAccountOwnerId = await _bankAccountRepository.GetCustomerIdForBankAccountAsync(command.BankAccountId);

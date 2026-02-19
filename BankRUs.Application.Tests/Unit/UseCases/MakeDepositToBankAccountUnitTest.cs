@@ -26,7 +26,7 @@ public class MakeDepositToBankAccountUnitTest
             BankAccountId: bankAccountId,
             Amount: (decimal)100.25111,
             Currency: "SEK",
-            Reference: "Test make deposit transaction");
+            Reference: "Test deposit transaction");
 
         // Act:
         var makeDepositResult = await makeDepositHandler.HandleAsync(makeDepositCommand);
@@ -37,7 +37,7 @@ public class MakeDepositToBankAccountUnitTest
         Assert.Equal(TransactionType.Deposit, makeDepositResult.Type);
         Assert.Equal((decimal)100.25, makeDepositResult.Amount);
         Assert.Equal("SEK", makeDepositCommand.Currency);
-        Assert.Equal("Test make deposit transaction", makeDepositResult.Reference);
+        Assert.Equal("Test deposit transaction", makeDepositResult.Reference);
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class MakeDepositToBankAccountUnitTest
             BankAccountId: Guid.NewGuid(),
             Amount: (decimal)100.25111,
             Currency: "SEK",
-            Reference: "Test bank account not found deposit transaction");
+            Reference: "Test deposit transaction, bank account not found");
 
         try
         {
@@ -87,7 +87,7 @@ public class MakeDepositToBankAccountUnitTest
             BankAccountId: Guid.NewGuid(),
             Amount: (decimal)100.25111,
             Currency: "SEK",
-            Reference: "Test bank account not found deposit transaction");
+            Reference: "Test deposit transaction, bank account not owned");
 
         try
         {
@@ -119,7 +119,7 @@ public class MakeDepositToBankAccountUnitTest
             BankAccountId: Guid.NewGuid(),
             Amount: (decimal)100.25111,
             Currency: "###",
-            Reference: "Test bank account unsupported currency");
+            Reference: "Test deposit transaction, bank account unsupported currency");
 
         try
         {
@@ -129,6 +129,37 @@ public class MakeDepositToBankAccountUnitTest
         {
             // Assert:
             Assert.IsType<BankAccountUnsupportedCurrencyException>(ex);
+        }
+    }
+
+    [Fact]
+    public async Task MakeDepositToBankAccountHandler_WhenTransactionAmountIsNegative_ShouldThrowNegativeAmountException()
+    {
+        // Arrange:
+        var customerId = Guid.NewGuid();
+
+        var makeDepositHandler = new MakeDepositToBankAccountHandler(
+            unitOfWork: new UnitOfWorkStub(),
+            bankAccountsRepository: new BankAccountRepositoryStub(customerId),
+            currencyService: new CurrencyServiceStub(),
+            transactionService: new TransactionServiceStub(),
+            auditLogger: new AuditLoggerStub());
+
+        var makeDepositCommand = new MakeDepositToBankAccountCommand(
+            CustomerId: customerId,
+            BankAccountId: Guid.NewGuid(),
+            Amount: (decimal)-100.25111,
+            Currency: "SEK",
+            Reference: "Test deposit transaction, negative amount");
+
+        try
+        {
+            // Act:
+            await makeDepositHandler.HandleAsync(makeDepositCommand);
+        } catch (Exception ex)
+        {
+            // Assert:
+            Assert.IsType<BankAccountTransactionException>(ex);
         }
     }
 }
