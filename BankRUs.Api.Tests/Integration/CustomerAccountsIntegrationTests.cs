@@ -190,6 +190,43 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
         Assert.Equal("Edited", patchedCustomerAccountContent.FirstName);
     }
 
+    [Fact]
+    public async Task CloseCustomerAccount_WhenCustomerAccountIsOpen_ShouldCloseCustomerAccount()
+    {
+        // Arrange:
+        await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
+
+        // Create new Customer account for test
+        var createCustomerAccountRequest = new CreateCustomerAccountRequestDto(
+            FirstName: "Test",
+            LastName: "Close",
+            Email: "test.close@example.com",
+            SocialSecurityNumber: Seeder.GenerateSocialSecurityNumber(factory.NextSeed),
+            Password: "TestP@ssw0rd!"
+        );
+
+        var createCustomerAccountResponse = await _client.PostAsJsonAsync("/api/customer-accounts/create", createCustomerAccountRequest);
+        var createCustomerAccountContent = await createCustomerAccountResponse.Content.ReadFromJsonAsync<CreateCustomerAccountResponseDto>() ?? throw new CreateTestCustomerAccountException();
+        var customerAccountId = createCustomerAccountContent.CustomerAccountId;
+        
+        // Act:
+        var response = await _client.DeleteAsync($"/api/customer-accounts/{customerAccountId}");
+
+        // Assert:
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+        var getClosedCustomerAccountResponse = await _client.GetAsync($"/api/customer-accounts/{customerAccountId}");
+        var getClosedCustomerAccountContent = await getClosedCustomerAccountResponse.Content.ReadFromJsonAsync<GetCustomerAccountResponseDto>();
+
+        Assert.Equal(HttpStatusCode.OK, getClosedCustomerAccountResponse.StatusCode);
+        Assert.NotNull(getClosedCustomerAccountContent);
+        Assert.Equal("", getClosedCustomerAccountContent.FirstName);
+        Assert.Equal("", getClosedCustomerAccountContent.LastName);
+        Assert.Equal("", getClosedCustomerAccountContent.Email);
+        Assert.Equal("", getClosedCustomerAccountContent.Ssn);
+        Assert.Equal(CustomerAccountStatus.Closed.ToString(), getClosedCustomerAccountContent.AccountStatus);
+    }
+
     /// <summary>
     /// See https://stackoverflow.com/a/68424710
     /// </summary>
