@@ -1,7 +1,9 @@
 using BankRUs.Api.Dtos.Accounts;
 using BankRUs.Api.Dtos.Auth;
+using BankRUs.Api.Tests.Exceptions;
 using BankRUs.Api.Tests.Infrastructure;
 using BankRUs.Application.Configuration;
+using BankRUs.Application.UseCases.GetCustomerAccountDetails;
 using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Persistence;
@@ -148,6 +150,44 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
 
         // Assert:
         Assert.Equal(HttpStatusCode.BadRequest, secondResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task PatchCustomer_WhenChangedDetailsProvided_UpdatesCustomerAccountDetails()
+    {
+        // Arrange:
+        await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
+
+        var createCustomerRequest = new CreateCustomerAccountRequestDto(
+            FirstName: "Test",
+            LastName: "Patch",
+            Email: "test.patch@example.com",
+            SocialSecurityNumber: Seeder.GenerateSocialSecurityNumber(factory.NextSeed),
+            Password: "TestP@ssw0rd!"
+        );
+
+        // Create new Customer account for test
+        var createCustomerResponse = await _client.PostAsJsonAsync("/api/customer-accounts/create", createCustomerRequest);
+        var createCustomerContent = await createCustomerResponse.Content.ReadFromJsonAsync<CreateCustomerAccountResponseDto>() ?? throw new CreateTestCustomerAccountException();
+        var customerAccountId = createCustomerContent.CustomerAccountId;
+
+        // Act:
+        var patchCustomerAccountRequest = new PatchCustomerAccountRequestDto(
+            FirstName: "Edited",
+            null, null, null);
+
+        var patchCustomerAccountResponse = await _client.PatchAsJsonAsync($"/api/customer-accounts/{customerAccountId}", patchCustomerAccountRequest);
+        
+        // Assert:
+        Assert.Equal(HttpStatusCode.NoContent, patchCustomerAccountResponse.StatusCode);
+
+        // Get updated Customer account details
+        var getPatchedCustomerAccountResponse = await _client.GetAsync($"/api/customer-accounts/{customerAccountId}");
+        Assert.Equal(HttpStatusCode.OK, getPatchedCustomerAccountResponse.StatusCode);
+        
+        var patchedCustomerAccountContent = await getPatchedCustomerAccountResponse.Content.ReadFromJsonAsync<GetCustomerAccountResponseDto>();
+        Assert.NotNull(patchedCustomerAccountContent);
+        Assert.Equal("Edited", patchedCustomerAccountContent.FirstName);
     }
 
     /// <summary>
