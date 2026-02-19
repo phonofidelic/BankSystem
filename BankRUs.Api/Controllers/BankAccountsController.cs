@@ -1,4 +1,5 @@
 ﻿using BankRUs.Api.Dtos.BankAccounts;
+using BankRUs.Api.Dtos.Transactions;
 using BankRUs.Application;
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.AuditLog;
@@ -85,7 +86,7 @@ public class BankAccountsController(
                 ));
 
             var transactionItems = result.QueryResult.Items.Select(transaction => new CustomerTransactionsListItemDto(
-                TransationId: transaction.Id,
+                TransactionId: transaction.Id,
                 Type: transaction.Type.ToString().ToLower(),
                 Amount: transaction.Amount,
                 CreatedAt: transaction.CreatedAt,

@@ -1,7 +1,6 @@
 ﻿using BankRUs.Application.Services.PaginationService;
-using BankRUs.Domain.Entities;
 
-namespace BankRUs.Api.Dtos.BankAccounts;
+namespace BankRUs.Api.Dtos.Transactions;
 
 public record ListTransactionsResponseDto(
     Guid AccountId,
@@ -11,7 +10,7 @@ public record ListTransactionsResponseDto(
     IReadOnlyList<CustomerTransactionsListItemDto> Items);
 
 public record CustomerTransactionsListItemDto(
-    Guid TransationId,
+    Guid TransactionId,
     string Type,
     decimal Amount,
     DateTime CreatedAt,
