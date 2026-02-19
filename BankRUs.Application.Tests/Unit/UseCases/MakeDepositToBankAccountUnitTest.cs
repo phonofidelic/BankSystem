@@ -41,7 +41,7 @@ public class MakeDepositToBankAccountUnitTest
     }
 
     [Fact]
-    public async Task MakeDepositToBankAccountHandler_WhenBankAccountNotFound_ShouldThrowNotFound()
+    public async Task MakeDepositToBankAccountHandler_WhenBankAccountNotFound_ShouldThrowBankAccountNotFoundException()
     {
         // Arrange:
         var customerId = Guid.NewGuid();
@@ -72,7 +72,7 @@ public class MakeDepositToBankAccountUnitTest
     }
 
     [Fact]
-    public async Task MakeDepositToBankAccountHandler_WhenBankAccountNotOwned_ShouldThrowNotOwned()
+    public async Task MakeDepositToBankAccountHandler_WhenBankAccountNotOwned_ShouldThrowBankAccountNotOwnedException()
     {
         // Arrange:
         var makeDepositHandler = new MakeDepositToBankAccountHandler(
@@ -102,7 +102,7 @@ public class MakeDepositToBankAccountUnitTest
     }
 
     [Fact]
-    public async Task MakeDepositToBankAccountHandler_WhenCurrencyDoesNotMatchBankAccount_ShouldThrowUnsupportedCurrency()
+    public async Task MakeDepositToBankAccountHandler_WhenCurrencyDoesNotMatchBankAccount_ShouldThrowBankAccountUnsupportedCurrencyException()
     {
         // Arrange:
         var customerId = Guid.NewGuid();
@@ -132,8 +132,10 @@ public class MakeDepositToBankAccountUnitTest
         }
     }
 
-    [Fact]
-    public async Task MakeDepositToBankAccountHandler_WhenTransactionAmountIsNegative_ShouldThrowNegativeAmountException()
+    [Theory]
+    [InlineData(-10)]
+    [InlineData(0)]
+    public async Task MakeDepositToBankAccountHandler_WhenTransactionAmountIsNotPositive_ShouldThrowBankAccountTransactionException(decimal amount)
     {
         // Arrange:
         var customerId = Guid.NewGuid();
@@ -148,7 +150,7 @@ public class MakeDepositToBankAccountUnitTest
         var makeDepositCommand = new MakeDepositToBankAccountCommand(
             CustomerId: customerId,
             BankAccountId: Guid.NewGuid(),
-            Amount: (decimal)-100.25111,
+            Amount: (decimal)amount,
             Currency: "SEK",
             Reference: "Test deposit transaction, negative amount");
 
