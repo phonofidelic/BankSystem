@@ -1,6 +1,6 @@
 ﻿using BankRUs.Application.Services.PaginationService;
 
-namespace BankRUs.Api.Dtos.Accounts;
+namespace BankRUs.Api.Dtos.CustomerAccounts;
 
 public record GetCustomerAccountsResponseDto(
     PagedResultMetadata Paging,

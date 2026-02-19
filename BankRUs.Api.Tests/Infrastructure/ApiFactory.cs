@@ -18,7 +18,11 @@ namespace BankRUs.Api.Tests.Infrastructure;
 public class ApiFactory : WebApplicationFactory<Program>
 {
     private static readonly int _seed = 184765;
+
+    private Random _random = new(_seed);
     private SqliteConnection? _connection;
+
+    public int NextSeed { get => _random.Next(); }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -113,8 +117,6 @@ public class ApiFactory : WebApplicationFactory<Program>
         base.Dispose(disposing);
         _connection?.Dispose();
     }
-
-    public int Seed { get => _seed; }
 
     private static async Task SeedDatabase(IServiceScope scope)
     {
