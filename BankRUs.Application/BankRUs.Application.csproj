@@ -17,6 +17,7 @@
   <ItemGroup>
     <Folder Include="UseCases/CloseCustomerAccount/" />
     <Folder Include="UseCases/GetCustomerAccountDetails/" />
+    <Folder Include="UseCases/ListAllTransactions/" />
   </ItemGroup>
 
 </Project>

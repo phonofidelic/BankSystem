@@ -2,5 +2,5 @@
 
 public interface IPaginationService
 {
-    public BasePagedResult<T> GetPagedResult<T>(BasePageQuery query, IQueryable<T> items);
+    public Task<BasePagedResult<T>> GetPagedResultAsync<T>(BasePageQuery query, IQueryable<T> items);
 }

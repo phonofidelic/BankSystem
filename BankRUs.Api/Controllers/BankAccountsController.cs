@@ -1,5 +1,4 @@
 ﻿using BankRUs.Api.Dtos.BankAccounts;
-using BankRUs.Api.Dtos.Transactions;
 using BankRUs.Application;
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.AuditLog;
@@ -40,11 +39,11 @@ public class BankAccountsController(
     // GET /api/bank-accounts/{bankAccountId}/transactions?page=1&pageSize=20&from=2026-01-04%2016:35:40&to=2026-02-04%2016:35:40
     [HttpGet("{id}/transactions")]
     [Produces("application/json")]
-    [ProducesResponseType<ListTransactionsResponseDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<GetTransactionsForBankAccountResponseDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Get(
+    public async Task<IActionResult> GetTransactionsForBankAccount(
         [FromRoute] string id,
         [FromQuery(Name = "page")] int page = 1,
         [FromQuery(Name = "size")] int pageSize = 20,
@@ -93,7 +92,7 @@ public class BankAccountsController(
                 BalanceAfter: transaction.BalanceAfter,
                 Reference: transaction.Reference)).ToList();
 
-            return Ok(new ListTransactionsResponseDto(
+            return Ok(new GetTransactionsForBankAccountResponseDto(
                 AccountId: result.BankAccountId,
                 Currency: result.Currency.ToString(),
                 Balance: result.CurrentBalance,
