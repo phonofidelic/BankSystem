@@ -29,6 +29,7 @@ public class ListTransactionsForBankAccountHandler(
         var bankAccount = await _bankAccountRepository.GetBankAccountAsync(query.BankAccountId);
 
         var transactionsQuery = new TransactionsPageQuery(
+            Search: null,
             BankAccountId: query.BankAccountId,
             StartPeriodUtc: query.StartPeriodUtc,
             EndPeriodUtc: query.EndPeriodUdc,

@@ -4,6 +4,7 @@ using BankRUs.Domain.Entities;
 namespace BankRUs.Application.Services.TransactionService;
 
 public record TransactionsPageQuery(
+    string? Search,
     Guid? BankAccountId,
     DateTime? StartPeriodUtc,
     DateTime? EndPeriodUtc,
