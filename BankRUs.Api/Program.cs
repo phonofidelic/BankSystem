@@ -12,12 +12,14 @@ using BankRUs.Application.Services.PaginationService;
 using BankRUs.Application.Services.TransactionService;
 using BankRUs.Application.UseCases.CloseCustomerAccount;
 using BankRUs.Application.UseCases.GetCustomerAccountDetails;
+using BankRUs.Application.UseCases.ListAllTransactions;
 using BankRUs.Application.UseCases.ListCustomerAccounts;
 using BankRUs.Application.UseCases.ListTransactionsForBankAccount;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount;
 using BankRUs.Application.UseCases.MakeWithdrawalFromBankAccount;
 using BankRUs.Application.UseCases.OpenCustomerAccount;
 using BankRUs.Application.UseCases.UpdateCustomerAccount;
+using BankRUs.Domain.Entities;
 using BankRUs.Infrastructure.Persistence;
 using BankRUs.Infrastructure.Repositories;
 using BankRUs.Infrastructure.Services.AuditLogService;
@@ -92,6 +94,7 @@ builder.Services.AddScoped<IHandler<MakeWithdrawalFromBankAccountCommand, MakeWi
 builder.Services.AddScoped<IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult>, ListCustomerAccountsHandler>();
 builder.Services.AddScoped<IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult>, UpdateCustomerAccountHandler>();
 builder.Services.AddScoped<IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult>, CloseCustomerAccountHandler>();
+builder.Services.AddScoped<IHandler<TransactionsPageQuery, BasePagedResult<Transaction>>, ListAllTransactionsHandler>();
 
 // Jwt config
 builder.Services.AddOptions<JwtOptions>()

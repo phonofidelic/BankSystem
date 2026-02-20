@@ -2,4 +2,4 @@
 
 public record BasePagedResult<T>(
     IReadOnlyList<T> Items,
-    PagedResultMetadata Meta);
+    PagedResultMetadata Paging);

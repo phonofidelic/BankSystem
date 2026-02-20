@@ -26,7 +26,12 @@ namespace BankRUs.Infrastructure.Services.TransactionService
 
         public async Task<IQueryable<Transaction>> GetTransactionsAsync(TransactionsPageQuery query)
         {
-            var transactions = _context.Transactions.AsQueryable();
+            var transactions = _context.Transactions.AsNoTracking();
+
+            if (query.Search != null)
+                transactions = transactions.Where(t =>
+                    t.Reference == null || t.Reference.Contains(query.Search))
+                    .AsQueryable();
 
             if (query.BankAccountId != null)
                 transactions = transactions.Where(t => t.BankAccountId == query.BankAccountId);

@@ -1,23 +1,18 @@
 using BankRUs.Api.Dtos.CustomerAccounts;
-using BankRUs.Api.Dtos.Auth;
 using BankRUs.Api.Tests.Exceptions;
 using BankRUs.Api.Tests.Infrastructure;
 using BankRUs.Application.Configuration;
 using BankRUs.Domain.Entities;
-using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace BankRUs.Api.Tests.Integration;
 
-public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixture<ApiFactory>
+public class CustomerAccountsIntegrationTests(ApiFactory factory) : BaseIntegrationTest(factory)
 {
-    //private readonly int _seed = factory.Seed;
-    private readonly HttpClient _client = factory.CreateClient();
     private readonly DefaultAdmin _defaultAdmin = factory.Services.GetRequiredService<IOptions<DefaultAdmin>>().Value;
     
     [Fact]
@@ -48,23 +43,9 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
     [Fact]
     public async Task GetCustomerAccounts_WhenPagingIsSpecified_ShouldReflectPagingQuery()
     {
-        // Arrange:
-        // Log in as Admin
-        await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
-
-        // Act:
-        var response = await _client.GetAsync("/api/customer-accounts?size=5&page=2&sortOrder=ascending");
-
-        // Assert:
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-        var getCustomerAccountsResponse = await response.Content.ReadFromJsonAsync<GetCustomerAccountsResponseDto>();
-
-        Assert.NotNull(getCustomerAccountsResponse);
-        Assert.NotNull(getCustomerAccountsResponse.Paging);
-        Assert.Equal(2, getCustomerAccountsResponse.Paging.Page);
-        Assert.Equal(5, getCustomerAccountsResponse.Paging.PageSize);
-        Assert.Equal("ascending", getCustomerAccountsResponse.Paging.Sort);
+        await Paging_ShouldReflectPagingQuery<GetCustomerAccountsResponseDto>(
+            url: "/api/customer-accounts?size=5&page=2&sortOrder=ascending",
+            credentials: new UserCredentials(_defaultAdmin.Email, _defaultAdmin.Password));
     }
 
     [Fact]
@@ -72,7 +53,7 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
     {
         // Arrange:
         await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
-        var ssn = Seeder.GenerateSocialSecurityNumber(factory.NextSeed);
+        var ssn = Seeder.GenerateSocialSecurityNumber(NextSeed);
         var createCustomerAccountRequest = new CreateCustomerAccountRequestDto(
             FirstName: "Test",
             LastName: "Details",
@@ -112,7 +93,7 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
             FirstName: "Test",
             LastName: "Create",
             Email: "test.create@example.com",
-            SocialSecurityNumber: Seeder.GenerateSocialSecurityNumber(factory.NextSeed),
+            SocialSecurityNumber: Seeder.GenerateSocialSecurityNumber(NextSeed),
             Password: "Test@123");
 
         // Act:
@@ -132,7 +113,7 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
         // Arrange:
         await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
 
-        var ssn = Seeder.GenerateSocialSecurityNumber(factory.NextSeed);
+        var ssn = Seeder.GenerateSocialSecurityNumber(NextSeed);
         var createFirstCustomerRequest = new CreateCustomerAccountRequestDto(
             FirstName: "Test",
             LastName: "First",
@@ -166,7 +147,7 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
             FirstName: "Test",
             LastName: "Patch",
             Email: "test.patch@example.com",
-            SocialSecurityNumber: Seeder.GenerateSocialSecurityNumber(factory.NextSeed),
+            SocialSecurityNumber: Seeder.GenerateSocialSecurityNumber(NextSeed),
             Password: "TestP@ssw0rd!"
         );
 
@@ -205,7 +186,7 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
             FirstName: "Test",
             LastName: "Close",
             Email: "test.close@example.com",
-            SocialSecurityNumber: Seeder.GenerateSocialSecurityNumber(factory.NextSeed),
+            SocialSecurityNumber: Seeder.GenerateSocialSecurityNumber(NextSeed),
             Password: "TestP@ssw0rd!"
         );
 
@@ -229,18 +210,5 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : IClassFixtur
         Assert.Equal("", getClosedCustomerAccountContent.Email);
         Assert.Equal("", getClosedCustomerAccountContent.Ssn);
         Assert.Equal(CustomerAccountStatus.Closed.ToString(), getClosedCustomerAccountContent.AccountStatus);
-    }
-
-    /// <summary>
-    /// See https://stackoverflow.com/a/68424710
-    /// </summary>
-    private async Task LoginClient(string username, string password)
-    {
-        var loginRequest = new LoginRequestDto(username, password);
-
-        var response = await _client.PostAsJsonAsync("/api/auth/login", loginRequest);
-
-        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponseDto>() ?? throw new Exception("Login failed");
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse?.Token);
     }
 }

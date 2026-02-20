@@ -16,10 +16,10 @@ public class ListCustomerAccountsHandler(
     public async Task<ListCustomerAccountsResult> HandleAsync(ListCustomerAccountsQuery query)
     {
         var customers = await _customerService.SearchCustomersAsync(query);
-        var result = _paginationService.GetPagedResult(query, customers);
+        var result = await _paginationService.GetPagedResultAsync(query, customers);
 
         return new ListCustomerAccountsResult(
             Items: result.Items,
-            Meta: result.Meta);
+            Meta: result.Paging);
     }
 }

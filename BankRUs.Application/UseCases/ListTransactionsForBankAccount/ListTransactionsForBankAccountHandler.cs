@@ -29,6 +29,7 @@ public class ListTransactionsForBankAccountHandler(
         var bankAccount = await _bankAccountRepository.GetBankAccountAsync(query.BankAccountId);
 
         var transactionsQuery = new TransactionsPageQuery(
+            Search: null,
             BankAccountId: query.BankAccountId,
             StartPeriodUtc: query.StartPeriodUtc,
             EndPeriodUtc: query.EndPeriodUdc,
@@ -39,7 +40,7 @@ public class ListTransactionsForBankAccountHandler(
 
         var queryResult = await _transactionService.GetTransactionsAsync(transactionsQuery);
 
-        var paginationResult = _paginationService.GetPagedResult(transactionsQuery, queryResult);
+        var paginationResult = await _paginationService.GetPagedResultAsync(transactionsQuery, queryResult);
 
         return new ListTransactionsForBankAccountResult(
             BankAccountId: bankAccount.Id,

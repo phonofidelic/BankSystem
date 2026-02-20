@@ -1,4 +1,5 @@
 ﻿using BankRUs.Application.Services.PaginationService;
+using Microsoft.EntityFrameworkCore;
 
 namespace BankRUs.Infrastructure.Services.PaginationService;
 
@@ -6,7 +7,7 @@ namespace BankRUs.Infrastructure.Services.PaginationService;
 public class PaginationService : IPaginationService 
 {
     private const int MAX_PAGE_SIZE = 50;
-    public BasePagedResult<T> GetPagedResult<T>(BasePageQuery query, IQueryable<T> items)
+    public async Task<BasePagedResult<T>> GetPagedResultAsync<T>(BasePageQuery query, IQueryable<T> items)
     {
         int pageSize = query.Size < MAX_PAGE_SIZE ? query.Size : MAX_PAGE_SIZE;
         var totalItems = items.Count();
@@ -14,12 +15,12 @@ public class PaginationService : IPaginationService
 
         var result = items
             .Skip(query.Skip).Take(query.Size)
-            .ToList();
+            ;
 
         return new BasePagedResult<T>
         (
-            Items: result,
-            Meta: new PagedResultMetadata(
+            Items: await result.ToListAsync(),
+            Paging: new PagedResultMetadata(
                 Page: query.Page,
                 PageSize: pageSize,
                 TotalCount: totalItems,
