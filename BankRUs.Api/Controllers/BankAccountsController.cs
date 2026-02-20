@@ -96,7 +96,7 @@ public class BankAccountsController(
                 AccountId: result.BankAccountId,
                 Currency: result.Currency.ToString(),
                 Balance: result.CurrentBalance,
-                Paging: result.QueryResult.Meta,
+                Paging: result.QueryResult.Paging,
                 Items: transactionItems));
         }
         catch (Exception ex) {

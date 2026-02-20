@@ -26,5 +26,14 @@ public class TransactionsIntegrationTests(ApiFactory factory) : BaseIntegrationT
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.NotNull(content);
         Assert.Equal(50, content.Items.Count);
+        Assert.True(content.Paging.TotalCount > content.Items.Count);
+    }
+
+    [Fact]
+    public async Task GetAllTransactions_WhenPagingIsSpecified_ShouldReflectPagingQuery()
+    {
+        await Paging_ShouldReflectPagingQuery<GetTransactionsResponseDto>(
+            url: "/api/transactions?page=2&size=15&sortOrder=ascending",
+            credentials: new UserCredentials(_defaultAdmin.Email, _defaultAdmin.Password));
     }
 }

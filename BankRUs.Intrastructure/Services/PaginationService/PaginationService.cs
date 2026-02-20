@@ -20,7 +20,7 @@ public class PaginationService : IPaginationService
         return new BasePagedResult<T>
         (
             Items: await result.ToListAsync(),
-            Meta: new PagedResultMetadata(
+            Paging: new PagedResultMetadata(
                 Page: query.Page,
                 PageSize: pageSize,
                 TotalCount: totalItems,

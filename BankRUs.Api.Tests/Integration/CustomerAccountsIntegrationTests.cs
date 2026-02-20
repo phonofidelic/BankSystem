@@ -43,23 +43,9 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : BaseIntegrat
     [Fact]
     public async Task GetCustomerAccounts_WhenPagingIsSpecified_ShouldReflectPagingQuery()
     {
-        // Arrange:
-        // Log in as Admin
-        await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
-
-        // Act:
-        var response = await _client.GetAsync("/api/customer-accounts?size=5&page=2&sortOrder=ascending");
-
-        // Assert:
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-        var getCustomerAccountsResponse = await response.Content.ReadFromJsonAsync<GetCustomerAccountsResponseDto>();
-
-        Assert.NotNull(getCustomerAccountsResponse);
-        Assert.NotNull(getCustomerAccountsResponse.Paging);
-        Assert.Equal(2, getCustomerAccountsResponse.Paging.Page);
-        Assert.Equal(5, getCustomerAccountsResponse.Paging.PageSize);
-        Assert.Equal("ascending", getCustomerAccountsResponse.Paging.Sort);
+        await Paging_ShouldReflectPagingQuery<GetCustomerAccountsResponseDto>(
+            url: "/api/customer-accounts?size=5&page=2&sortOrder=ascending",
+            credentials: new UserCredentials(_defaultAdmin.Email, _defaultAdmin.Password));
     }
 
     [Fact]

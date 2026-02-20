@@ -35,7 +35,7 @@ public class TransactionsController(
             Reference: item.Reference)).ToList();
 
         return Ok(new GetTransactionsResponseDto(
-            Paging: result.Meta,
+            Paging: result.Paging,
             Items: listItems
         ));
     }

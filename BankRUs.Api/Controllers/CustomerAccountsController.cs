@@ -47,7 +47,7 @@ public class AccountsController(
             Email: customer.Email)).ToList();
 
         return Ok(new GetCustomerAccountsResponseDto(
-            Paging: result.Meta,
+            Paging: result.Paging,
             Items: customerItems));
     }
 

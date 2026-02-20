@@ -20,6 +20,6 @@ public class ListCustomerAccountsHandler(
 
         return new ListCustomerAccountsResult(
             Items: result.Items,
-            Meta: result.Meta);
+            Meta: result.Paging);
     }
 }
