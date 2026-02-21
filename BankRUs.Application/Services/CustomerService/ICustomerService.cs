@@ -1,10 +1,9 @@
-﻿using BankRUs.Application.Services.CustomerService.GetBankAccount;
-using BankRUs.Domain.Entities;
+﻿using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 
-namespace BankRUs.Application.Services.CustomerService;
+namespace BankRUs.Application.Services.CustomerAccountService;
 
-public interface ICustomerService
+public interface ICustomerAccountService
 {
     public Task<IQueryable<CustomerAccount>> SearchCustomersAsync(CustomerAccountsPageQuery query);
     

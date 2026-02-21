@@ -1,4 +1,4 @@
-﻿using BankRUs.Application.Services.CustomerService;
+﻿using BankRUs.Application.Services.CustomerAccountService;
 using BankRUs.Application.Services.PaginationService;
 using Microsoft.Extensions.Logging;
 
@@ -6,11 +6,11 @@ namespace BankRUs.Application.UseCases.ListCustomerAccounts;
 
 public class ListCustomerAccountsHandler(
     ILogger<ListCustomerAccountsHandler> logger,
-    ICustomerService customerService, 
+    ICustomerAccountService customerService, 
     IPaginationService paginationService) : IHandler<CustomerAccountsPageQuery, ListCustomerAccountsResult>
 {
     private readonly ILogger<ListCustomerAccountsHandler> _logger = logger;
-    private readonly ICustomerService _customerService = customerService;
+    private readonly ICustomerAccountService _customerService = customerService;
     private readonly IPaginationService _paginationService = paginationService;
     public async Task<ListCustomerAccountsResult> HandleAsync(CustomerAccountsPageQuery query)
     {

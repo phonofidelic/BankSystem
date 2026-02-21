@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BankRUs.Application.Services.CustomerService
+namespace BankRUs.Application.Services.CustomerAccountService
 {
     public record CreateBankAccountResult(BankAccount BankAccount);
 }

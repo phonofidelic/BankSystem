@@ -1,4 +1,4 @@
-﻿namespace BankRUs.Application.Services.CustomerService;
+﻿namespace BankRUs.Application.Services.CustomerAccountService;
 
 public sealed record CreateCustomerAccountRequest
 (

@@ -1,5 +1,5 @@
 ﻿using BankRUs.Application.GuardClause;
-using BankRUs.Application.Services.CustomerService;
+using BankRUs.Application.Services.CustomerAccountService;
 using BankRUs.Application.Services.EmailService;
 using BankRUs.Application.Services.Identity;
 using BankRUs.Domain.ValueObjects;
@@ -9,14 +9,14 @@ namespace BankRUs.Application.UseCases.OpenCustomerAccount;
 public class OpenCustomerAccountHandler(
     IUnitOfWork unitOfWork,
     IIdentityService identityService,
-    ICustomerService customerService,
+    ICustomerAccountService customerService,
     IEmailSender emailSender) : IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResult>
 {
     // ToDo: Add ILoggerService?
     //private readonly ILoggerService<OpenCustomerAccountHandler> _logger;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IIdentityService _identityService = identityService;
-    private readonly ICustomerService _customerService = customerService;
+    private readonly ICustomerAccountService _customerService = customerService;
     private readonly IEmailSender _emailSender = emailSender;
 
     public async Task<OpenCustomerAccountResult> HandleAsync(OpenCustomerAccountCommand command)

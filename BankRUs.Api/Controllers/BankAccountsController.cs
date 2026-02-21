@@ -2,7 +2,7 @@
 using BankRUs.Application;
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.AuditLog;
-using BankRUs.Application.Services.CustomerService;
+using BankRUs.Application.Services.CustomerAccountService;
 using BankRUs.Application.UseCases.ListTransactionsForBankAccount;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount;
 using BankRUs.Application.UseCases.MakeWithdrawalFromBankAccount;
@@ -18,14 +18,14 @@ namespace BankRUs.Api.Controllers;
 [Authorize(Roles = Roles.Customer)]
 [ApiController]
 public class BankAccountsController(
-    ICustomerService customerService,
+    ICustomerAccountService customerService,
     IHandler<ListTransactionsForBankAccountQuery, ListTransactionsForBankAccountResult> listTransactionsforBankAccountHandler,
     IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult> makeDepositToBankAccountHandler,
     IHandler<MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult> makeWithdrawalFromBankAccountHandler,
     ILogger<BankAccountsController> logger,
     IAuditLogger auditLogger) : ControllerBase
 {
-    private readonly ICustomerService _customerService = customerService;
+    private readonly ICustomerAccountService _customerService = customerService;
     private readonly IHandler<ListTransactionsForBankAccountQuery, ListTransactionsForBankAccountResult> _listTransactionsForBankAccountHandler = listTransactionsforBankAccountHandler;
     private readonly IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult> _makeDepositToBankAccountHandler = makeDepositToBankAccountHandler;
     private readonly IHandler<MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult> _makeWithdrawalFromBankAccountHandler = makeWithdrawalFromBankAccountHandler;

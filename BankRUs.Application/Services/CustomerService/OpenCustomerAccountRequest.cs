@@ -1,7 +1,6 @@
-﻿using BankRUs.Application.Services.CustomerService.GetBankAccount;
-using BankRUs.Domain.Entities;
+﻿using BankRUs.Domain.Entities;
 
-namespace BankRUs.Application.Services.CustomerService;
+namespace BankRUs.Application.Services.CustomerAccountService;
 
 public record OpenCustomerAccountRequest(
     CustomerAccount CustomerAccount,

@@ -1,16 +1,16 @@
 ﻿using BankRUs.Application.Exceptions;
 using BankRUs.Application.GuardClause;
-using BankRUs.Application.Services.CustomerService;
+using BankRUs.Application.Services.CustomerAccountService;
 using BankRUs.Application.UseCases.OpenCustomerAccount;
 
 namespace BankRUs.Application.UseCases.UpdateCustomerAccount;
 
 public class UpdateCustomerAccountHandler(
     IUnitOfWork unitOfWork,
-    ICustomerService customerService): IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult>
+    ICustomerAccountService customerService): IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult>
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
-    private readonly ICustomerService _customerService = customerService;
+    private readonly ICustomerAccountService _customerService = customerService;
 
     public async Task<UpdateCustomerAccountResult> HandleAsync(UpdateCustomerAccountCommand command)
     {

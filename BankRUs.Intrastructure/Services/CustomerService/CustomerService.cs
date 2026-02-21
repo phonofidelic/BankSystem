@@ -1,7 +1,6 @@
 ﻿using BankRUs.Application.Configuration;
 using BankRUs.Application.Exceptions;
-using BankRUs.Application.Services.CustomerService;
-using BankRUs.Application.Services.CustomerService.GetBankAccount;
+using BankRUs.Application.Services.CustomerAccountService;
 using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Persistence;
@@ -12,7 +11,7 @@ namespace BankRUs.Infrastructure.Services.CustomerService
 {
     public class CustomerService(
         IOptions<AppSettings> appSettings,
-        ApplicationDbContext context) : ICustomerService
+        ApplicationDbContext context) : ICustomerAccountService
     {
         private readonly AppSettings _appSettings = appSettings.Value;
         private readonly ApplicationDbContext _context = context;
