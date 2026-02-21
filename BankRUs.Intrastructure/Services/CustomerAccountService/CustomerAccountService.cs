@@ -7,9 +7,9 @@ using BankRUs.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace BankRUs.Infrastructure.Services.CustomerService
+namespace BankRUs.Infrastructure.Services.CustomerAccountService
 {
-    public class CustomerService(
+    public class CustomerAccountService(
         IOptions<AppSettings> appSettings,
         ApplicationDbContext context) : ICustomerAccountService
     {
