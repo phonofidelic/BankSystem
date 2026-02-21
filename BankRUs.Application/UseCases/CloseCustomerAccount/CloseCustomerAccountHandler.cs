@@ -33,27 +33,12 @@ public class CloseCustomerAccountHandler(
         
         List<Transaction> closingTransactions = [];
         
-        // ToDo: Move to service?
         foreach(var bankAccount in bankAccounts)
         {
-            var createTransactionRequest = new CreateTransactionRequest
-            (
-                CustomerId: customerAccount.Id,
-                BankAccountId: bankAccount. Id,
-                Amount: bankAccount.Balance,
-                Currency: bankAccount.Currency,
-                Reference: string.Format("Closing transaction for Bank account {0}", bankAccount.Name),
-                Type: TransactionType.Withdrawal
-            );
-
-            var createTransactionResult = await _transactionService.CreateTransactionAsync(createTransactionRequest);
-            
-            var closingTransaction = createTransactionResult.Transaction;
-
-            bankAccount.AddTransaction(closingTransaction);
             bankAccount.Close();
-
-            closingTransactions.Add(closingTransaction);
+            var closingTransaction = bankAccount.GetClosingTransaction();
+            if (closingTransaction != null)
+                closingTransactions.Add(closingTransaction);
         }
 
         // Remove the ApplicationUser
