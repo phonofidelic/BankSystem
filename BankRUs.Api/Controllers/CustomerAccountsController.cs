@@ -19,14 +19,14 @@ namespace BankRUs.Api.Controllers;
 public class AccountsController(
     ILogger<AccountsController> logger,
     ICustomerService customerService,
-    IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> listCustomerAccountsHandler,
+    IHandler<CustomerAccountsPageQuery, ListCustomerAccountsResult> listCustomerAccountsHandler,
     IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResult> openAccountHandler,
     IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> updateCustomerAccountHandler,
     IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> closeCustomerAccountHandler) : ControllerBase
 {
     private readonly ILogger<AccountsController> _logger = logger;
     private readonly ICustomerService _customerService = customerService;
-    private readonly IHandler<ListCustomerAccountsQuery, ListCustomerAccountsResult> _listCustomerAccountsHandler = listCustomerAccountsHandler;
+    private readonly IHandler<CustomerAccountsPageQuery, ListCustomerAccountsResult> _listCustomerAccountsHandler = listCustomerAccountsHandler;
     private readonly IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResult> _openAccountHandler = openAccountHandler;
     private readonly IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> _updateCustomerAccountHandler = updateCustomerAccountHandler;
     private readonly IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> _closeCustomerAccountHandler = closeCustomerAccountHandler;
@@ -36,7 +36,7 @@ public class AccountsController(
     [Produces("application/json")]
     [ProducesResponseType<GetCustomerAccountsResponseDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> GetCustomerAccounts([FromQuery] ListCustomerAccountsQuery query)
+    public async Task<IActionResult> GetCustomerAccounts([FromQuery] CustomerAccountsPageQuery query)
     {
         var result = await _listCustomerAccountsHandler.HandleAsync(query);
 

@@ -2,7 +2,6 @@
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.CustomerService;
 using BankRUs.Application.Services.CustomerService.GetBankAccount;
-using BankRUs.Application.UseCases.ListCustomerAccounts;
 using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Persistence;
@@ -18,7 +17,7 @@ namespace BankRUs.Infrastructure.Services.CustomerService
         private readonly AppSettings _appSettings = appSettings.Value;
         private readonly ApplicationDbContext _context = context;
 
-        public async Task<IQueryable<CustomerAccount>> SearchCustomersAsync(ListCustomerAccountsQuery query)
+        public async Task<IQueryable<CustomerAccount>> SearchCustomersAsync(CustomerAccountsPageQuery query)
         {
             var search = query.Search ?? string.Empty;
             var results = _context.Customers.AsNoTracking()
