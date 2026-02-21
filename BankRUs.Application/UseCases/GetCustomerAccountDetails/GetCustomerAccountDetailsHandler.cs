@@ -1,14 +1,14 @@
 using System;
 using BankRUs.Application.Exceptions;
-using BankRUs.Application.Services.CustomerService;
+using BankRUs.Application.Services.CustomerAccountService;
 
 namespace BankRUs.Application.UseCases.GetCustomerAccountDetails;
 
 public class GetCustomerAccountDetailsHandler(
-    ICustomerService customerService
+    ICustomerAccountService customerService
 ) : IHandler<GetCustomerAccountDetailsQuery, GetCustomerAccountDetailsResult>
 {
-    private readonly ICustomerService _customerService = customerService;
+    private readonly ICustomerAccountService _customerService = customerService;
     public async Task<GetCustomerAccountDetailsResult> HandleAsync(GetCustomerAccountDetailsQuery query)
     {
         var applicationUserId = query.ApplicationUserId;

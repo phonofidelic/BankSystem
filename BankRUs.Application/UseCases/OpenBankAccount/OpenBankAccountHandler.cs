@@ -1,4 +1,4 @@
-﻿using BankRUs.Application.Services.CustomerService;
+﻿using BankRUs.Application.Services.CustomerAccountService;
 using BankRUs.Application.Services.EmailService;
 
 
@@ -6,11 +6,11 @@ namespace BankRUs.Application.UseCases.OpenBankAccount;
 
 public class OpenBankAccountHandler : IHandler<OpenBankAccountCommand, OpenBankAccountResult>
 {
-    private readonly ICustomerService _customerService;
+    private readonly ICustomerAccountService _customerService;
     private readonly IEmailSender _emailSender;
 
     public OpenBankAccountHandler(
-        ICustomerService customerService,
+        ICustomerAccountService customerService,
          IEmailSender emailSender)
     {
         _customerService = customerService;

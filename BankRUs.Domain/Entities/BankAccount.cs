@@ -14,7 +14,7 @@ public class BankAccount : BaseUpdatableEntity<Guid>
 
     public Guid CustomerId { get; set; }
     
-    public Customer Customer { get; set; } = default!;
+    public CustomerAccount Customer { get; set; } = default!;
     
     public required Currency Currency { get; set; }
     

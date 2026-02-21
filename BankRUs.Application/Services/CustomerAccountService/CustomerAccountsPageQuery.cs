@@ -1,8 +1,8 @@
 ﻿using BankRUs.Application.Services.PaginationService;
 
-namespace BankRUs.Application.Services.CustomerService;
+namespace BankRUs.Application.Services.CustomerAccountService;
 
-public record CustomersSearchQuery(
+public record CustomerAccountsPageQuery(
     string? Search,
     string? FirstName,
     string? LastName,

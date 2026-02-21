@@ -16,7 +16,7 @@ public class Transaction : BaseCreatableEntity<Guid>
     public override Guid Id { get; set; } = Guid.NewGuid();
 
     public Guid  CustomerId { get; set; }
-    public Customer Customer { get; set; } = default!;
+    public CustomerAccount Customer { get; set; } = default!;
 
     public Guid BankAccountId { get; set; }
     public BankAccount BankAccount { get; set; } = default!;

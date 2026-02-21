@@ -1,24 +1,22 @@
 ﻿using BankRUs.Application.Configuration;
 using BankRUs.Application.Exceptions;
-using BankRUs.Application.Services.CustomerService;
-using BankRUs.Application.Services.CustomerService.GetBankAccount;
-using BankRUs.Application.UseCases.ListCustomerAccounts;
+using BankRUs.Application.Services.CustomerAccountService;
 using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace BankRUs.Infrastructure.Services.CustomerService
+namespace BankRUs.Infrastructure.Services.CustomerAccountService
 {
-    public class CustomerService(
+    public class CustomerAccountService(
         IOptions<AppSettings> appSettings,
-        ApplicationDbContext context) : ICustomerService
+        ApplicationDbContext context) : ICustomerAccountService
     {
         private readonly AppSettings _appSettings = appSettings.Value;
         private readonly ApplicationDbContext _context = context;
 
-        public async Task<IQueryable<Customer>> SearchCustomersAsync(ListCustomerAccountsQuery query)
+        public async Task<IQueryable<CustomerAccount>> SearchCustomersAsync(CustomerAccountsPageQuery query)
         {
             var search = query.Search ?? string.Empty;
             var results = _context.Customers.AsNoTracking()
@@ -37,7 +35,7 @@ namespace BankRUs.Infrastructure.Services.CustomerService
             return results;
         }
 
-        public async Task<Customer> GetCustomerAsync(Guid customerId)
+        public async Task<CustomerAccount> GetCustomerAsync(Guid customerId)
         {
             return await _context.Customers.Include(c => c.BankAccounts)
                 .Where(c => c.Id == customerId)
@@ -53,20 +51,20 @@ namespace BankRUs.Infrastructure.Services.CustomerService
             return customer.Id;
         }
 
-        public async Task<Customer?> GetClosedCustomerAccountBySocialSecurityNumber(string socialSecurityNumber)
+        public async Task<CustomerAccount?> GetClosedCustomerAccountBySocialSecurityNumber(string socialSecurityNumber)
         {
             return await _context.Customers.FirstOrDefaultAsync(c => 
             c.SocialSecurityNumber == socialSecurityNumber
             && c.Status == CustomerAccountStatus.Closed);
         }
 
-        public async Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request)
+        public async Task<CreateCustomerAccountResult> CreateCustomerAsync(CreateCustomerAccountRequest request)
         {
-            var newCustomer = new Customer(request.ApplicationUserId, request.SocialSecurityNumber);
+            var newCustomer = new CustomerAccount(request.ApplicationUserId, request.SocialSecurityNumber);
 
             await _context.Customers.AddAsync(newCustomer);
 
-            return new CreateCustomerResult(newCustomer);
+            return new CreateCustomerAccountResult(newCustomer);
         }
 
         public async Task OpenCustomerAccountAsync(OpenCustomerAccountRequest request)

@@ -1,9 +1,6 @@
 ﻿using BankRUs.Domain.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace BankRUs.Application.Services.CustomerService.GetBankAccount;
+namespace BankRUs.Application.Services.CustomerAccountService;
 
 public class CompleteCustomerAccountDetails(
     string FirstName,

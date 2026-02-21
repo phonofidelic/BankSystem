@@ -2,7 +2,7 @@ using BankRUs.Api.Dtos.CustomerAccounts;
 using BankRUs.Api.Dtos.Me;
 using BankRUs.Application;
 using BankRUs.Application.Exceptions;
-using BankRUs.Application.Services.CustomerService;
+using BankRUs.Application.Services.CustomerAccountService;
 using BankRUs.Application.UseCases.CloseCustomerAccount;
 using BankRUs.Application.UseCases.GetCustomerAccountDetails;
 using BankRUs.Application.UseCases.UpdateCustomerAccount;
@@ -21,13 +21,13 @@ namespace BankRUs.Api.Controllers
     [Authorize(Policy = Policies.REQUIRE_AUTHENTICATION)]
     public class MeController(
         ILogger<MeController> logger,
-        ICustomerService customerService,
+        ICustomerAccountService customerService,
         IHandler<GetCustomerAccountDetailsQuery, GetCustomerAccountDetailsResult> getCustomerDetailsResponseHandler,
         IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> updateCustomerAccountHandler,
         IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> closeCustomerAccountHandler) : ControllerBase
     {
         private readonly ILogger<MeController> _logger = logger;
-        private readonly ICustomerService _customerService = customerService;
+        private readonly ICustomerAccountService _customerService = customerService;
         private readonly IHandler<GetCustomerAccountDetailsQuery, GetCustomerAccountDetailsResult> _getBankAccountsForCustomerHandler = getCustomerDetailsResponseHandler;
         private readonly IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> _updateCustomerAccountHandler = updateCustomerAccountHandler;
         private readonly IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> _closeCustomerAccountHandler = closeCustomerAccountHandler;

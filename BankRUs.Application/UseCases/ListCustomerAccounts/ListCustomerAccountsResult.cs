@@ -3,4 +3,4 @@ using BankRUs.Domain.Entities;
 
 namespace BankRUs.Application.UseCases.ListCustomerAccounts;
 
-public record ListCustomerAccountsResult(IReadOnlyList<Customer> Items, PagedResultMetadata Meta) : BasePagedResult<Customer>(Items, Meta);
+public record ListCustomerAccountsResult(IReadOnlyList<CustomerAccount> Items, PagedResultMetadata Meta) : BasePagedResult<CustomerAccount>(Items, Meta);
