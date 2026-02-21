@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BankRUs.Domain.Entities;
 
-public class Customer(Guid applicationUserId, string socialSecurityNumber) : BaseUpdatableEntity<Guid>
+public class CustomerAccount(Guid applicationUserId, string socialSecurityNumber) : BaseUpdatableEntity<Guid>
 {
     public override Guid Id { get; set; } = Guid.NewGuid();
 

@@ -12,7 +12,7 @@ public sealed class ApplicationDbContext(
     ) : IdentityDbContext<ApplicationUser>(options)
 {
     private bool _setTimestamps { get; set; } = true;
-    public DbSet<Customer> Customers { get; set; } = default!;
+    public DbSet<CustomerAccount> Customers { get; set; } = default!;
     public DbSet<BankAccount> BankAccounts { get; set; } = default!;
     public DbSet<Transaction> Transactions { get; set; } = default!;
 

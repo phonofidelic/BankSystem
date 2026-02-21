@@ -5,4 +5,4 @@ using System.Text;
 
 namespace BankRUs.Application.Services.CustomerService;
 
-public record CreateCustomerResult(Customer Customer);
+public record CreateCustomerResult(CustomerAccount Customer);

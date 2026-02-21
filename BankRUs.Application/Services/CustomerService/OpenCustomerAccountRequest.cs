@@ -4,6 +4,6 @@ using BankRUs.Domain.Entities;
 namespace BankRUs.Application.Services.CustomerService;
 
 public record OpenCustomerAccountRequest(
-    Customer CustomerAccount,
+    CustomerAccount CustomerAccount,
     CompleteCustomerAccountDetails CustomerAccountDetails,
     Guid ApplicationUserId);

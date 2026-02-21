@@ -37,8 +37,8 @@ public static class Seeder
         var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
         var appSettings = serviceProvider.GetRequiredService<IOptions<AppSettings>>().Value;
 
-        var customer = new Faker<Customer>()
-            .CustomInstantiator((f) => new Customer(f.Random.Guid(), f.Person.Personnummer()))
+        var customer = new Faker<CustomerAccount>()
+            .CustomInstantiator((f) => new CustomerAccount(f.Random.Guid(), f.Person.Personnummer()))
             .RuleFor(c => c.ApplicationUserId, (f, c) => f.Random.Guid())
             .RuleFor(c => c.FirstName, (f, c) => f.Person.FirstName)
             .RuleFor(c => c.LastName, (f, c) => f.Person.LastName + SeedStamp(seed))
@@ -56,7 +56,7 @@ public static class Seeder
         }
     }
 
-    private static async Task GenerateBankAccountsForCustomer(Customer customer, int seed, IServiceProvider serviceProvider)
+    private static async Task GenerateBankAccountsForCustomer(CustomerAccount customer, int seed, IServiceProvider serviceProvider)
     {
         var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
         var appSettings = serviceProvider.GetRequiredService<IOptions<AppSettings>>().Value;

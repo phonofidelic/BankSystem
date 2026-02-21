@@ -18,7 +18,7 @@ namespace BankRUs.Infrastructure.Services.CustomerService
         private readonly AppSettings _appSettings = appSettings.Value;
         private readonly ApplicationDbContext _context = context;
 
-        public async Task<IQueryable<Customer>> SearchCustomersAsync(ListCustomerAccountsQuery query)
+        public async Task<IQueryable<CustomerAccount>> SearchCustomersAsync(ListCustomerAccountsQuery query)
         {
             var search = query.Search ?? string.Empty;
             var results = _context.Customers.AsNoTracking()
@@ -37,7 +37,7 @@ namespace BankRUs.Infrastructure.Services.CustomerService
             return results;
         }
 
-        public async Task<Customer> GetCustomerAsync(Guid customerId)
+        public async Task<CustomerAccount> GetCustomerAsync(Guid customerId)
         {
             return await _context.Customers.Include(c => c.BankAccounts)
                 .Where(c => c.Id == customerId)
@@ -53,7 +53,7 @@ namespace BankRUs.Infrastructure.Services.CustomerService
             return customer.Id;
         }
 
-        public async Task<Customer?> GetClosedCustomerAccountBySocialSecurityNumber(string socialSecurityNumber)
+        public async Task<CustomerAccount?> GetClosedCustomerAccountBySocialSecurityNumber(string socialSecurityNumber)
         {
             return await _context.Customers.FirstOrDefaultAsync(c => 
             c.SocialSecurityNumber == socialSecurityNumber
@@ -62,7 +62,7 @@ namespace BankRUs.Infrastructure.Services.CustomerService
 
         public async Task<CreateCustomerResult> CreateCustomerAsync(CreateCustomerRequest request)
         {
-            var newCustomer = new Customer(request.ApplicationUserId, request.SocialSecurityNumber);
+            var newCustomer = new CustomerAccount(request.ApplicationUserId, request.SocialSecurityNumber);
 
             await _context.Customers.AddAsync(newCustomer);
 
