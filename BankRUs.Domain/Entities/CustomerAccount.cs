@@ -79,13 +79,25 @@ public class CustomerAccount(Guid applicationUserId, string socialSecurityNumber
 
     public void Close()
     {
-        // Validate that Customer account closure is allowed
-        var canClose = BankAccounts.All(bankAccount => bankAccount.Balance == 0);
+        // A Customer account can be closed if...
+
+        // 1) all bank accounts have a positive balance
+        var canClose = BankAccounts.All(bankAccount => bankAccount.Balance >= 0);
 
         if (!canClose)
         {
-            var bankAccountsWithRemainingBalance = BankAccounts.Where(bankAccount => bankAccount.Balance != 0);
-            throw new CloseCustomerAccountException(string.Format("Could not close Customer account. {0} bank accounts have a remaining balance", bankAccountsWithRemainingBalance.Count()));
+            var bankAccountsWithNegativeBalance = BankAccounts.Where(bankAccount => bankAccount.Balance < 0).ToList();
+            throw new CloseCustomerAccountException(string.Format("Could not close Customer account. {0} bank accounts have a negative balance", bankAccountsWithNegativeBalance.Count));
+        }
+
+        List<Transaction> closingTransactions = [];
+
+        foreach (var bankAccount in BankAccounts)
+        {
+            bankAccount.Close();
+            var closingTransaction = bankAccount.GetClosingTransaction();
+            if (closingTransaction != null)
+                closingTransactions.Add(closingTransaction);
         }
 
         FirstName = "";
@@ -94,6 +106,20 @@ public class CustomerAccount(Guid applicationUserId, string socialSecurityNumber
         SocialSecurityNumber = "";
         Status = CustomerAccountStatus.Closed;
         ClosedOn = DateTime.UtcNow;
+    }
+
+    public IReadOnlyList<Transaction> GetClosingTransactions()
+    {
+        List<Transaction> closingTransactions = [];
+        
+        foreach(var bankAccount in BankAccounts)
+        {
+            var closingTransaction = bankAccount.GetClosingTransaction();
+            if (closingTransaction != null)
+                closingTransactions.Add(closingTransaction);
+        }
+
+        return closingTransactions;
     }
 }
 

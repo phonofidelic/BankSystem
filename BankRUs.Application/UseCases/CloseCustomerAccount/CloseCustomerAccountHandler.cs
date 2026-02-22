@@ -1,9 +1,6 @@
-using BankRUs.Application.BankAccounts;
 using BankRUs.Application.Services.CustomerAccountService;
 using BankRUs.Application.Services.EmailService;
 using BankRUs.Application.Services.Identity;
-using BankRUs.Application.Services.TransactionService;
-using BankRUs.Domain.Entities;
 
 namespace BankRUs.Application.UseCases.CloseCustomerAccount;
 
@@ -11,35 +8,26 @@ public class CloseCustomerAccountHandler(
     IUnitOfWork unitOfWork,
     IIdentityService identityService,
     ICustomerAccountService customerService,
-    ITransactionService transactionService,
-    IBankAccountsRepository bankAccountsRepository,
     IEmailSender emailSender
 ) : IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult>
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
     private readonly IIdentityService _identityService = identityService;
+
     private readonly ICustomerAccountService _customerService = customerService;
-    private readonly ITransactionService _transactionService = transactionService;
-    private readonly IBankAccountsRepository _bankAccountRepository = bankAccountsRepository;
+
     private readonly IEmailSender _emailSender = emailSender;
+    
     public async Task<CloseCustomerAccountResult> HandleAsync(CloseCustomerAccountCommand command)
     {
-        // A Customer account can be closed if...
-
-        // 1) all bank accounts have a zero balance
         var customerAccount = await _customerService.GetCustomerAsync(command.CustomerAccountId);
         
-        var bankAccounts = customerAccount.GetBankAccounts();
-        
-        List<Transaction> closingTransactions = [];
-        
-        foreach(var bankAccount in bankAccounts)
-        {
-            bankAccount.Close();
-            var closingTransaction = bankAccount.GetClosingTransaction();
-            if (closingTransaction != null)
-                closingTransactions.Add(closingTransaction);
-        }
+        // Close the Customer account
+        customerAccount.Close();
+
+        // Get closing bank account Transactions
+        var closingTransactions = customerAccount.GetClosingTransactions();
 
         // Remove the ApplicationUser
         await _identityService.DeleteApplicationUserAsync(customerAccount.ApplicationUserId);
@@ -52,13 +40,11 @@ public class CloseCustomerAccountHandler(
             closingTransactions: closingTransactions
         );
 
-        // Close the Customer account
-        customerAccount.Close();
+        await _unitOfWork.SaveAsync();
 
         // Send confirmation email
         await _emailSender.SendEmailAsync(confirmationEmail);
 
-        await _unitOfWork.SaveAsync();
         return new CloseCustomerAccountResult();
     }
 }
