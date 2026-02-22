@@ -210,5 +210,12 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : BaseIntegrat
         Assert.Equal("", getClosedCustomerAccountContent.Email);
         Assert.Equal("", getClosedCustomerAccountContent.Ssn);
         Assert.Equal(CustomerAccountStatus.Closed.ToString(), getClosedCustomerAccountContent.AccountStatus);
+
+        foreach (var bankAccount in getClosedCustomerAccountContent.BankAccounts)
+        {
+            Assert.Equal(BankAccountStatus.Closed.ToString(), bankAccount.AccountStatus);
+            Assert.Equal(0, bankAccount.CurrentBalance);
+            Assert.Equal("", bankAccount.Name);
+        }
     }
 }
