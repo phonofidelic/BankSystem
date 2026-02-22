@@ -42,7 +42,7 @@ public class BankAccount : BaseUpdatableEntity<Guid>
             throw new NegativeBalanceException();
         }
         
-        if (Balance < 0)
+        if (Balance > 0)
         {
             var closingTransaction = new Transaction
             {
