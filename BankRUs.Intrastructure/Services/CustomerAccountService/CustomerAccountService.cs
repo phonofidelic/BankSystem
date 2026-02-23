@@ -86,29 +86,6 @@ namespace BankRUs.Infrastructure.Services.CustomerAccountService
             request.CustomerAccount.Open();
         }
 
-        public async Task<CreateBankAccountResult> CreateBankAccountAsync(CreateBankAccountRequest request)
-        {
-            try
-            {
-                var customer = await _context.Customers.FindAsync(request.CustomerId) 
-                    ?? throw new Exception("Customer not found");
-                
-                BankAccount newBankAccount = new()
-                {
-                    Name = request.BankAccountName,
-                    CustomerId = customer.Id,
-                    Currency = _appSettings.DefaultCurrency
-                };
-
-                _context.BankAccounts.Add(newBankAccount);
-                return new CreateBankAccountResult(newBankAccount);
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
         public bool EmailExists(string email)
         {
             var result = _context.Customers.Where(c => c.Email == email).FirstOrDefault();

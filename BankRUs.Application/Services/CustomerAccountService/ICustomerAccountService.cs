@@ -18,9 +18,6 @@ public interface ICustomerAccountService
 
     public Task OpenCustomerAccountAsync(OpenCustomerAccountRequest request);
 
-    // ToDo: Move to BankAccountsRepository?
-    public Task<CreateBankAccountResult> CreateBankAccountAsync(CreateBankAccountRequest request);
-    
     public bool EmailExists(string email);
     
     public bool SsnExists(string ssn);
