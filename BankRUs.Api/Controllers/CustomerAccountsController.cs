@@ -62,7 +62,7 @@ public class AccountsController(
     {
         try
         {
-            var customer = await _customerService.GetCustomerAsync(customerId);
+            var customer = await _customerService.GetCustomerAccountAsync(customerId);
             var bankAccountListItems = customer.BankAccounts.Select(b => new CustomerBankAccountListItemDto(
                 Id: b.Id,
                 Name: b.Name,

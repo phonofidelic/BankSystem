@@ -16,7 +16,7 @@ namespace BankRUs.Infrastructure.Services.CustomerAccountService
         private readonly AppSettings _appSettings = appSettings.Value;
         private readonly ApplicationDbContext _context = context;
 
-        public async Task<IQueryable<CustomerAccount>> SearchCustomersAsync(CustomerAccountsPageQuery query)
+        public async Task<IQueryable<CustomerAccount>> SearchCustomerAccountsAsync(CustomerAccountsPageQuery query)
         {
             var search = query.Search ?? string.Empty;
             var results = _context.Customers.AsNoTracking()
@@ -35,14 +35,14 @@ namespace BankRUs.Infrastructure.Services.CustomerAccountService
             return results;
         }
 
-        public async Task<CustomerAccount> GetCustomerAsync(Guid customerId)
+        public async Task<CustomerAccount> GetCustomerAccountAsync(Guid customerId)
         {
             return await _context.Customers.Include(c => c.BankAccounts)
                 .Where(c => c.Id == customerId)
                 .FirstOrDefaultAsync() ?? throw new CustomerNotFoundException();
         }
 
-        public async Task<Guid> GetCustomerIdAsync(Guid applicationUserId)
+        public async Task<Guid> GetCustomerAccountIdAsync(Guid applicationUserId)
         {
             var customer = await _context
                 .Customers.Where(customer => customer.ApplicationUserId == applicationUserId)
@@ -58,7 +58,7 @@ namespace BankRUs.Infrastructure.Services.CustomerAccountService
             && c.Status == CustomerAccountStatus.Closed);
         }
 
-        public async Task<CreateCustomerAccountResult> CreateCustomerAsync(CreateCustomerAccountRequest request)
+        public async Task<CreateCustomerAccountResult> CreateCustomerAccountAsync(CreateCustomerAccountRequest request)
         {
             var newCustomer = new CustomerAccount(request.ApplicationUserId, request.SocialSecurityNumber);
 

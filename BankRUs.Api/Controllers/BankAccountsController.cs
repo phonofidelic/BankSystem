@@ -71,7 +71,7 @@ public class BankAccountsController(
 
         try
         {
-            var customerId = await _customerService.GetCustomerIdAsync(userGuid);
+            var customerId = await _customerService.GetCustomerAccountIdAsync(userGuid);
 
             var result = await _listTransactionsForBankAccountHandler.HandleAsync(new ListTransactionsForBankAccountQuery(
                 CustomerId: customerId,
@@ -143,7 +143,7 @@ public class BankAccountsController(
 
         try
         {
-            var customerId = await _customerService.GetCustomerIdAsync(userGuid);
+            var customerId = await _customerService.GetCustomerAccountIdAsync(userGuid);
             
             var result = await _makeDepositToBankAccountHandler.HandleAsync(new MakeDepositToBankAccountCommand(
                 CustomerId: customerId,
@@ -212,7 +212,7 @@ public class BankAccountsController(
 
         try
         {
-            var customerId = await _customerService.GetCustomerIdAsync(userGuid);
+            var customerId = await _customerService.GetCustomerAccountIdAsync(userGuid);
 
             var result = await _makeWithdrawalFromBankAccountHandler.HandleAsync(new MakeWithdrawalFromBankAccountCommand(
                 CustomerId: customerId,

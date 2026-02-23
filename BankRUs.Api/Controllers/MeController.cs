@@ -125,7 +125,7 @@ namespace BankRUs.Api.Controllers
 
             try
             {
-                var customerAccountId = await _customerService.GetCustomerIdAsync(applicationUserId);
+                var customerAccountId = await _customerService.GetCustomerAccountIdAsync(applicationUserId);
                 var updateCustomerAccountResult = await _updateCustomerAccountHandler.HandleAsync(new UpdateCustomerAccountCommand(
                     CustomerAccountId: customerAccountId,
                     Details: new CustomerAccountDetails(
@@ -181,7 +181,7 @@ namespace BankRUs.Api.Controllers
 
             try
             {
-                var customerAccountId = await _customerService.GetCustomerIdAsync(applicationUserId);
+                var customerAccountId = await _customerService.GetCustomerAccountIdAsync(applicationUserId);
                 await _closeCustomerAccountHandler.HandleAsync(new CloseCustomerAccountCommand(customerAccountId));
 
                 return NoContent();

@@ -31,7 +31,7 @@ public class MakeDepositToBankAccountHandler(
         if (!bankAccountExists) throw new BankAccountNotFoundException();
 
         // 2) The Customer owns the Bank Account
-        var bankAccountOwnerId = await _bankAccountRepository.GetCustomerIdForBankAccountAsync(command.BankAccountId);
+        var bankAccountOwnerId = await _bankAccountRepository.GetCustomerAccountIdForBankAccountAsync(command.BankAccountId);
         var sanitizedCustomerId = Guard.Against.BankAccountNotOwned(command.CustomerId, bankAccountOwnerId);
 
         // 3) The Deposit Amount is a positive decimal
@@ -46,7 +46,7 @@ public class MakeDepositToBankAccountHandler(
 
         // 5) The Bank Account supports the provided Currency
         var parsedCurrency = _currencyService.ParseIsoSymbol(command.Currency);
-        var bankAccountCurrency = await _bankAccountRepository.GetBankAccountCurrency(command.BankAccountId);
+        var bankAccountCurrency = await _bankAccountRepository.GetBankAccountCurrencyAsync(command.BankAccountId);
         var sanitizedTransactionCurrency = Guard.Against.BankAccountUnsupportedCurrency(parsedCurrency, bankAccountCurrency);
 
         // Get the result from the Transaction service

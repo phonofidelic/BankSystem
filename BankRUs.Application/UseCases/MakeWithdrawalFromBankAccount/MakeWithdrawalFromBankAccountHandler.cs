@@ -26,11 +26,11 @@ public class MakeWithdrawalFromBankAccountHandler(
         // A withdrawal can be made from a Bank Account if...
 
         // 1) The Bank Account exists
-        bool bankAccountexists = _bankAccountRepository.BankAccountExists(command.BankAccountId);
-        if (!bankAccountexists) throw new BankAccountNotFoundException();
+        bool bankAccountExists = _bankAccountRepository.BankAccountExists(command.BankAccountId);
+        if (!bankAccountExists) throw new BankAccountNotFoundException();
 
         // 2) The Customer owns the Bank Account
-        var bankAccountOwnerId = await _bankAccountRepository.GetCustomerIdForBankAccountAsync(command.BankAccountId);
+        var bankAccountOwnerId = await _bankAccountRepository.GetCustomerAccountIdForBankAccountAsync(command.BankAccountId);
         Guard.Against.BankAccountNotOwned(bankAccountOwnerId, command.CustomerId);
 
         // 3) The Deposit Amount is a positive decimal
@@ -45,11 +45,11 @@ public class MakeWithdrawalFromBankAccountHandler(
 
         // 5) The Bank Account supports the provided Currency
         var parsedCurrency = _currencyService.ParseIsoSymbol(command.Currency);
-        var bankAccountCurrency = await _bankAccountRepository.GetBankAccountCurrency(command.BankAccountId);
+        var bankAccountCurrency = await _bankAccountRepository.GetBankAccountCurrencyAsync(command.BankAccountId);
         var sanitizedCurrency = Guard.Against.BankAccountUnsupportedCurrency(parsedCurrency, bankAccountCurrency);
 
         // 6) The current balance covers the withdrawal amount
-        var currentBankAccountBalance = await _bankAccountRepository.GetBankAccountBalance(command.BankAccountId);
+        var currentBankAccountBalance = await _bankAccountRepository.GetBankAccountBalanceAsync(command.BankAccountId);
         Guard.Against.BankAccountOverdraft(currentBankAccountBalance, command.Amount);
 
         // Get the result from the Transaction service

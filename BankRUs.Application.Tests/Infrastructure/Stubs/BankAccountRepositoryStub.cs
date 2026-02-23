@@ -9,7 +9,7 @@ public class BankAccountRepositoryStub(Guid customerId) : IBankAccountsRepositor
 {
     private readonly Guid _customerId = customerId;
     
-    public async Task Add(BankAccount bankAccount)
+    public async Task AddAsync(BankAccount bankAccount)
     {
         await Task.Delay(100);
     }
@@ -38,12 +38,12 @@ public class BankAccountRepositoryStub(Guid customerId) : IBankAccountsRepositor
         return bankAccount.Generate();
     }
 
-    public async Task<decimal> GetBankAccountBalance(Guid bankAccountId)
+    public async Task<decimal> GetBankAccountBalanceAsync(Guid bankAccountId)
     {
         return new Faker().Finance.Amount();
     }
 
-    public async Task<Currency> GetBankAccountCurrency(Guid bankAccountId)
+    public async Task<Currency> GetBankAccountCurrencyAsync(Guid bankAccountId)
     {
         return new Currency
             {
@@ -73,7 +73,7 @@ public class BankAccountRepositoryStub(Guid customerId) : IBankAccountsRepositor
         return bankAccount.Generate(2).AsQueryable();
     }
 
-    public async Task<BankAccount?> GetClosedBankAccountBySocialSecurityNumber(string socialSecurityNumber)
+    public async Task<BankAccount?> GetClosedBankAccountBySocialSecurityNumberAsync(string socialSecurityNumber)
     {
         var bankAccount = new Faker<BankAccount>()
             .RuleFor(b => b.Id, Guid.NewGuid)
@@ -92,7 +92,7 @@ public class BankAccountRepositoryStub(Guid customerId) : IBankAccountsRepositor
         return bankAccount.Generate();
     }
 
-    public async Task<Guid> GetCustomerIdForBankAccountAsync(Guid bankAccountId)
+    public async Task<Guid> GetCustomerAccountIdForBankAccountAsync(Guid bankAccountId)
     {
         return _customerId;
     }

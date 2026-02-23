@@ -5,16 +5,16 @@ namespace BankRUs.Application.Services.CustomerAccountService;
 
 public interface ICustomerAccountService
 {
-    public Task<IQueryable<CustomerAccount>> SearchCustomersAsync(CustomerAccountsPageQuery query);
+    public Task<IQueryable<CustomerAccount>> SearchCustomerAccountsAsync(CustomerAccountsPageQuery query);
     
-    public Task<CustomerAccount> GetCustomerAsync(Guid customerId);
+    public Task<CustomerAccount> GetCustomerAccountAsync(Guid customerId);
     
-    public Task<Guid> GetCustomerIdAsync(Guid applicationUserId);
+    public Task<Guid> GetCustomerAccountIdAsync(Guid applicationUserId);
 
     public Task<CustomerAccount?> GetClosedCustomerAccountBySocialSecurityNumber(string socialSecurityNumber);
 
     CompleteCustomerAccountDetails ValidateCustomerAccountDetails(CustomerAccountDetails customerAccountDetails);
-    public Task<CreateCustomerAccountResult> CreateCustomerAsync(CreateCustomerAccountRequest request);
+    public Task<CreateCustomerAccountResult> CreateCustomerAccountAsync(CreateCustomerAccountRequest request);
 
     public Task OpenCustomerAccountAsync(OpenCustomerAccountRequest request);
 
