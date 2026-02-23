@@ -54,33 +54,15 @@ namespace BankRUs.Infrastructure.Services.CustomerAccountService
         public async Task<CustomerAccount?> GetClosedCustomerAccountBySocialSecurityNumber(string socialSecurityNumber)
         {
             return await _context.Customers.FirstOrDefaultAsync(c => 
-            c.SocialSecurityNumber == socialSecurityNumber
-            && c.Status == CustomerAccountStatus.Closed);
-        }
-
-        public async Task<CreateCustomerAccountResult> CreateCustomerAccountAsync(CreateCustomerAccountRequest request)
-        {
-            var newCustomer = new CustomerAccount(request.ApplicationUserId, request.SocialSecurityNumber);
-
-            await _context.Customers.AddAsync(newCustomer);
-
-            return new CreateCustomerAccountResult(newCustomer);
+                c.SocialSecurityNumber == socialSecurityNumber
+                && c.Status == CustomerAccountStatus.Closed);
         }
 
         public async Task OpenCustomerAccountAsync(OpenCustomerAccountRequest request)
         {
-            var defaultBankAccount = new BankAccount
-            {
-                Name = "Default Checking Account",
-                CustomerId = request.CustomerAccount.Id,
-                Currency = _appSettings.DefaultCurrency
-            };
-
-            await _context.BankAccounts.AddAsync(defaultBankAccount);
-
             request.CustomerAccount.UpdateAccountDetails(request.CustomerAccountDetails);
             request.CustomerAccount.SetApplicationUserId(request.ApplicationUserId);
-            request.CustomerAccount.AddBankAccount(defaultBankAccount);
+            request.CustomerAccount.AddBankAccount(request.DefaultBankAccount);
 
             // ToDo: Simulate customer visiting confirmation url?
             request.CustomerAccount.Open();
@@ -107,7 +89,5 @@ namespace BankRUs.Infrastructure.Services.CustomerAccountService
 
             return new CompleteCustomerAccountDetails(firstName, lastName, email, socialSecurityNumber);
         }
-
-        
     }
 }
