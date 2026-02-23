@@ -58,4 +58,9 @@ public class BankAccountsRepository(ApplicationDbContext context) : IBankAccount
     {
         return await _context.BankAccounts.FirstOrDefaultAsync(b => b.Customer.SocialSecurityNumber == socialSecurityNumber);
     }
+
+    public async Task AddAsync(BankAccount bankAccount)
+    {
+        await _context.BankAccounts.AddAsync(bankAccount);
+    }
 }

@@ -1,8 +1,5 @@
 ﻿using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BankRUs.Application.BankAccounts
 {
@@ -20,6 +17,8 @@ namespace BankRUs.Application.BankAccounts
         public Task<Currency> GetBankAccountCurrencyAsync(Guid bankAccountId);
 
         public Task<BankAccount?> GetClosedBankAccountBySocialSecurityNumberAsync(string socialSecurityNumber);
+
+        public Task AddAsync(BankAccount bankAccount);
 
         public bool BankAccountExists(Guid bankAccountId);
     }
