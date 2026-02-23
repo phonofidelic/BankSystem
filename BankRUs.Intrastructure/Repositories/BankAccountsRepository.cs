@@ -11,13 +11,6 @@ public class BankAccountsRepository(ApplicationDbContext context) : IBankAccount
 {
     private readonly ApplicationDbContext _context = context;
 
-    public async Task Add(BankAccount bankAccount)
-    {
-        await _context.BankAccounts.AddAsync(bankAccount);
-        await _context.SaveChangesAsync();
-
-    }
-
     public bool BankAccountExists(Guid bankAccountId)
     {
         return _context.BankAccounts.Find(bankAccountId) != null;
@@ -36,13 +29,13 @@ public class BankAccountsRepository(ApplicationDbContext context) : IBankAccount
             .Where(b => b.CustomerId == customer.Id);
     }
 
-    public async Task<Guid> GetCustomerIdForBankAccountAsync(Guid bankAccountId)
+    public async Task<Guid> GetCustomerAccountIdForBankAccountAsync(Guid bankAccountId)
     {
         var bankAccount = await _context.BankAccounts.FindAsync(bankAccountId);
         return bankAccount?.CustomerId ?? throw new Exception("Bank account not found");
     }
 
-    public async Task<decimal> GetBankAccountBalance(Guid bankAccountId)
+    public async Task<decimal> GetBankAccountBalanceAsync(Guid bankAccountId)
     {
         var bankAccount = await _context.BankAccounts.FindAsync(bankAccountId)
             ?? throw new BankAccountNotFoundException();
@@ -55,13 +48,13 @@ public class BankAccountsRepository(ApplicationDbContext context) : IBankAccount
         return await _context.BankAccounts.FindAsync(bankAccountId) ?? throw new BankAccountNotFoundException();
     }
 
-    public async Task<Currency> GetBankAccountCurrency(Guid bankAccountId)
+    public async Task<Currency> GetBankAccountCurrencyAsync(Guid bankAccountId)
     {
         var bankAccount = await GetBankAccountAsync(bankAccountId);
         return bankAccount.Currency;
     }
 
-    public async Task<BankAccount?> GetClosedBankAccountBySocialSecurityNumber(string socialSecurityNumber)
+    public async Task<BankAccount?> GetClosedBankAccountBySocialSecurityNumberAsync(string socialSecurityNumber)
     {
         return await _context.BankAccounts.FirstOrDefaultAsync(b => b.Customer.SocialSecurityNumber == socialSecurityNumber);
     }

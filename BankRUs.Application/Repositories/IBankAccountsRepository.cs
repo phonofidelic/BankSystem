@@ -8,20 +8,18 @@ namespace BankRUs.Application.BankAccounts
 {
     public interface IBankAccountsRepository
     {
-        public Task Add(BankAccount bankAccount);
-
         // ToDo: Task<IReadonlyList<BankAccount>> ?
-        public Task<IQueryable<BankAccount>> GetBankAccountsForCustomerAsync(Guid customerId);
+        public Task<IQueryable<BankAccount>> GetBankAccountsForCustomerAsync(Guid customerAccountId);
 
         public Task<BankAccount> GetBankAccountAsync(Guid bankAccountId);
 
-        public Task<Guid> GetCustomerIdForBankAccountAsync(Guid bankAccountId);
+        public Task<Guid> GetCustomerAccountIdForBankAccountAsync(Guid bankAccountId);
 
-        public Task<decimal> GetBankAccountBalance(Guid bankAccountId);
+        public Task<decimal> GetBankAccountBalanceAsync(Guid bankAccountId);
 
-        public Task<Currency> GetBankAccountCurrency(Guid bankAccountId);
+        public Task<Currency> GetBankAccountCurrencyAsync(Guid bankAccountId);
 
-        public Task<BankAccount?> GetClosedBankAccountBySocialSecurityNumber(string socialSecurityNumber);
+        public Task<BankAccount?> GetClosedBankAccountBySocialSecurityNumberAsync(string socialSecurityNumber);
 
         public bool BankAccountExists(Guid bankAccountId);
     }

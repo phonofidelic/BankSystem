@@ -24,7 +24,7 @@ public class ListTransactionsForBankAccountHandler(
         if (!bankAccountexists) throw new BankAccountNotFoundException();
 
         // 2) The Customer owns the Bank Account
-        var bankAccountOwnerId = await _bankAccountRepository.GetCustomerIdForBankAccountAsync(query.BankAccountId);
+        var bankAccountOwnerId = await _bankAccountRepository.GetCustomerAccountIdForBankAccountAsync(query.BankAccountId);
         Guard.Against.BankAccountNotOwned(bankAccountOwnerId, query.CustomerId);
         var bankAccount = await _bankAccountRepository.GetBankAccountAsync(query.BankAccountId);
 
