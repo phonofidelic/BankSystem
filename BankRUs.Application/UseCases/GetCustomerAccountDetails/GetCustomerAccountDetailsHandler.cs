@@ -12,8 +12,8 @@ public class GetCustomerAccountDetailsHandler(
     public async Task<GetCustomerAccountDetailsResult> HandleAsync(GetCustomerAccountDetailsQuery query)
     {
         var applicationUserId = query.ApplicationUserId;
-        var customerAccountId = await _customerService.GetCustomerIdAsync(applicationUserId);
-        var customerAccount = await _customerService.GetCustomerAsync(customerAccountId);
+        var customerAccountId = await _customerService.GetCustomerAccountIdAsync(applicationUserId);
+        var customerAccount = await _customerService.GetCustomerAccountAsync(customerAccountId);
 
         return new GetCustomerAccountDetailsResult(
             CustomerAccountId: customerAccount.Id,

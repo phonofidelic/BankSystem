@@ -45,7 +45,7 @@ public class OpenCustomerAccountHandler(
          )) ?? throw new Exception("Could not create application user"); ;
 
         // Create new Customer
-        var createCustomerResult = await _customerService.CreateCustomerAsync(new CreateCustomerAccountRequest(
+        var createCustomerResult = await _customerService.CreateCustomerAccountAsync(new CreateCustomerAccountRequest(
             ApplicationUserId: createApplicationUserResult.UserId, 
             SocialSecurityNumber: command.SocialSecurityNumber));
 

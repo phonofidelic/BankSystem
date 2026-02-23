@@ -17,7 +17,7 @@ public class UpdateCustomerAccountHandler(
         // A Customer account can be updated if...
 
         // 1) The Customer exists in the system
-        var customerAccount = await _customerService.GetCustomerAsync(command.CustomerAccountId)
+        var customerAccount = await _customerService.GetCustomerAccountAsync(command.CustomerAccountId)
             ?? throw new CustomerNotFoundException();
 
         // 2) If the Email is new, it must be unique in the system

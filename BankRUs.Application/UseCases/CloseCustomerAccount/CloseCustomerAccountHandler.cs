@@ -21,7 +21,7 @@ public class CloseCustomerAccountHandler(
     
     public async Task<CloseCustomerAccountResult> HandleAsync(CloseCustomerAccountCommand command)
     {
-        var customerAccount = await _customerService.GetCustomerAsync(command.CustomerAccountId);
+        var customerAccount = await _customerService.GetCustomerAccountAsync(command.CustomerAccountId);
         
         // Close the Customer account
         customerAccount.Close();

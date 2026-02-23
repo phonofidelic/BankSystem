@@ -14,7 +14,7 @@ public class ListCustomerAccountsHandler(
     private readonly IPaginationService _paginationService = paginationService;
     public async Task<ListCustomerAccountsResult> HandleAsync(CustomerAccountsPageQuery query)
     {
-        var customers = await _customerService.SearchCustomersAsync(query);
+        var customers = await _customerService.SearchCustomerAccountsAsync(query);
         var result = await _paginationService.GetPagedResultAsync(query, customers);
 
         return new ListCustomerAccountsResult(
