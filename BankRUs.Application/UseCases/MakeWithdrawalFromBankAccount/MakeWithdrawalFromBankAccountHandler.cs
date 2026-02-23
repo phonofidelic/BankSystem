@@ -26,8 +26,8 @@ public class MakeWithdrawalFromBankAccountHandler(
         // A withdrawal can be made from a Bank Account if...
 
         // 1) The Bank Account exists
-        bool bankAccountexists = _bankAccountRepository.BankAccountExists(command.BankAccountId);
-        if (!bankAccountexists) throw new BankAccountNotFoundException();
+        bool bankAccountExists = _bankAccountRepository.BankAccountExists(command.BankAccountId);
+        if (!bankAccountExists) throw new BankAccountNotFoundException();
 
         // 2) The Customer owns the Bank Account
         var bankAccountOwnerId = await _bankAccountRepository.GetCustomerAccountIdForBankAccountAsync(command.BankAccountId);
