@@ -1,6 +1,7 @@
 ﻿using BankRUs.Application.Configuration;
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.CustomerAccountService;
+using BankRUs.Application.UseCases.ListCustomerAccounts;
 using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Persistence;

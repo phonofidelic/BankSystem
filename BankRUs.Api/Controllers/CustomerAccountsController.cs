@@ -2,7 +2,6 @@
 using BankRUs.Application;
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.Repositories;
-using BankRUs.Application.Services.CustomerAccountService;
 using BankRUs.Application.UseCases.CloseCustomerAccount;
 using BankRUs.Application.UseCases.ListCustomerAccounts;
 using BankRUs.Application.UseCases.OpenCustomerAccount;
