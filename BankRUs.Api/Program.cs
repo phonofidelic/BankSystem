@@ -93,7 +93,7 @@ builder.Services.AddScoped<IHandler<OpenCustomerAccountCommand, OpenCustomerAcco
 builder.Services.AddScoped<IHandler<ListTransactionsForBankAccountQuery, ListTransactionsForBankAccountResult>, ListTransactionsForBankAccountHandler>();
 builder.Services.AddScoped<IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, MakeDepositToBankAccountHandler>();
 builder.Services.AddScoped<IHandler<MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult>, MakeWithdrawalFromBankAccountHandler>();
-builder.Services.AddScoped<IHandler<CustomerAccountsPageQuery, ListCustomerAccountsResult>, ListCustomerAccountsHandler>();
+builder.Services.AddScoped<IHandler<ListCustomerAccountsPageQuery, ListCustomerAccountsResult>, ListCustomerAccountsHandler>();
 builder.Services.AddScoped<IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult>, UpdateCustomerAccountHandler>();
 builder.Services.AddScoped<IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult>, CloseCustomerAccountHandler>();
 builder.Services.AddScoped<IHandler<TransactionsPageQuery, BasePagedResult<Transaction>>, ListAllTransactionsHandler>();

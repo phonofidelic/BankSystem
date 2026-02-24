@@ -6,7 +6,7 @@ namespace BankRUs.Application.Services.CustomerAccountService;
 
 public interface ICustomerAccountService
 {
-    public Task<IQueryable<CustomerAccount>> SearchCustomerAccountsAsync(CustomerAccountsPageQuery query);
+    public Task<IQueryable<CustomerAccount>> SearchCustomerAccountsAsync(ListCustomerAccountsPageQuery query);
         
     public Task<Guid> GetCustomerAccountIdAsync(Guid applicationUserId);
 

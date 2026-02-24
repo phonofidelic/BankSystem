@@ -17,7 +17,7 @@ namespace BankRUs.Infrastructure.Services.CustomerAccountService
         private readonly AppSettings _appSettings = appSettings.Value;
         private readonly ApplicationDbContext _context = context;
 
-        public async Task<IQueryable<CustomerAccount>> SearchCustomerAccountsAsync(CustomerAccountsPageQuery query)
+        public async Task<IQueryable<CustomerAccount>> SearchCustomerAccountsAsync(ListCustomerAccountsPageQuery query)
         {
             var search = query.Search ?? string.Empty;
             var results = _context.Customers.AsNoTracking()

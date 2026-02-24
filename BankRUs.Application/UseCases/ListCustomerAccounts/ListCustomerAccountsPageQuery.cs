@@ -2,7 +2,7 @@
 
 namespace BankRUs.Application.UseCases.ListCustomerAccounts;
 
-public record CustomerAccountsPageQuery(
+public record ListCustomerAccountsPageQuery(
     string? Search,
     string? FirstName,
     string? LastName,

@@ -19,14 +19,14 @@ namespace BankRUs.Api.Controllers;
 public class AccountsController(
     ILogger<AccountsController> logger,
     ICustomerAccountsRepository customerAccountsRepository,
-    IHandler<CustomerAccountsPageQuery, ListCustomerAccountsResult> listCustomerAccountsHandler,
+    IHandler<ListCustomerAccountsPageQuery, ListCustomerAccountsResult> listCustomerAccountsHandler,
     IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResult> openAccountHandler,
     IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> updateCustomerAccountHandler,
     IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> closeCustomerAccountHandler) : ControllerBase
 {
     private readonly ILogger<AccountsController> _logger = logger;
     private readonly ICustomerAccountsRepository _customerAccountRepository = customerAccountsRepository;
-    private readonly IHandler<CustomerAccountsPageQuery, ListCustomerAccountsResult> _listCustomerAccountsHandler = listCustomerAccountsHandler;
+    private readonly IHandler<ListCustomerAccountsPageQuery, ListCustomerAccountsResult> _listCustomerAccountsHandler = listCustomerAccountsHandler;
     private readonly IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResult> _openAccountHandler = openAccountHandler;
     private readonly IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> _updateCustomerAccountHandler = updateCustomerAccountHandler;
     private readonly IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> _closeCustomerAccountHandler = closeCustomerAccountHandler;
@@ -36,7 +36,7 @@ public class AccountsController(
     [Produces("application/json")]
     [ProducesResponseType<GetCustomerAccountsResponseDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> GetCustomerAccounts([FromQuery] CustomerAccountsPageQuery query)
+    public async Task<IActionResult> GetCustomerAccounts([FromQuery] ListCustomerAccountsPageQuery query)
     {
         var result = await _listCustomerAccountsHandler.HandleAsync(query);
 
