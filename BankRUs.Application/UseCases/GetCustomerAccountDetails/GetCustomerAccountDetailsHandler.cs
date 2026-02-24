@@ -17,7 +17,7 @@ public class GetCustomerAccountDetailsHandler(
     {
         var applicationUserId = query.ApplicationUserId;
         var customerAccountId = await _customerService.GetCustomerAccountIdAsync(applicationUserId);
-        var customerAccount = await _customerAccountRepository.GetCustomerAccountAsync(customerAccountId);
+        var customerAccount = await _customerAccountRepository.GetCustomerAccountAsync(customerAccountId) ?? throw new CustomerNotFoundException();
 
         return new GetCustomerAccountDetailsResult(
             CustomerAccountId: customerAccount.Id,

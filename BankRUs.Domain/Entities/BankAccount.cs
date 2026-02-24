@@ -28,7 +28,7 @@ public class BankAccount(Guid customerAccountId) : BaseUpdatableEntity<Guid>
         if (details.Name != null)
             Name = details.Name;
 
-        if (Currency == null && details.Currency != null)
+        if (Currency is null && details.Currency is not null)
             Currency = details.Currency;
     }
 
