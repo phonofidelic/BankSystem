@@ -46,7 +46,7 @@ public class OpenCustomerAccountHandler(
         var sanitizedSocialSecurityNumber = Guard.Against.DuplicateCustomer(command.SocialSecurityNumber, _customerService.SsnExists);
 
         // Create the Customer details object
-        var customerDetails = _customerService.ValidateCustomerAccountDetails(new CustomerAccountDetails(
+        var customerAccountDetails = _customerService.ValidateCustomerAccountDetails(new CustomerAccountDetails(
             firstName: command.FirstName,
             lastName: command.LastName,
             email: command.Email,
@@ -62,25 +62,17 @@ public class OpenCustomerAccountHandler(
 
         // Create new Customer account
         var customerAccount = new CustomerAccount(createApplicationUserResult.UserId, command.SocialSecurityNumber);
-
+        customerAccount.UpdateAccountDetails(customerAccountDetails);
+        await _customerAccountRepository.AddCustomerAccountAsync(customerAccount);
 
         // Create default Bank account
-        var defaultBankAccount = new BankAccount
+        var defaultBankAccount = new BankAccount(customerAccount.Id);
+        defaultBankAccount.UpdateAccountDetails(new BankAccountDetails
         {
             Name = "Default Checking Account",
-            CustomerId = customerAccount.Id,
             Currency = _currencyService.GetDefaultCurrency()
-        };
-
+        });
         await _bankAccountRepository.AddAsync(defaultBankAccount);
-        
-        await _customerService.OpenCustomerAccountAsync(new OpenCustomerAccountRequest(
-            CustomerAccount: customerAccount,
-            CustomerAccountDetails: customerDetails,
-            DefaultBankAccount: defaultBankAccount,
-            ApplicationUserId: createApplicationUserResult.UserId));
-
-        await _customerAccountRepository.AddCustomerAccountAsync(customerAccount);
         
         // Send confirmation email to customer
         var sendEmailRequest = new OpenCustomerAccountConfirmationEmail(
@@ -90,6 +82,8 @@ public class OpenCustomerAccountHandler(
 
         await _emailSender.SendEmailAsync(sendEmailRequest);
 
+        // ToDo: Simulate customer visiting confirmation url?
+        customerAccount.Open(defaultBankAccount);
 
         // Complete unit of work
         await _unitOfWork.SaveAsync();

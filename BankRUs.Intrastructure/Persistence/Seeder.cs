@@ -43,7 +43,6 @@ public static class Seeder
             .RuleFor(c => c.FirstName, (f, c) => f.Person.FirstName)
             .RuleFor(c => c.LastName, (f, c) => f.Person.LastName + SeedStamp(seed))
             .RuleFor(c => c.Email, (f, c) => f.Internet.Email(c.FirstName, c.LastName))
-            // .RuleFor(c => c.SocialSecurityNumber, (f, c) => f.Person.Personnummer())
             .RuleFor(c => c.CreatedAt, (f, c) => f.Date.Past(f.Random.Int(0, 5)))
             .RuleFor(c => c.UpdatedAt, (f, c) => f.Date.Recent());
 
@@ -64,10 +63,10 @@ public static class Seeder
 
         var currency = appSettings.DefaultCurrency;
         var bankAccount = new Faker<BankAccount>()
+            .CustomInstantiator((f) => new BankAccount(customer.Id))
             .RuleFor(b => b.Id, (f, b) => f.Random.Guid())
             .RuleFor(b => b.Name, (f, b) => f.Finance.AccountName() + SeedStamp(seed))
-            .RuleFor(b => b.CustomerId, () => customer.Id)
-            .RuleFor(b => b.Customer, () => customer)
+            .RuleFor(b => b.CustomerAccount, () => customer)
             .RuleFor(b => b.Balance, () => 1000)
             .RuleFor(b => b.Currency, (f, b) => new Currency
             {
@@ -104,7 +103,7 @@ public static class Seeder
             .CustomInstantiator(f => new Transaction(bankAccount.Balance > 0 ? f.Random.Enum<TransactionType>() : TransactionType.Deposit) 
             { 
                 BankAccountId = bankAccount.Id,
-                CustomerId = bankAccount.CustomerId,
+                CustomerId = bankAccount.CustomerAccountId,
                 Currency = new Currency
                 {
                     EnglishName = currency.EnglishName,
@@ -114,8 +113,8 @@ public static class Seeder
                 }
             })
             .RuleFor(t => t.Id, (f) => f.Random.Guid())
-            .RuleFor(t => t.CustomerId, () => bankAccount.CustomerId)
-            .RuleFor(t => t.Customer, () => bankAccount.Customer)
+            .RuleFor(t => t.CustomerId, () => bankAccount.CustomerAccountId)
+            .RuleFor(t => t.Customer, () => bankAccount.CustomerAccount)
             .RuleFor(t => t.BankAccountId, () => bankAccount.Id)
             .RuleFor(t => t.BankAccount, () => bankAccount)
             .RuleFor(t => t.Amount, (f, t) => f.Finance.Amount())

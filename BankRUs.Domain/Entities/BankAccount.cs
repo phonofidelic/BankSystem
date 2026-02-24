@@ -2,7 +2,7 @@
 
 namespace BankRUs.Domain.Entities;
 
-public class BankAccount : BaseUpdatableEntity<Guid>
+public class BankAccount(Guid customerAccountId) : BaseUpdatableEntity<Guid>
 {
     public override Guid Id { get; set; } = Guid.NewGuid();
 
@@ -12,15 +12,25 @@ public class BankAccount : BaseUpdatableEntity<Guid>
 
     public string Name { get; set; } = "Checking account";
 
-    public Guid CustomerId { get; set; }
+    public Guid CustomerAccountId { get; set; } = customerAccountId;
     
-    public CustomerAccount Customer { get; set; } = default!;
-    
-    public required Currency Currency { get; set; }
+    public CustomerAccount CustomerAccount { get; set; } = default!;
+
+    public Currency Currency { get; set; } = default!;
     
     public decimal Balance { get; private set; }
     
     public ICollection<Transaction> Transactions { get; set; } = [];
+
+    // ToDo: add UpdateAccountDetails method for BankAccount
+    public void UpdateAccountDetails(BankAccountDetails details)
+    {
+        if (details.Name != null)
+            Name = details.Name;
+
+        if (Currency == null && details.Currency != null)
+            Currency = details.Currency;
+    }
 
     public void AddTransaction(Transaction transaction)
     {
@@ -33,6 +43,8 @@ public class BankAccount : BaseUpdatableEntity<Guid>
         transaction.UpdateBalanceAfter(pendingBalance);
         Balance = pendingBalance;
         Transactions.Add(transaction);
+
+        EnforceInvariants();
     }
 
     public void Close()
@@ -46,7 +58,7 @@ public class BankAccount : BaseUpdatableEntity<Guid>
         {
             var closingTransaction = new Transaction
             {
-                CustomerId = CustomerId,
+                CustomerId = CustomerAccountId,
                 BankAccountId = Id,
                 Amount = Balance,
                 Currency = Currency,
@@ -68,6 +80,12 @@ public class BankAccount : BaseUpdatableEntity<Guid>
 
         return Transactions.OrderBy(t => t.CreatedAt).LastOrDefault();
     }
+
+    private void EnforceInvariants()
+    {
+        var unsupportedCurrencyTransaction = Transactions.Any(t => t.Currency != Currency);
+        if (unsupportedCurrencyTransaction) throw new InvalidTransactionCurrencyException();
+    }
 }
 
 
@@ -83,3 +101,5 @@ public class InsufficientFundsException() : Exception("Insufficient Funds");
 public class NegativeBalanceException() : Exception("Bank account has negative balance");
 
 public class UnexpectedBankAccountStatus(BankAccountStatus expectedStatus, BankAccountStatus actualStatus) : Exception($"Bank account status is '{actualStatus}' but was expected to be '{expectedStatus}'");
+
+public class InvalidTransactionCurrencyException() : Exception("Bank account cannot contain a transaction of a different currency");

@@ -14,8 +14,6 @@ public interface ICustomerAccountService
 
     CompleteCustomerAccountDetails ValidateCustomerAccountDetails(CustomerAccountDetails customerAccountDetails);
 
-    public Task OpenCustomerAccountAsync(OpenCustomerAccountRequest request);
-
     public bool EmailExists(string email);
     
     public bool SsnExists(string ssn);

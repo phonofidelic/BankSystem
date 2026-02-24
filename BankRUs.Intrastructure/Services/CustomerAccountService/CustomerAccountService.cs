@@ -59,16 +59,6 @@ namespace BankRUs.Infrastructure.Services.CustomerAccountService
                 && c.Status == CustomerAccountStatus.Closed);
         }
 
-        public async Task OpenCustomerAccountAsync(OpenCustomerAccountRequest request)
-        {
-            request.CustomerAccount.UpdateAccountDetails(request.CustomerAccountDetails);
-            request.CustomerAccount.SetApplicationUserId(request.ApplicationUserId);
-            request.CustomerAccount.AddBankAccount(request.DefaultBankAccount);
-
-            // ToDo: Simulate customer visiting confirmation url?
-            request.CustomerAccount.Open();
-        }
-
         public bool EmailExists(string email)
         {
             var result = _context.Customers.Where(c => c.Email == email).FirstOrDefault();

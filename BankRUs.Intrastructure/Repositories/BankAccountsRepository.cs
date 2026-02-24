@@ -26,13 +26,13 @@ public class BankAccountsRepository(ApplicationDbContext context) : IBankAccount
             ? throw new Exception("Customer not found")
             : _context.BankAccounts
             .AsNoTracking()
-            .Where(b => b.CustomerId == customer.Id);
+            .Where(b => b.CustomerAccountId == customer.Id);
     }
 
     public async Task<Guid> GetCustomerAccountIdForBankAccountAsync(Guid bankAccountId)
     {
         var bankAccount = await _context.BankAccounts.FindAsync(bankAccountId);
-        return bankAccount?.CustomerId ?? throw new Exception("Bank account not found");
+        return bankAccount?.CustomerAccountId ?? throw new Exception("Bank account not found");
     }
 
     public async Task<decimal> GetBankAccountBalanceAsync(Guid bankAccountId)
@@ -56,7 +56,7 @@ public class BankAccountsRepository(ApplicationDbContext context) : IBankAccount
 
     public async Task<BankAccount?> GetClosedBankAccountBySocialSecurityNumberAsync(string socialSecurityNumber)
     {
-        return await _context.BankAccounts.FirstOrDefaultAsync(b => b.Customer.SocialSecurityNumber == socialSecurityNumber);
+        return await _context.BankAccounts.FirstOrDefaultAsync(b => b.CustomerAccount.SocialSecurityNumber == socialSecurityNumber);
     }
 
     public async Task AddAsync(BankAccount bankAccount)
