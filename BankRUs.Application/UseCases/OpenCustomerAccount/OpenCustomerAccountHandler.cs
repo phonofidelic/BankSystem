@@ -69,8 +69,7 @@ public class OpenCustomerAccountHandler(
         {
             Name = "Default Checking Account",
             CustomerId = customerAccount.Id,
-            // ToDo: remove hard-coded ISO symbol
-            Currency = _currencyService.ParseIsoSymbol("SEK")
+            Currency = _currencyService.GetDefaultCurrency()
         };
 
         await _bankAccountRepository.AddAsync(defaultBankAccount);
