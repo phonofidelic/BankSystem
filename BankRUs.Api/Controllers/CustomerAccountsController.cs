@@ -1,6 +1,7 @@
 ﻿using BankRUs.Api.Dtos.CustomerAccounts;
 using BankRUs.Application;
 using BankRUs.Application.Exceptions;
+using BankRUs.Application.Repositories;
 using BankRUs.Application.Services.CustomerAccountService;
 using BankRUs.Application.UseCases.CloseCustomerAccount;
 using BankRUs.Application.UseCases.ListCustomerAccounts;
@@ -18,14 +19,14 @@ namespace BankRUs.Api.Controllers;
 [ApiController]
 public class AccountsController(
     ILogger<AccountsController> logger,
-    ICustomerAccountService customerService,
+    ICustomerAccountsRepository customerAccountsRepository,
     IHandler<CustomerAccountsPageQuery, ListCustomerAccountsResult> listCustomerAccountsHandler,
     IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResult> openAccountHandler,
     IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> updateCustomerAccountHandler,
     IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> closeCustomerAccountHandler) : ControllerBase
 {
     private readonly ILogger<AccountsController> _logger = logger;
-    private readonly ICustomerAccountService _customerService = customerService;
+    private readonly ICustomerAccountsRepository _customerAccountRepository = customerAccountsRepository;
     private readonly IHandler<CustomerAccountsPageQuery, ListCustomerAccountsResult> _listCustomerAccountsHandler = listCustomerAccountsHandler;
     private readonly IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResult> _openAccountHandler = openAccountHandler;
     private readonly IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> _updateCustomerAccountHandler = updateCustomerAccountHandler;
@@ -62,7 +63,8 @@ public class AccountsController(
     {
         try
         {
-            var customer = await _customerService.GetCustomerAccountAsync(customerId);
+            var customer = await _customerAccountRepository.GetCustomerAccountAsync(customerId) ?? throw new CustomerNotFoundException();
+
             var bankAccountListItems = customer.BankAccounts.Select(b => new CustomerBankAccountListItemDto(
                 Id: b.Id,
                 Name: b.Name,

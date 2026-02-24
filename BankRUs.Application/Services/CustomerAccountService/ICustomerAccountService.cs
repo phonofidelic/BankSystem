@@ -6,9 +6,7 @@ namespace BankRUs.Application.Services.CustomerAccountService;
 public interface ICustomerAccountService
 {
     public Task<IQueryable<CustomerAccount>> SearchCustomerAccountsAsync(CustomerAccountsPageQuery query);
-    
-    public Task<CustomerAccount> GetCustomerAccountAsync(Guid customerId);
-    
+        
     public Task<Guid> GetCustomerAccountIdAsync(Guid applicationUserId);
 
     public Task<CustomerAccount?> GetClosedCustomerAccountBySocialSecurityNumber(string socialSecurityNumber);

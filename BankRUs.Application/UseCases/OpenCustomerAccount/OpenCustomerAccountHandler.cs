@@ -63,13 +63,13 @@ public class OpenCustomerAccountHandler(
         // Create new Customer account
         var customerAccount = new CustomerAccount(createApplicationUserResult.UserId, command.SocialSecurityNumber);
 
-        await _customerAccountRepository.AddCustomerAccountAsync(customerAccount);
 
         // Create default Bank account
         var defaultBankAccount = new BankAccount
         {
             Name = "Default Checking Account",
             CustomerId = customerAccount.Id,
+            // ToDo: remove hard-coded ISO symbol
             Currency = _currencyService.ParseIsoSymbol("SEK")
         };
 
@@ -81,6 +81,8 @@ public class OpenCustomerAccountHandler(
             DefaultBankAccount: defaultBankAccount,
             ApplicationUserId: createApplicationUserResult.UserId));
 
+        await _customerAccountRepository.AddCustomerAccountAsync(customerAccount);
+        
         // Send confirmation email to customer
         var sendEmailRequest = new OpenCustomerAccountConfirmationEmail(
             to: command.Email,
