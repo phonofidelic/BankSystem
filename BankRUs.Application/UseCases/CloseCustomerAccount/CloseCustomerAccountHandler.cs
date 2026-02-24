@@ -1,4 +1,5 @@
-using BankRUs.Application.Services.CustomerAccountService;
+using BankRUs.Application.Exceptions;
+using BankRUs.Application.Repositories;
 using BankRUs.Application.Services.EmailService;
 using BankRUs.Application.Services.Identity;
 
@@ -7,7 +8,7 @@ namespace BankRUs.Application.UseCases.CloseCustomerAccount;
 public class CloseCustomerAccountHandler(
     IUnitOfWork unitOfWork,
     IIdentityService identityService,
-    ICustomerAccountService customerService,
+    ICustomerAccountsRepository customerAccountRepository,
     IEmailSender emailSender
 ) : IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult>
 {
@@ -15,13 +16,13 @@ public class CloseCustomerAccountHandler(
 
     private readonly IIdentityService _identityService = identityService;
 
-    private readonly ICustomerAccountService _customerService = customerService;
+    private readonly ICustomerAccountsRepository _customerAccountRepository = customerAccountRepository;
 
     private readonly IEmailSender _emailSender = emailSender;
-    
+
     public async Task<CloseCustomerAccountResult> HandleAsync(CloseCustomerAccountCommand command)
     {
-        var customerAccount = await _customerService.GetCustomerAccountAsync(command.CustomerAccountId);
+        var customerAccount = await _customerAccountRepository.GetCustomerAccountAsync(command.CustomerAccountId) ?? throw new CustomerNotFoundException();
         
         // Close the Customer account
         customerAccount.Close();

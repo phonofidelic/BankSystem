@@ -7,12 +7,12 @@ namespace BankRUs.Application.UseCases.ListCustomerAccounts;
 public class ListCustomerAccountsHandler(
     ILogger<ListCustomerAccountsHandler> logger,
     ICustomerAccountService customerService, 
-    IPaginationService paginationService) : IHandler<CustomerAccountsPageQuery, ListCustomerAccountsResult>
+    IPaginationService paginationService) : IHandler<ListCustomerAccountsPageQuery, ListCustomerAccountsResult>
 {
     private readonly ILogger<ListCustomerAccountsHandler> _logger = logger;
     private readonly ICustomerAccountService _customerService = customerService;
     private readonly IPaginationService _paginationService = paginationService;
-    public async Task<ListCustomerAccountsResult> HandleAsync(CustomerAccountsPageQuery query)
+    public async Task<ListCustomerAccountsResult> HandleAsync(ListCustomerAccountsPageQuery query)
     {
         var customers = await _customerService.SearchCustomerAccountsAsync(query);
         var result = await _paginationService.GetPagedResultAsync(query, customers);

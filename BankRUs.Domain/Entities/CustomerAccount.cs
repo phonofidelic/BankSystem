@@ -26,14 +26,11 @@ public class CustomerAccount(Guid applicationUserId, string socialSecurityNumber
 
     public ICollection<Transaction> Transactions { get; set; } = [];
 
-    public void SetApplicationUserId(Guid applicationUserId) => ApplicationUserId = applicationUserId; 
-
-    public void Open()
+    public void Open(BankAccount defaultBankAccount)
     {
-        if (string.IsNullOrEmpty(FirstName)) throw new OpenCustomerAccountException(FirstName);
-        if (string.IsNullOrEmpty(LastName)) throw new OpenCustomerAccountException(LastName);
-        if (string.IsNullOrEmpty(Email)) throw new OpenCustomerAccountException(FirstName);
-        if (string.IsNullOrEmpty(SocialSecurityNumber)) throw new OpenCustomerAccountException(SocialSecurityNumber);
+        AddBankAccount(defaultBankAccount);
+
+        EnforceInvariants();
 
         Status = CustomerAccountStatus.Opened;
     }
@@ -121,6 +118,15 @@ public class CustomerAccount(Guid applicationUserId, string socialSecurityNumber
 
         return closingTransactions;
     }
+
+    private void EnforceInvariants()
+    {
+        if (string.IsNullOrEmpty(FirstName)) throw new OpenCustomerAccountException(FirstName);
+        if (string.IsNullOrEmpty(LastName)) throw new OpenCustomerAccountException(LastName);
+        if (string.IsNullOrEmpty(Email)) throw new OpenCustomerAccountException(FirstName);
+        if (string.IsNullOrEmpty(SocialSecurityNumber)) throw new OpenCustomerAccountException(SocialSecurityNumber);
+        if (BankAccounts.Count < 1) throw new OpenCustomerAccountException(BankAccounts);
+    }
 }
 
 public enum CustomerAccountStatus
@@ -130,5 +136,5 @@ public enum CustomerAccountStatus
     Closed
 }
 
-class OpenCustomerAccountException(object param) : ArgumentException("Could not open Customer account. Missing required parameter.", paramName: nameof(param));
+class OpenCustomerAccountException(object prop) : Exception($"Could not open Customer account. Value of property '{nameof(prop)}' is invalid");
 class CloseCustomerAccountException(string message = "Could not close Customer account") : Exception(message);

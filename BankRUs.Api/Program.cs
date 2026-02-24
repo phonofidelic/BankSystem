@@ -1,6 +1,7 @@
 using BankRUs.Application;
 using BankRUs.Application.BankAccounts;
 using BankRUs.Application.Configuration;
+using BankRUs.Application.Repositories;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.Authentication;
 using BankRUs.Application.Services.Authentication.AuthenticateUser;
@@ -82,6 +83,7 @@ builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<ICustomerAccountService, CustomerAccountService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IEmailSender, FakeEmailSender>();
+builder.Services.AddScoped<ICustomerAccountsRepository, CustomerAccountsRepository>();
 builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();
 
 // Scoped Command/Query handlers
@@ -91,7 +93,7 @@ builder.Services.AddScoped<IHandler<OpenCustomerAccountCommand, OpenCustomerAcco
 builder.Services.AddScoped<IHandler<ListTransactionsForBankAccountQuery, ListTransactionsForBankAccountResult>, ListTransactionsForBankAccountHandler>();
 builder.Services.AddScoped<IHandler<MakeDepositToBankAccountCommand, MakeDepositToBankAccountResult>, MakeDepositToBankAccountHandler>();
 builder.Services.AddScoped<IHandler<MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult>, MakeWithdrawalFromBankAccountHandler>();
-builder.Services.AddScoped<IHandler<CustomerAccountsPageQuery, ListCustomerAccountsResult>, ListCustomerAccountsHandler>();
+builder.Services.AddScoped<IHandler<ListCustomerAccountsPageQuery, ListCustomerAccountsResult>, ListCustomerAccountsHandler>();
 builder.Services.AddScoped<IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult>, UpdateCustomerAccountHandler>();
 builder.Services.AddScoped<IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult>, CloseCustomerAccountHandler>();
 builder.Services.AddScoped<IHandler<TransactionsPageQuery, BasePagedResult<Transaction>>, ListAllTransactionsHandler>();

@@ -1,7 +1,7 @@
 ﻿using BankRUs.Api.Dtos.CustomerAccounts;
 using BankRUs.Application;
 using BankRUs.Application.Exceptions;
-using BankRUs.Application.Services.CustomerAccountService;
+using BankRUs.Application.Repositories;
 using BankRUs.Application.UseCases.CloseCustomerAccount;
 using BankRUs.Application.UseCases.ListCustomerAccounts;
 using BankRUs.Application.UseCases.OpenCustomerAccount;
@@ -18,15 +18,15 @@ namespace BankRUs.Api.Controllers;
 [ApiController]
 public class AccountsController(
     ILogger<AccountsController> logger,
-    ICustomerAccountService customerService,
-    IHandler<CustomerAccountsPageQuery, ListCustomerAccountsResult> listCustomerAccountsHandler,
+    ICustomerAccountsRepository customerAccountsRepository,
+    IHandler<ListCustomerAccountsPageQuery, ListCustomerAccountsResult> listCustomerAccountsHandler,
     IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResult> openAccountHandler,
     IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> updateCustomerAccountHandler,
     IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> closeCustomerAccountHandler) : ControllerBase
 {
     private readonly ILogger<AccountsController> _logger = logger;
-    private readonly ICustomerAccountService _customerService = customerService;
-    private readonly IHandler<CustomerAccountsPageQuery, ListCustomerAccountsResult> _listCustomerAccountsHandler = listCustomerAccountsHandler;
+    private readonly ICustomerAccountsRepository _customerAccountRepository = customerAccountsRepository;
+    private readonly IHandler<ListCustomerAccountsPageQuery, ListCustomerAccountsResult> _listCustomerAccountsHandler = listCustomerAccountsHandler;
     private readonly IHandler<OpenCustomerAccountCommand, OpenCustomerAccountResult> _openAccountHandler = openAccountHandler;
     private readonly IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult> _updateCustomerAccountHandler = updateCustomerAccountHandler;
     private readonly IHandler<CloseCustomerAccountCommand, CloseCustomerAccountResult> _closeCustomerAccountHandler = closeCustomerAccountHandler;
@@ -36,7 +36,7 @@ public class AccountsController(
     [Produces("application/json")]
     [ProducesResponseType<GetCustomerAccountsResponseDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> GetCustomerAccounts([FromQuery] CustomerAccountsPageQuery query)
+    public async Task<IActionResult> GetCustomerAccounts([FromQuery] ListCustomerAccountsPageQuery query)
     {
         var result = await _listCustomerAccountsHandler.HandleAsync(query);
 
@@ -62,7 +62,8 @@ public class AccountsController(
     {
         try
         {
-            var customer = await _customerService.GetCustomerAccountAsync(customerId);
+            var customer = await _customerAccountRepository.GetCustomerAccountAsync(customerId) ?? throw new CustomerNotFoundException();
+
             var bankAccountListItems = customer.BankAccounts.Select(b => new CustomerBankAccountListItemDto(
                 Id: b.Id,
                 Name: b.Name,

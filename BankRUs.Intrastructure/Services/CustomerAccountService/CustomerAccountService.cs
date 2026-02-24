@@ -1,6 +1,7 @@
 ﻿using BankRUs.Application.Configuration;
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.CustomerAccountService;
+using BankRUs.Application.UseCases.ListCustomerAccounts;
 using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 using BankRUs.Infrastructure.Persistence;
@@ -16,7 +17,7 @@ namespace BankRUs.Infrastructure.Services.CustomerAccountService
         private readonly AppSettings _appSettings = appSettings.Value;
         private readonly ApplicationDbContext _context = context;
 
-        public async Task<IQueryable<CustomerAccount>> SearchCustomerAccountsAsync(CustomerAccountsPageQuery query)
+        public async Task<IQueryable<CustomerAccount>> SearchCustomerAccountsAsync(ListCustomerAccountsPageQuery query)
         {
             var search = query.Search ?? string.Empty;
             var results = _context.Customers.AsNoTracking()
@@ -54,59 +55,8 @@ namespace BankRUs.Infrastructure.Services.CustomerAccountService
         public async Task<CustomerAccount?> GetClosedCustomerAccountBySocialSecurityNumber(string socialSecurityNumber)
         {
             return await _context.Customers.FirstOrDefaultAsync(c => 
-            c.SocialSecurityNumber == socialSecurityNumber
-            && c.Status == CustomerAccountStatus.Closed);
-        }
-
-        public async Task<CreateCustomerAccountResult> CreateCustomerAccountAsync(CreateCustomerAccountRequest request)
-        {
-            var newCustomer = new CustomerAccount(request.ApplicationUserId, request.SocialSecurityNumber);
-
-            await _context.Customers.AddAsync(newCustomer);
-
-            return new CreateCustomerAccountResult(newCustomer);
-        }
-
-        public async Task OpenCustomerAccountAsync(OpenCustomerAccountRequest request)
-        {
-            var defaultBankAccount = new BankAccount
-            {
-                Name = "Default Checking Account",
-                CustomerId = request.CustomerAccount.Id,
-                Currency = _appSettings.DefaultCurrency
-            };
-
-            await _context.BankAccounts.AddAsync(defaultBankAccount);
-
-            request.CustomerAccount.UpdateAccountDetails(request.CustomerAccountDetails);
-            request.CustomerAccount.SetApplicationUserId(request.ApplicationUserId);
-            request.CustomerAccount.AddBankAccount(defaultBankAccount);
-
-            // ToDo: Simulate customer visiting confirmation url?
-            request.CustomerAccount.Open();
-        }
-
-        public async Task<CreateBankAccountResult> CreateBankAccountAsync(CreateBankAccountRequest request)
-        {
-            try
-            {
-                var customer = await _context.Customers.FindAsync(request.CustomerId) 
-                    ?? throw new Exception("Customer not found");
-                
-                BankAccount newBankAccount = new()
-                {
-                    Name = request.BankAccountName,
-                    CustomerId = customer.Id,
-                    Currency = _appSettings.DefaultCurrency
-                };
-
-                _context.BankAccounts.Add(newBankAccount);
-                return new CreateBankAccountResult(newBankAccount);
-            }
-            catch
-            {
-                throw;
-            }
+                c.SocialSecurityNumber == socialSecurityNumber
+                && c.Status == CustomerAccountStatus.Closed);
         }
 
         public bool EmailExists(string email)
@@ -130,7 +80,5 @@ namespace BankRUs.Infrastructure.Services.CustomerAccountService
 
             return new CompleteCustomerAccountDetails(firstName, lastName, email, socialSecurityNumber);
         }
-
-        
     }
 }

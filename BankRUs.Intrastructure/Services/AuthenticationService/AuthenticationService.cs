@@ -11,7 +11,7 @@ namespace BankRUs.Infrastructure.Services.Authentication
         {
             var user = await _userManager.FindByEmailAsync(username);
 
-            if (user == null) {
+            if (user == null || user.UserName == null || user.Email == null) {
                 return null;
             }
 

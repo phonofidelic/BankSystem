@@ -10,7 +10,7 @@ namespace BankRUs.Infrastructure.Persistence.Configurations
         {
             builder
                 .HasMany(c => c.BankAccounts)
-                .WithOne(b => b.Customer);
+                .WithOne(b => b.CustomerAccount);
 
             builder
                 .HasMany(c => c.Transactions)

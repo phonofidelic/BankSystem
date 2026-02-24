@@ -24,7 +24,7 @@ namespace BankRUs.Infrastructure.Persistence.Configurations
                 .WithOne(t => t.BankAccount);
 
             builder
-                .HasOne(ba => ba.Customer)
+                .HasOne(ba => ba.CustomerAccount)
                 .WithMany(c => c.BankAccounts);
         }
     }

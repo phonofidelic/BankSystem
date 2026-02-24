@@ -1,26 +1,19 @@
-﻿using BankRUs.Domain.Entities;
+﻿using BankRUs.Application.UseCases.ListCustomerAccounts;
+using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 
 namespace BankRUs.Application.Services.CustomerAccountService;
 
 public interface ICustomerAccountService
 {
-    public Task<IQueryable<CustomerAccount>> SearchCustomerAccountsAsync(CustomerAccountsPageQuery query);
-    
-    public Task<CustomerAccount> GetCustomerAccountAsync(Guid customerId);
-    
+    public Task<IQueryable<CustomerAccount>> SearchCustomerAccountsAsync(ListCustomerAccountsPageQuery query);
+        
     public Task<Guid> GetCustomerAccountIdAsync(Guid applicationUserId);
 
     public Task<CustomerAccount?> GetClosedCustomerAccountBySocialSecurityNumber(string socialSecurityNumber);
 
     CompleteCustomerAccountDetails ValidateCustomerAccountDetails(CustomerAccountDetails customerAccountDetails);
-    public Task<CreateCustomerAccountResult> CreateCustomerAccountAsync(CreateCustomerAccountRequest request);
 
-    public Task OpenCustomerAccountAsync(OpenCustomerAccountRequest request);
-
-    // ToDo: Move to BankAccountsRepository?
-    public Task<CreateBankAccountResult> CreateBankAccountAsync(CreateBankAccountRequest request);
-    
     public bool EmailExists(string email);
     
     public bool SsnExists(string ssn);

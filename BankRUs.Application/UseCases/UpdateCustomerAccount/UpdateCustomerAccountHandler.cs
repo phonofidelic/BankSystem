@@ -1,5 +1,6 @@
 ﻿using BankRUs.Application.Exceptions;
 using BankRUs.Application.GuardClause;
+using BankRUs.Application.Repositories;
 using BankRUs.Application.Services.CustomerAccountService;
 using BankRUs.Application.UseCases.OpenCustomerAccount;
 
@@ -7,17 +8,19 @@ namespace BankRUs.Application.UseCases.UpdateCustomerAccount;
 
 public class UpdateCustomerAccountHandler(
     IUnitOfWork unitOfWork,
-    ICustomerAccountService customerService): IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult>
+    ICustomerAccountService customerService,
+    ICustomerAccountsRepository customerAccountRepository): IHandler<UpdateCustomerAccountCommand, UpdateCustomerAccountResult>
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly ICustomerAccountService _customerService = customerService;
+    private readonly ICustomerAccountsRepository _customerAccountRepository = customerAccountRepository;
 
     public async Task<UpdateCustomerAccountResult> HandleAsync(UpdateCustomerAccountCommand command)
     {
         // A Customer account can be updated if...
 
         // 1) The Customer exists in the system
-        var customerAccount = await _customerService.GetCustomerAccountAsync(command.CustomerAccountId)
+        var customerAccount = await _customerAccountRepository.GetCustomerAccountAsync(command.CustomerAccountId)
             ?? throw new CustomerNotFoundException();
 
         // 2) If the Email is new, it must be unique in the system

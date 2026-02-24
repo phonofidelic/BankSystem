@@ -6,6 +6,17 @@ namespace BankRUs.Application.Tests.Infrastructure.Stubs;
 
 public class CurrencyServiceStub : ICurrencyService
 {
+    public Currency GetDefaultCurrency()
+    {
+        return new Currency
+        {
+            EnglishName = "Swedish Krona",
+            NativeName = "Svensk krona",
+            ISOSymbol = "SEK",
+            Symbol = "kr"
+        };
+    }
+
     public Currency ParseIsoSymbol(string isoSymbol)
     {
         if (isoSymbol == "SEK")
