@@ -27,6 +27,24 @@ public class BankAccountsIntegrationTest(ApiFactory factory) : BaseIntegrationTe
     }
 
     [Fact]
+    public async Task PostWithdrawal_WhenInsufficientFunds_ShouldReturn400BadRequest()
+    {
+        // Given
+        await LoginClient(_testCustomerCredentials.Email, _testCustomerCredentials.Password);
+        var postWithdrawalRequest = new PostWithdrawalRequestDto(
+            Amount: 1000000000,
+            IsoCurrencySymbol: "SEK",
+            Reference: "Test withdrawal transaction"
+        );
+    
+        // When
+        var response = await _client.PostAsJsonAsync($"/api/bank-accounts/{_testCustomerBankAccountId}/withdrawals", postWithdrawalRequest);
+    
+        // Then
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
     public async Task GetTransactionsForBankAccount_WhenBankAccountExists_ShouldReturn200AndMax50Transactions()
     {
         // Given
