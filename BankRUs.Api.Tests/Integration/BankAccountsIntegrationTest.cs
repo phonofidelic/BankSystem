@@ -52,7 +52,7 @@ public class BankAccountsIntegrationTest(ApiFactory factory) : BaseIntegrationTe
         var postWithdrawalRequest = new PostWithdrawalRequestDto(
             Amount: 100,
             IsoCurrencySymbol: "SEK",
-            Reference: "Test withdrawal transaction"
+            Reference: "Test deposit transaction"
         );
     
         // When
@@ -72,7 +72,7 @@ public class BankAccountsIntegrationTest(ApiFactory factory) : BaseIntegrationTe
         var postWithdrawalRequest = new PostWithdrawalRequestDto(
             Amount: amount,
             IsoCurrencySymbol: "SEK",
-            Reference: "Test withdrawal transaction"
+            Reference: "Test deposit negative amount transaction"
         );
     
         // When
