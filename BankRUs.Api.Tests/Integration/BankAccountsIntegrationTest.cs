@@ -2,7 +2,6 @@ using System.Net;
 using System.Net.Http.Json;
 using BankRUs.Api.Dtos.BankAccounts;
 using BankRUs.Api.Tests.Infrastructure;
-using Xunit.Sdk;
 
 
 namespace BankRUs.Api.Tests.Integration;
