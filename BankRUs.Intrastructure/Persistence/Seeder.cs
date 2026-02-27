@@ -1,4 +1,8 @@
+using BankRUs.Application;
 using BankRUs.Application.Configuration;
+using BankRUs.Application.Services.CurrencyService;
+using BankRUs.Application.Services.Identity;
+using BankRUs.Application.UseCases.OpenCustomerAccount;
 using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 using Bogus;
@@ -29,6 +33,48 @@ public static class Seeder
 
         var toRemove = await context.Customers.Where(c => c.LastName.Contains(SeedStamp(seed))).ToListAsync();
         context.Customers.RemoveRange(toRemove);
+    }
+
+    public static async Task<CustomerAccount> CreateTestCustomerAccount(
+        CreateApplicationUserRequest request, 
+        Guid applicationUserId,
+        Guid testCustomerBankAccountId,
+        int seed, 
+        IServiceProvider serviceProvider)
+    {
+        Randomizer.Seed = new Random(seed);
+        var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
+        var faker = new Faker();
+        var currencyService = serviceProvider.GetRequiredService<ICurrencyService>();
+        var ssn = faker.Person.Personnummer();
+
+        var testCustomerAccount = new CustomerAccount(applicationUserId, ssn);
+        
+        testCustomerAccount.UpdateAccountDetails(new CustomerAccountDetails(
+            firstName: request.FirstName,
+            lastName: request.LastName,
+            email: request.Email,
+            socialSecurityNumber: ssn
+        ));
+
+        var defaultBankAccount = new BankAccount(testCustomerAccount.Id)
+        {
+            Id = testCustomerBankAccountId
+        };
+        defaultBankAccount.UpdateAccountDetails(new BankAccountDetails
+        {
+            Name = "Default Checking Account",
+            Currency = currencyService.GetDefaultCurrency()
+        });
+
+        testCustomerAccount.AddBankAccount(defaultBankAccount);
+
+        await context.BankAccounts.AddAsync(defaultBankAccount);
+        await context.Customers.AddAsync(testCustomerAccount);
+
+        await GenerateTransactionsForBankAccount(defaultBankAccount, seed, serviceProvider);
+        
+        return testCustomerAccount;
     }
 
     public static async Task GenerateSeededDataAsync(int count, int seed, IServiceProvider serviceProvider)

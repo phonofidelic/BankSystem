@@ -13,6 +13,10 @@ public record BasePageQuery(
     public static BasePageQuery Parse(string input)
     {
         var queryParams = HttpUtility.ParseQueryString(input.Split('?')[1]);
+        if (queryParams == null)
+        {
+            return new BasePageQuery();
+        }
 
         var pageString = queryParams.Get("page".Normalize());
         var sizeString = queryParams.Get("size".Normalize());
