@@ -41,10 +41,9 @@ public abstract class BaseIntegrationTest(ApiFactory factory) : IClassFixture<Ap
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse?.Token);
     }
 
-    protected async Task Paging_ShouldReflectPagingQuery<T>(string url, UserCredentials credentials)
+    protected async Task Paging_ShouldReflectPagingQuery<T>(string url)
     {
         // Arrange:
-        await LoginClient(credentials.Email, credentials.Password);
         var paging = BasePageQuery.Parse(url);
 
         // Act:

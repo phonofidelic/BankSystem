@@ -10,12 +10,12 @@ public class BankAccountsIntegrationTest(ApiFactory factory) : BaseIntegrationTe
     public async Task GetTransactionsForBankAccount_WhenBankAccountExists_ShouldReturn200AndMax50Transactions()
     {
         // Given
-        // await LoginClient(_testCustomerCredentials.Email, _testCustomerCredentials.Password);
+        await LoginClient(_testCustomerCredentials.Email, _testCustomerCredentials.Password);
 
         // When
         string paging = "?size=5&page=2&order=ascending";
 
         // Then
-        await Paging_ShouldReflectPagingQuery<CustomerTransactionsListItemDto>($"/api/bank-accounts/{_testCustomerBankAccountId}/transactions{paging}", _testCustomerCredentials);
+        await Paging_ShouldReflectPagingQuery<CustomerTransactionsListItemDto>($"/api/bank-accounts/{_testCustomerBankAccountId}/transactions{paging}");
     }
 }

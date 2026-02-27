@@ -32,8 +32,13 @@ public class TransactionsIntegrationTests(ApiFactory factory) : BaseIntegrationT
     [Fact]
     public async Task GetAllTransactions_WhenPagingIsSpecified_ShouldReflectPagingQuery()
     {
-        await Paging_ShouldReflectPagingQuery<GetTransactionsResponseDto>(
-            url: "/api/transactions?page=2&size=15&sortOrder=ascending",
-            credentials: new UserCredentials(_defaultAdmin.Email, _defaultAdmin.Password));
+        // Given
+        await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
+
+        // When
+        string paging = "?page=2&size=15&sortOrder=ascending";
+
+        // THen
+        await Paging_ShouldReflectPagingQuery<GetTransactionsResponseDto>($"/api/transactions{paging}");
     }
 }

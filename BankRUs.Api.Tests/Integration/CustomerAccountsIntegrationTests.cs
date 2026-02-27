@@ -43,9 +43,14 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : BaseIntegrat
     [Fact]
     public async Task GetCustomerAccounts_WhenPagingIsSpecified_ShouldReflectPagingQuery()
     {
-        await Paging_ShouldReflectPagingQuery<GetCustomerAccountsResponseDto>(
-            url: "/api/customer-accounts?size=5&page=2&sortOrder=ascending",
-            credentials: new UserCredentials(_defaultAdmin.Email, _defaultAdmin.Password));
+        // Given
+        await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
+
+        // When
+        string paging = "?size=5&page=2&sortOrder=ascending";
+
+        // Then
+        await Paging_ShouldReflectPagingQuery<GetCustomerAccountsResponseDto>($"/api/customer-accounts{paging}");
     }
 
     [Fact]
