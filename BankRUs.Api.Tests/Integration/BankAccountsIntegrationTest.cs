@@ -45,7 +45,7 @@ public class BankAccountsIntegrationTest(ApiFactory factory) : BaseIntegrationTe
     }
 
     [Fact]
-    public async Task PostDeposit_WhenPositiveAmount_ShouldReturn201Created()
+    public async Task PostDeposit_WhenPositiveAmount_ShouldReturn400BagRequest()
     {
         // Given
         await LoginClient(_testCustomerCredentials.Email, _testCustomerCredentials.Password);
