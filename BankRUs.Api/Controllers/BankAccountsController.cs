@@ -81,8 +81,7 @@ public class BankAccountsController(
                 Type: type,
                 Page: page,
                 PageSize: pageSize,
-                SortOrder: sort
-                ));
+                SortOrder: sort));
 
             var transactionItems = result.QueryResult.Items.Select(transaction => new CustomerTransactionsListItemDto(
                 TransactionId: transaction.Id,
@@ -109,9 +108,8 @@ public class BankAccountsController(
             {
                 return BadRequest(ex.Message);
             }
+            return BadRequest();
         }
-
-        return BadRequest();
     }
 
     // POST /api/bank-accounts/{bankAccountId}/deposits
@@ -183,7 +181,6 @@ public class BankAccountsController(
 
     // POST /api/bank-accounts/{bankAccountId}/withdrawals
     [HttpPost("{id}/withdrawals")]
-    [HttpPost("{id}/deposits")]
     [Produces("application/json")]
     [ProducesResponseType<PostWithdrawalRequestDto>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

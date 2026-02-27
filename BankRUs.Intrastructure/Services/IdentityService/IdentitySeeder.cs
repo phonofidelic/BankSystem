@@ -1,4 +1,5 @@
 ﻿using BankRUs.Application.Configuration;
+using BankRUs.Application.Services.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -41,6 +42,23 @@ public static class IdentitySeeder
                 }
             }
         }
+    }
+
+    public static async Task SeedTestUser(UserManager<ApplicationUser> userManager, CreateApplicationUserRequest request, Guid id, string role)
+    {
+        var user = new ApplicationUser
+        {
+            Id = id.ToString(),
+            UserName = request.Email,
+            Email = request.Email,
+            FirstName = request.FirstName,
+            LastName = request.LastName
+        };
+
+        var password = request.Password.Trim();
+        
+        await userManager.CreateAsync(user, password);
+        await userManager.AddToRoleAsync(user, role);
     }
 
     private static async Task SeedDefaultAdmin(UserManager<ApplicationUser> userManager, DefaultAdmin adminConfig)

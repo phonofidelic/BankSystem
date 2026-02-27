@@ -47,7 +47,7 @@ namespace BankRUs.Infrastructure.Services.CustomerAccountService
         {
             var customer = await _context
                 .Customers.Where(customer => customer.ApplicationUserId == applicationUserId)
-                .FirstAsync() ?? throw new CustomerNotFoundException(string.Format("Customer not found with user Id {0}", applicationUserId));
+                .FirstOrDefaultAsync() ?? throw new CustomerNotFoundException(string.Format("Customer not found with user Id {0}", applicationUserId));
 
             return customer.Id;
         }

@@ -2,7 +2,11 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using BankRUs.Api.Dtos.Auth;
+using BankRUs.Application;
 using BankRUs.Application.Services.PaginationService;
+using BankRUs.Infrastructure.Services.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BankRUs.Api.Tests.Infrastructure;
 
@@ -12,9 +16,17 @@ public abstract class BaseIntegrationTest(ApiFactory factory) : IClassFixture<Ap
 
     private readonly Random _random = new (_seed);
 
-    protected readonly HttpClient _client = factory.CreateClient();
+    protected UserCredentials _testCustomerCredentials = factory.TestCustomerCredentials;
+
+    protected Guid _testCustomerBankAccountId { get; set; } = factory.TestCustomerBankAccountId;
     
     protected int NextSeed { get => _random.Next(); }
+    
+    protected readonly IUnitOfWork _unitOfWork = factory.Services.GetRequiredService<IUnitOfWork>();
+    
+    protected UserManager<ApplicationUser> _userManager = factory.Services.GetRequiredService<UserManager<ApplicationUser>>();
+
+    protected readonly HttpClient _client = factory.CreateClient();
 
     /// <summary>
     /// See https://stackoverflow.com/a/68424710
