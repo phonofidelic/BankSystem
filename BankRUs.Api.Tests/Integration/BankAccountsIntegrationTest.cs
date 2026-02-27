@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Http.Json;
 using BankRUs.Api.Dtos.BankAccounts;
 using BankRUs.Api.Tests.Infrastructure;
 
@@ -6,6 +8,24 @@ namespace BankRUs.Api.Tests.Integration;
 
 public class BankAccountsIntegrationTest(ApiFactory factory) : BaseIntegrationTest(factory)
 {
+    [Fact]
+    public async Task PostWithdrawal_WhenSufficientFunds_ShouldReturn201Created()
+    {
+        // Given
+        await LoginClient(_testCustomerCredentials.Email, _testCustomerCredentials.Password);
+        var postWithdrawalRequest = new PostWithdrawalRequestDto(
+            Amount: 100,
+            IsoCurrencySymbol: "SEK",
+            Reference: "Test withdrawal transaction"
+        );
+    
+        // When
+        var response = await _client.PostAsJsonAsync($"/api/bank-accounts/{_testCustomerBankAccountId}/withdrawals", postWithdrawalRequest);
+    
+        // Then
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
     [Fact]
     public async Task GetTransactionsForBankAccount_WhenBankAccountExists_ShouldReturn200AndMax50Transactions()
     {

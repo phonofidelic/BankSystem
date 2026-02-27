@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using BankRUs.Api.Dtos.BankAccounts;
 using BankRUs.Api.Dtos.Transactions;
 using BankRUs.Api.Tests.Infrastructure;
 using BankRUs.Application.Configuration;
@@ -38,7 +39,7 @@ public class TransactionsIntegrationTests(ApiFactory factory) : BaseIntegrationT
         // When
         string paging = "?page=2&size=15&sortOrder=ascending";
 
-        // THen
+        // Then
         await Paging_ShouldReflectPagingQuery<GetTransactionsResponseDto>($"/api/transactions{paging}");
     }
 }
