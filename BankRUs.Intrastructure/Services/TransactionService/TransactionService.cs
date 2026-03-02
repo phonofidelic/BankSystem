@@ -36,15 +36,15 @@ namespace BankRUs.Infrastructure.Services.TransactionService
             if (query.BankAccountId != null)
                 transactions = transactions.Where(t => t.BankAccountId == query.BankAccountId);
 
-            transactions = query.SortOrder == SortOrder.Ascending
+            transactions = query.Order == SortOrder.Ascending
                 ? transactions.OrderBy(t => t.CreatedAt)
                 : transactions.OrderByDescending(t => t.CreatedAt);
 
-            if (query.StartPeriodUtc != null)
-                transactions = transactions.Where(t => t.CreatedAt >= query.StartPeriodUtc);
+            if (query.Start != null)
+                transactions = transactions.Where(t => t.CreatedAt >= query.Start);
 
-            if (query.EndPeriodUtc != null)
-                transactions = transactions.Where(t => t.CreatedAt <= query.EndPeriodUtc);
+            if (query.End != null)
+                transactions = transactions.Where(t => t.CreatedAt <= query.End);
 
             if (query.Type != null)
                 transactions = transactions.Where(t => t.Type == query.Type);

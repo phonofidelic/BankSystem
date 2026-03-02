@@ -36,16 +36,21 @@ public class CustomerAccountsIntegrationTests(ApiFactory factory) : BaseIntegrat
         
         Assert.NotNull(getCustomerAccountsResponse.Paging);
         Assert.Equal(1, getCustomerAccountsResponse.Paging.Page);
-        Assert.Equal(50, getCustomerAccountsResponse.Paging.PageSize);
-        Assert.Equal("descending", getCustomerAccountsResponse.Paging.Sort);
+        Assert.Equal(50, getCustomerAccountsResponse.Paging.Size);
+        Assert.Equal("descending", getCustomerAccountsResponse.Paging.Order);
     }
 
     [Fact]
     public async Task GetCustomerAccounts_WhenPagingIsSpecified_ShouldReflectPagingQuery()
     {
-        await Paging_ShouldReflectPagingQuery<GetCustomerAccountsResponseDto>(
-            url: "/api/customer-accounts?size=5&page=2&sortOrder=ascending",
-            credentials: new UserCredentials(_defaultAdmin.Email, _defaultAdmin.Password));
+        // Given
+        await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
+
+        // When
+        string paging = "?size=5&page=2&order=ascending";
+
+        // Then
+        await Paging_ShouldReflectPagingQuery<GetCustomerAccountsResponseDto>($"/api/customer-accounts{paging}");
     }
 
     [Fact]

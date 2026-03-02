@@ -12,6 +12,8 @@ using BankRUs.Application.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using BankRUs.Application.Services.EmailService;
+using BankRUs.Application.Services.Identity;
+using Microsoft.AspNetCore.Identity;
 
 namespace BankRUs.Api.Tests.Infrastructure;
 
@@ -23,6 +25,10 @@ public class ApiFactory : WebApplicationFactory<Program>
     private SqliteConnection? _connection;
 
     public int NextSeed { get => _random.Next(); }
+
+    public UserCredentials TestCustomerCredentials { get; } = new ("test.customer@example.com", "T3stP@ssw0rd");
+
+    public Guid TestCustomerBankAccountId { get; } = Guid.Parse("414c4399-9a9e-48c9-b8bb-5f4a52d796dd");
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -89,6 +95,7 @@ public class ApiFactory : WebApplicationFactory<Program>
 
             // 4) Add services for seeding mock data
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IIdentityService, IdentityService>();
 
             // 5) Add test database
             _connection = new SqliteConnection("DataSource=:memory:");
@@ -103,12 +110,18 @@ public class ApiFactory : WebApplicationFactory<Program>
             using var serviceProvider = services.BuildServiceProvider();
             using var scope = serviceProvider.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
             db.Database.EnsureCreated();
 
             await IdentitySeeder.SeedAsync(scope.ServiceProvider);
             await CurrencySeeder.SeedAsync(scope.ServiceProvider);
+            
+            db.SetTimestamps(false);
             await SeedDatabase(scope);
+            await SeedTestCustomerAccount(scope);
+            await unitOfWork.SaveAsync();
+            db.SetTimestamps(true);
         });
     }
 
@@ -120,15 +133,33 @@ public class ApiFactory : WebApplicationFactory<Program>
 
     private static async Task SeedDatabase(IServiceScope scope)
     {
-        // Generate/remove seeded data
-        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
         await Seeder.GenerateSeededDataAsync(count: 10, seed: _seed, scope.ServiceProvider);
-        // await Seeder.RemoveSeededDataAsync(SEED, scope.ServiceProvider);
+    }
 
-        dbContext.SetTimestamps(false);
-        await unitOfWork.SaveAsync();
-        dbContext.SetTimestamps(true);
+    private async Task SeedTestCustomerAccount(IServiceScope scope)
+    {
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+        var testCustomerApplicationUserId = Guid.NewGuid();
+        var request = new CreateApplicationUserRequest
+        (
+            Email: TestCustomerCredentials.Email,
+            FirstName: "Test",
+            LastName: "Customer",
+            Password: TestCustomerCredentials.Password
+        );
+
+        await IdentitySeeder.SeedTestUser(
+            userManager,
+            request,
+            testCustomerApplicationUserId,
+            Roles.Customer);
+
+        await Seeder.CreateTestCustomerAccount(
+            request, 
+            testCustomerApplicationUserId,
+            TestCustomerBankAccountId,
+            NextSeed, 
+            scope.ServiceProvider);
     }
 }

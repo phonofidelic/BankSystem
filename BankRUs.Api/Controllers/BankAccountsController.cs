@@ -3,6 +3,7 @@ using BankRUs.Application;
 using BankRUs.Application.Exceptions;
 using BankRUs.Application.Services.AuditLog;
 using BankRUs.Application.Services.CustomerAccountService;
+using BankRUs.Application.Services.TransactionService;
 using BankRUs.Application.UseCases.ListTransactionsForBankAccount;
 using BankRUs.Application.UseCases.MakeDepositToBankAccount;
 using BankRUs.Application.UseCases.MakeWithdrawalFromBankAccount;
@@ -45,12 +46,7 @@ public class BankAccountsController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetTransactionsForBankAccount(
         [FromRoute] string id,
-        [FromQuery(Name = "page")] int page = 1,
-        [FromQuery(Name = "size")] int pageSize = 20,
-        [FromQuery(Name = "from")] DateTime? from = null,
-        [FromQuery(Name = "to")] DateTime? to = null,
-        [FromQuery(Name = "type")] TransactionType? type = null,
-        [FromQuery(Name = "sort")] SortOrder sort = SortOrder.Descending)
+        [FromQuery] TransactionsPageQuery query)
     {
         if (!Guid.TryParse(id, out Guid bankAccountId))
         {
@@ -76,13 +72,7 @@ public class BankAccountsController(
             var result = await _listTransactionsForBankAccountHandler.HandleAsync(new ListTransactionsForBankAccountQuery(
                 CustomerId: customerId,
                 BankAccountId: bankAccountId,
-                StartPeriodUtc: from,
-                EndPeriodUdc: to,
-                Type: type,
-                Page: page,
-                PageSize: pageSize,
-                SortOrder: sort
-                ));
+                TransactionsPageQuery: query));
 
             var transactionItems = result.QueryResult.Items.Select(transaction => new CustomerTransactionsListItemDto(
                 TransactionId: transaction.Id,
@@ -100,6 +90,7 @@ public class BankAccountsController(
                 Items: transactionItems));
         }
         catch (Exception ex) {
+            _logger.LogError(new EventId(), ex.Message);
             if (ex is NotFoundException)
             {
                 return NotFound(ex.Message);
@@ -109,9 +100,8 @@ public class BankAccountsController(
             {
                 return BadRequest(ex.Message);
             }
+            return BadRequest();
         }
-
-        return BadRequest();
     }
 
     // POST /api/bank-accounts/{bankAccountId}/deposits
@@ -183,7 +173,6 @@ public class BankAccountsController(
 
     // POST /api/bank-accounts/{bankAccountId}/withdrawals
     [HttpPost("{id}/withdrawals")]
-    [HttpPost("{id}/deposits")]
     [Produces("application/json")]
     [ProducesResponseType<PostWithdrawalRequestDto>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

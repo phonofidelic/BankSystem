@@ -1,16 +1,12 @@
-﻿using BankRUs.Domain.Entities;
+﻿using BankRUs.Application.Services.PaginationService;
+using BankRUs.Application.Services.TransactionService;
 
 namespace BankRUs.Application.UseCases.ListTransactionsForBankAccount;
 
 public record ListTransactionsForBankAccountQuery(
     Guid CustomerId,
-    // TransactionsPageQuery
     Guid BankAccountId,
-    DateTime? StartPeriodUtc = null,
-    DateTime? EndPeriodUdc = null,
-    TransactionType? Type = null,
-    // BasePageQuery
-    int Page = 1,
-    int PageSize = 20,
-    SortOrder? SortOrder = SortOrder.Descending
-    );
+    TransactionsPageQuery TransactionsPageQuery) : BasePageQuery(
+        Page: TransactionsPageQuery.Page, 
+        Size: TransactionsPageQuery.Size, 
+        Order: TransactionsPageQuery.Order);
