@@ -28,19 +28,9 @@ public class ListTransactionsForBankAccountHandler(
         Guard.Against.BankAccountNotOwned(bankAccountOwnerId, query.CustomerId);
         var bankAccount = await _bankAccountRepository.GetBankAccountAsync(query.BankAccountId);
 
-        var transactionsQuery = new TransactionsPageQuery(
-            Search: null,
-            BankAccountId: query.BankAccountId,
-            StartPeriodUtc: query.StartPeriodUtc,
-            EndPeriodUtc: query.EndPeriodUdc,
-            Type: query.Type,
-            Page: query.Page,
-            PageSize: query.PageSize,
-            SortOrder: query.SortOrder ?? SortOrder.Descending);
+        var queryResult = await _transactionService.GetTransactionsAsync(query.TransactionsPageQuery);
 
-        var queryResult = await _transactionService.GetTransactionsAsync(transactionsQuery);
-
-        var paginationResult = await _paginationService.GetPagedResultAsync(transactionsQuery, queryResult);
+        var paginationResult = await _paginationService.GetPagedResultAsync(query.TransactionsPageQuery, queryResult);
 
         return new ListTransactionsForBankAccountResult(
             BankAccountId: bankAccount.Id,

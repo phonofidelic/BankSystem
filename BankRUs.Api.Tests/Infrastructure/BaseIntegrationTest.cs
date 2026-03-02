@@ -54,7 +54,7 @@ public abstract class BaseIntegrationTest(ApiFactory factory) : IClassFixture<Ap
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.NotNull(content);
         Assert.Equal(paging.Page, content.Paging.Page);
-        Assert.Equal(paging.Size, content.Paging.PageSize);
-        Assert.Equal(paging.SortOrder.ToString(), content.Paging.Sort, ignoreCase: true);
+        Assert.Equal(paging.Size, content.Paging.Size);
+        Assert.Equal(paging.Order.ToString(), content.Paging.Order, ignoreCase: true);
     }
 }

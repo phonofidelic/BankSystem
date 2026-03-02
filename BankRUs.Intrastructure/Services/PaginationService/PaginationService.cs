@@ -9,12 +9,12 @@ public class PaginationService : IPaginationService
     private const int MAX_PAGE_SIZE = 50;
     public async Task<BasePagedResult<T>> GetPagedResultAsync<T>(BasePageQuery query, IQueryable<T> items)
     {
-        int pageSize = query.Size < MAX_PAGE_SIZE ? query.Size : MAX_PAGE_SIZE;
+        int pageSize = query.Size < MAX_PAGE_SIZE && query.Size > 0  ? query.Size : MAX_PAGE_SIZE;
         var totalItems = items.Count();
         var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
 
         var result = items
-            .Skip(query.Skip).Take(query.Size)
+            .Skip(query.Skip).Take(pageSize)
             ;
 
         return new BasePagedResult<T>
@@ -22,10 +22,10 @@ public class PaginationService : IPaginationService
             Items: await result.ToListAsync(),
             Paging: new PagedResultMetadata(
                 Page: query.Page,
-                PageSize: pageSize,
+                Size: pageSize,
                 TotalCount: totalItems,
                 TotalPages: totalPages,
-                Sort: query.SortOrder.ToString().ToLower())
+                Order: query.Order.ToString().ToLower())
         );
     }
 }

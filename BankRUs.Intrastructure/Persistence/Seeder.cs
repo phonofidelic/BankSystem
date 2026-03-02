@@ -2,7 +2,6 @@ using BankRUs.Application;
 using BankRUs.Application.Configuration;
 using BankRUs.Application.Services.CurrencyService;
 using BankRUs.Application.Services.Identity;
-using BankRUs.Application.UseCases.OpenCustomerAccount;
 using BankRUs.Domain.Entities;
 using BankRUs.Domain.ValueObjects;
 using Bogus;
@@ -72,7 +71,7 @@ public static class Seeder
         await context.BankAccounts.AddAsync(defaultBankAccount);
         await context.Customers.AddAsync(testCustomerAccount);
 
-        await GenerateTransactionsForBankAccount(defaultBankAccount, seed, serviceProvider);
+        await GenerateTransactionsForBankAccount(defaultBankAccount, seed, serviceProvider, count: 100);
         
         return testCustomerAccount;
     }
@@ -138,7 +137,7 @@ public static class Seeder
         }
     }
 
-    private static async Task GenerateTransactionsForBankAccount(BankAccount bankAccount, int seed, IServiceProvider serviceProvider)
+    private static async Task GenerateTransactionsForBankAccount(BankAccount bankAccount, int seed, IServiceProvider serviceProvider, int? count = null)
     {
         var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
         var appSettings = serviceProvider.GetRequiredService<IOptions<AppSettings>>().Value;
@@ -171,7 +170,17 @@ public static class Seeder
                 return transactionDate;
              });
 
-        var transactions = transaction.GenerateBetween(MIN_TRANSACTIONS, MAX_TRANSACTIONS);
+
+        List<Transaction> transactions;
+        
+        if (count != null)
+        {
+            Console.WriteLine("### count: {0}", count);
+            transactions = transaction.Generate(count: (int)count);
+        } else
+        {
+            transactions = transaction.GenerateBetween(MIN_TRANSACTIONS, MAX_TRANSACTIONS);
+        }
 
         foreach (var t in transactions)
         {

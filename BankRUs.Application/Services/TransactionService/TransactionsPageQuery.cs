@@ -6,9 +6,9 @@ namespace BankRUs.Application.Services.TransactionService;
 public record TransactionsPageQuery(
     string? Search,
     Guid? BankAccountId,
-    DateTime? StartPeriodUtc,
-    DateTime? EndPeriodUtc,
+    DateTime? Start,
+    DateTime? End,
     TransactionType? Type,
-    int Page = 1,
-    int PageSize = 50,
-    SortOrder SortOrder = SortOrder.Descending) : BasePageQuery(Page, PageSize, SortOrder);
+    int Page,
+    int Size,
+    SortOrder Order) : BasePageQuery(Page, Size, Order: Order);

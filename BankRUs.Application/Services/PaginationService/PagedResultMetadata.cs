@@ -2,7 +2,7 @@
 
 public record PagedResultMetadata(
     int Page,
-    int PageSize,
+    int Size,
     int TotalPages,
     int TotalCount,
-    string? Sort);
+    string? Order);

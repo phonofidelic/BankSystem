@@ -37,7 +37,7 @@ public class TransactionsIntegrationTests(ApiFactory factory) : BaseIntegrationT
         await LoginClient(_defaultAdmin.Email, _defaultAdmin.Password);
 
         // When
-        string paging = "?page=2&size=15&sortOrder=ascending";
+        string paging = "?page=2&size=15&order=ascending";
 
         // Then
         await Paging_ShouldReflectPagingQuery<GetTransactionsResponseDto>($"/api/transactions{paging}");

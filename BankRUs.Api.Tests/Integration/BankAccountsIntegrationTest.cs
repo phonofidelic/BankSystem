@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 using BankRUs.Api.Dtos.BankAccounts;
 using BankRUs.Api.Tests.Infrastructure;
 
@@ -88,7 +89,21 @@ public class BankAccountsIntegrationTest(ApiFactory factory) : BaseIntegrationTe
     {
         // Given
         await LoginClient(_testCustomerCredentials.Email, _testCustomerCredentials.Password);
+        // When
+        var response = await _client.GetAsync($"/api/bank-accounts/{_testCustomerBankAccountId}/transactions");
 
+        // Then
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var content = await response.Content.ReadFromJsonAsync<GetTransactionsForBankAccountResponseDto>();
+        Assert.NotNull(content);
+        Assert.InRange(content.Items.Count, 0, 50);
+    }
+
+    [Fact]
+    public async Task GetTransactionsForBankAccount_WhenPagingQueryProvided_ShouldReflectPagingQuery()
+    {
+        // Given
+        await LoginClient(_testCustomerCredentials.Email, _testCustomerCredentials.Password);
         // When
         string paging = "?size=5&page=2&order=ascending";
 
