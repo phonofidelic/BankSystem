@@ -121,13 +121,17 @@ SQL_CONNECTION_STRING="Server=tcp:${SQL_SERVER_NAME}.database.windows.net,1433;D
 
 # ── Key Vault ──────────────────────────────────────────────────────────────────
 echo ""
-echo "▶ Creating Key Vault..."
-az keyvault create \
-  --resource-group "$RESOURCE_GROUP" \
-  --name "$KEY_VAULT_NAME" \
-  --location "$LOCATION" \
-  --enable-rbac-authorization true \
-  --output none
+if az keyvault show --name "$KEY_VAULT_NAME" --resource-group "$RESOURCE_GROUP" --output none 2>/dev/null; then
+  echo "▶ Key Vault already exists, skipping creation."
+else
+  echo "▶ Creating Key Vault..."
+  az keyvault create \
+    --resource-group "$RESOURCE_GROUP" \
+    --name "$KEY_VAULT_NAME" \
+    --location "$LOCATION" \
+    --enable-rbac-authorization true \
+    --output none
+fi
 
 KEY_VAULT_URI=$(az keyvault show --name "$KEY_VAULT_NAME" --query properties.vaultUri -o tsv)
 
