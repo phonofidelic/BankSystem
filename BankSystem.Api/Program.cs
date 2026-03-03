@@ -158,15 +158,14 @@ builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
 
-// Apply any pending migrations
-using var scope = app.Services.CreateScope();
-var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-await dbContext.Database.MigrateAsync();
-
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
+
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await dbContext.Database.MigrateAsync();
 
     await IdentitySeeder.SeedAsync(scope.ServiceProvider);
     await CurrencySeeder.SeedAsync(scope.ServiceProvider);
