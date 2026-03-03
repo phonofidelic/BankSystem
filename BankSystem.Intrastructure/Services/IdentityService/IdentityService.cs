@@ -1,0 +1,65 @@
+﻿using BankSystem.Application.Services.Identity;
+using BankSystem.Application.Exceptions;
+using BankSystem.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Identity;
+
+namespace BankSystem.Infrastructure.Services.Identity;
+
+public class IdentityService : IIdentityService
+{
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ApplicationDbContext _context;
+
+    public IdentityService(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+    {
+        _userManager = userManager;
+        _context = context;
+    }
+
+    public async Task AssignCustomerServiceRepresentativeRoleToUser(Guid applicationUserId)
+    {
+        var user = await _userManager.FindByIdAsync(applicationUserId.ToString()) ?? throw new ApplicationUserNotFoundException();
+        await _userManager.AddToRoleAsync(user, Roles.CustomerServiceRepresentative);
+    }
+
+    public async Task<CreateApplicationUserResult> CreateApplicationUserAsync(CreateApplicationUserRequest request)
+    {
+        var user = new ApplicationUser
+        {
+            UserName = request.Email.Trim(),
+            FirstName = request.FirstName.Trim(),
+            LastName = request.LastName.Trim(),
+            Email = request.Email.Trim()
+        };
+
+        string password = request.Password.Trim();
+
+        var result = await _userManager.CreateAsync(user, password);
+
+        if (!result.Succeeded)
+        {
+            var error = result.Errors.FirstOrDefault();
+            if (error != null)
+                throw new DuplicateCustomerException(error.Description, error.Code);
+            throw new Exception("Unable to create user");
+        }
+
+        await _userManager.AddToRoleAsync(user, Roles.Customer);
+
+
+        return new CreateApplicationUserResult(UserId: Guid.Parse(user.Id));
+    }
+
+    public async Task DeleteApplicationUserAsync(Guid ApplicationUserId)
+    {
+        try
+        {
+            var user = await _userManager.FindByIdAsync(ApplicationUserId.ToString()) ?? throw new ApplicationUserNotFoundException();
+            await _userManager.DeleteAsync(user);
+        }
+        catch
+        {
+            throw;
+        }
+    }
+}

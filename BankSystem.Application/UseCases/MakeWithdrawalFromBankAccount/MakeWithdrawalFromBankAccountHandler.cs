@@ -1,0 +1,87 @@
+﻿using BankSystem.Application.BankAccounts;
+using BankSystem.Application.Exceptions;
+using BankSystem.Application.GuardClause;
+using BankSystem.Application.Guards;
+using BankSystem.Application.Services.AuditLog;
+using BankSystem.Application.Services.CurrencyService;
+using BankSystem.Application.Services.TransactionService;
+using BankSystem.Domain.Entities;
+
+namespace BankSystem.Application.UseCases.MakeWithdrawalFromBankAccount;
+
+public class MakeWithdrawalFromBankAccountHandler(
+    IUnitOfWork unitOfWork,
+    IBankAccountsRepository bankAccountsRepository,
+    ICurrencyService currencyService,
+    ITransactionService transactionService,
+    IAuditLogger auditLogger) : IHandler<MakeWithdrawalFromBankAccountCommand, MakeWithdrawalFromBankAccountResult>
+{
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly IBankAccountsRepository _bankAccountRepository = bankAccountsRepository;
+    private readonly ICurrencyService _currencyService = currencyService;
+    private readonly ITransactionService _transactionService = transactionService;
+
+    public async Task<MakeWithdrawalFromBankAccountResult> HandleAsync(MakeWithdrawalFromBankAccountCommand command)
+    {
+        // A withdrawal can be made from a Bank Account if...
+
+        // 1) The Bank Account exists
+        bool bankAccountExists = _bankAccountRepository.BankAccountExists(command.BankAccountId);
+        if (!bankAccountExists) throw new BankAccountNotFoundException();
+
+        // 2) The Customer owns the Bank Account
+        var bankAccountOwnerId = await _bankAccountRepository.GetCustomerAccountIdForBankAccountAsync(command.BankAccountId);
+        Guard.Against.BankAccountNotOwned(bankAccountOwnerId, command.CustomerId);
+
+        // 3) The Deposit Amount is a positive decimal
+        decimal sanitizedAmount = command.Amount;
+        sanitizedAmount = Guard.Ensure.RoundToNearestHundredth(sanitizedAmount, auditLogger);
+        sanitizedAmount = Guard.Against.NegativeAmount(sanitizedAmount);
+        sanitizedAmount = Guard.Against.ZeroAmount(sanitizedAmount);
+
+        // 4) The Deposit Reference message has no more than 140 characters
+        string? sanitizedReference = command.Reference;
+        sanitizedReference = Guard.Against.MaxReferenceLength(sanitizedReference);
+
+        // 5) The Bank Account supports the provided Currency
+        var parsedCurrency = _currencyService.ParseIsoSymbol(command.Currency);
+        var bankAccountCurrency = await _bankAccountRepository.GetBankAccountCurrencyAsync(command.BankAccountId);
+        var sanitizedCurrency = Guard.Against.BankAccountUnsupportedCurrency(parsedCurrency, bankAccountCurrency);
+
+        // 6) The current balance covers the withdrawal amount
+        var currentBankAccountBalance = await _bankAccountRepository.GetBankAccountBalanceAsync(command.BankAccountId);
+        Guard.Against.BankAccountOverdraft(currentBankAccountBalance, command.Amount);
+
+        // Get the result from the Transaction service
+        var createTransactionResult = await _transactionService.CreateTransactionAsync(new CreateTransactionRequest(
+            CustomerId: command.CustomerId,
+            BankAccountId: command.BankAccountId,
+            Type: TransactionType.Withdrawal,
+            Amount: sanitizedAmount,
+            Currency: sanitizedCurrency,
+            Reference: sanitizedReference));
+
+        // Get the Transaction instance
+        var createdTransaction = createTransactionResult.Transaction;
+
+        var bankAccount = await _bankAccountRepository.GetBankAccountAsync(command.BankAccountId);
+        
+        // Transaction functionality is implemented in BankAccount and Transaction entities
+        bankAccount.AddTransaction(createdTransaction);
+
+        // Complete unit of work
+        await _unitOfWork.SaveAsync();
+
+        return createTransactionResult == null
+            ? throw new Exception("Withdrawal transaction could not be made")
+            : new MakeWithdrawalFromBankAccountResult(
+                TransactionId: createTransactionResult.Transaction.Id,
+                CustomerId: createTransactionResult.Transaction.CustomerId,
+                Type: createTransactionResult.Transaction.Type,
+                Amount: createTransactionResult.Transaction.Amount,
+                BalanceAfter: createdTransaction.BalanceAfter,
+                Currency: createTransactionResult.Transaction.Currency.ToString(),
+                Reference: createTransactionResult.Transaction.Reference,
+                CreatedAt: createTransactionResult.Transaction.CreatedAt);
+    }
+}

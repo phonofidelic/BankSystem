@@ -1,0 +1,31 @@
+﻿using BankSystem.Application.Services.PaginationService;
+using Microsoft.EntityFrameworkCore;
+
+namespace BankSystem.Infrastructure.Services.PaginationService;
+
+
+public class PaginationService : IPaginationService 
+{
+    private const int MAX_PAGE_SIZE = 50;
+    public async Task<BasePagedResult<T>> GetPagedResultAsync<T>(BasePageQuery query, IQueryable<T> items)
+    {
+        int pageSize = query.Size < MAX_PAGE_SIZE && query.Size > 0  ? query.Size : MAX_PAGE_SIZE;
+        var totalItems = items.Count();
+        var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+        var result = items
+            .Skip(query.Skip).Take(pageSize)
+            ;
+
+        return new BasePagedResult<T>
+        (
+            Items: await result.ToListAsync(),
+            Paging: new PagedResultMetadata(
+                Page: query.Page,
+                Size: pageSize,
+                TotalCount: totalItems,
+                TotalPages: totalPages,
+                Order: query.Order.ToString().ToLower())
+        );
+    }
+}
