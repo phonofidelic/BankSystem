@@ -1,4 +1,4 @@
 #!/bin/bash
-cd ./BankRUs.Api
+cd ./BankSystem.Api
 
 ./dev.sh

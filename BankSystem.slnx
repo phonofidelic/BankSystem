@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="BankSystem.Api.Tests/BankSystem.Api.Tests.csproj" Id="3c22d97c-165a-48fa-8745-ad88409cef99" />
+  <Project Path="BankSystem.Api/BankSystem.Api.csproj" />
+  <Project Path="BankSystem.Application.Tests/BankSystem.Application.Tests.csproj" />
+  <Project Path="BankSystem.Application/BankSystem.Application.csproj" Id="cef4d8ae-4b7d-4e92-a8e4-0cb365c7d3f2" />
+  <Project Path="BankSystem.Domain/BankSystem.Domain.csproj" Id="a49360e8-7c0e-4927-9a53-69f158889059" />
+  <Project Path="BankSystem.Intrastructure/BankSystem.Infrastructure.csproj" Id="b130ab18-2217-4a41-90c9-70d7abf2b1ce" />
+</Solution>
