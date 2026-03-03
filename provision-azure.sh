@@ -35,6 +35,8 @@ CONTAINER_ENV_NAME="banksystem-env"
 CONTAINER_APP_NAME="banksystem-api"
 IMAGE_NAME="banksystem-api"
 IMAGE_TAG="latest"
+JWT_ISSUER="banksystem-api"                  # Set to your domain/URL in production
+JWT_AUDIENCE="banksystem-client"             # Set to your client identifier in production
 
 # ── Prompt for secrets (never hard-coded) ─────────────────────────────────────
 echo ""
@@ -181,6 +183,13 @@ az role assignment create \
   --scope "$ACR_RESOURCE_ID" \
   --output none
 
+# Wait for RBAC role assignments to propagate before creating the Container App.
+# Without this, the managed identity may not yet have Key Vault access when the
+# app first starts, causing secret resolution to fail and crash-looping on startup.
+echo ""
+echo "▶ Waiting for RBAC role assignments to propagate (90s)..."
+sleep 90
+
 # ── Container Apps Environment ─────────────────────────────────────────────────
 echo ""
 echo "▶ Creating Container Apps environment..."
@@ -216,6 +225,8 @@ az containerapp create \
   --env-vars \
     "ASPNETCORE_ENVIRONMENT=Production" \
     "ConnectionStrings__Default=secretref:connectionstring" \
+    "JwtOptions__Issuer=$JWT_ISSUER" \
+    "JwtOptions__Audience=$JWT_AUDIENCE" \
     "JwtOptions__Secret=secretref:jwt-secret" \
     "DefaultAdmin__Username=secretref:admin-username" \
     "DefaultAdmin__Password=secretref:admin-password" \
