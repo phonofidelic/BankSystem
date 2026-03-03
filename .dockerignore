@@ -1,0 +1,54 @@
+# Git
+.git
+.gitignore
+.gitattributes
+.github
+
+# Build artifacts
+**/bin/
+**/obj/
+
+# Test projects
+BankSystem.Api.Tests/
+BankSystem.Application.Tests/
+
+# IDE and editor files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.userprefs
+
+# Solution files
+*.sln
+*.slnx
+
+# Scripts
+dev.sh
+provision-azure.sh
+
+# Documentation
+*.md
+
+# NuGet
+**/packages/
+*.nupkg
+*.snupkg
+
+# Test results and coverage
+**/TestResults/
+coverage*.json
+coverage*.xml
+coverage*.info
+*.coverage
+*.coveragexml
+
+# Logs
+**/*.log
+*.binlog
+
+# Secrets and environment overrides
+*.env
+.env*
+**/appsettings.Development.json
+**/appsettings.Local.json
